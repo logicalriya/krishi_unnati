@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/home_page.dart';
 
-
-
+import 'screens/login_page.dart';
 
 void main() {
   runApp(const CropHealthApp());
@@ -15,7 +13,8 @@ class CropHealthApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Crop Health',
+      title: 'Krishi Unnati',
+
       theme: ThemeData(
         useMaterial3: true,
         fontFamily: 'Roboto',
@@ -24,7 +23,9 @@ class CropHealthApp extends StatelessWidget {
           seedColor: const Color(0xFF20A963),
         ),
       ),
-      home: const HomePage(),
+
+      // Common starting page
+      home: const LoginPage(),
     );
   }
 }
