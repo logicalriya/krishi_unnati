@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'admin_dashboard.dart';
 import 'crop_health_page.dart';
 import 'soil_health_page.dart';
+import 'pest_alert_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -13,15 +14,105 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedBottomIndex = 0;
+  String selectedLanguage = 'English';
 
   // ----------------------------------------------------------
   // NAVIGATION
   // ----------------------------------------------------------
+void _showLanguageSelector() {
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(
+        top: Radius.circular(22),
+      ),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Select Language',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF195B37),
+              ),
+            ),
+
+            const SizedBox(height: 15),
+
+            _languageOption(
+              'English',
+              'English',
+            ),
+
+            _languageOption(
+              'বাংলা',
+              'Bengali',
+            ),
+
+            _languageOption(
+              'मराठी',
+              'Marathi',
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+Widget _languageOption(String displayName, String languageName) {
+  final bool isSelected = selectedLanguage == languageName;
+
+  return ListTile(
+    contentPadding: EdgeInsets.zero,
+    leading: Icon(
+      isSelected
+          ? Icons.radio_button_checked
+          : Icons.radio_button_off,
+      color: const Color(0xFF0BA951),
+    ),
+    title: Text(
+      displayName,
+      style: TextStyle(
+        fontSize: 15,
+        fontWeight: isSelected
+            ? FontWeight.w800
+            : FontWeight.w600,
+        color: const Color(0xFF303030),
+      ),
+    ),
+    onTap: () {
+      setState(() {
+        selectedLanguage = languageName;
+      });
+
+      Navigator.pop(context);
+    },
+  );
+}
 
   void openCropHealth() {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const CropHealthPage()),
+      MaterialPageRoute(
+        builder: (context) => const CropHealthPage(),
+      ),
+    );
+  }
+
+  void openPestAlert() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PestAlertPage(),
+      ),
     );
   }
 
@@ -41,7 +132,6 @@ class _HomePageState extends State<HomePage> {
   void onBottomNavigation(int index) {
     setState(() {
       selectedBottomIndex = index;
-      
     });
 
     switch (index) {
@@ -86,35 +176,47 @@ class _HomePageState extends State<HomePage> {
               // =================================================
               // STATUS BAR
               // =================================================
+
               _buildStatusBar(),
 
               // =================================================
               // FARMER PROFILE
               // =================================================
+
               _buildFarmerProfile(),
 
               // =================================================
               // CHECK MY CROP
               // =================================================
-              _buildSectionTitle(icon: Icons.crop_free, title: 'CHECK MY CROP'),
+
+              _buildSectionTitle(
+                icon: Icons.crop_free,
+                title: 'CHECK MY CROP',
+              ),
 
               _buildSecureFieldCheck(),
 
               // =================================================
               // CROP TOOLS
               // =================================================
+
               _buildCropTools(),
 
               // =================================================
               // GET HELP
               // =================================================
-              _buildSectionTitle(icon: Icons.help_outline, title: 'GET HELP'),
+
+              _buildSectionTitle(
+                icon: Icons.help_outline,
+                title: 'GET HELP',
+              ),
 
               _buildHelpTools(),
 
               // =================================================
               // LOCAL & OFFLINE
               // =================================================
+
               _buildSectionTitle(
                 icon: Icons.location_on_outlined,
                 title: 'LOCAL & OFFLINE',
@@ -125,6 +227,7 @@ class _HomePageState extends State<HomePage> {
               // =================================================
               // TODAY'S ALERTS
               // =================================================
+
               _buildAlerts(),
 
               const SizedBox(height: 25),
@@ -136,6 +239,7 @@ class _HomePageState extends State<HomePage> {
       // =========================================================
       // BOTTOM NAVIGATION
       // =========================================================
+
       bottomNavigationBar: _buildBottomNavigation(),
     );
   }
@@ -183,7 +287,9 @@ class _HomePageState extends State<HomePage> {
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFF1D5737)),
+                  border: Border.all(
+                    color: const Color(0xFF1D5737),
+                  ),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: const Row(
@@ -227,35 +333,58 @@ class _HomePageState extends State<HomePage> {
   Widget _buildStatusBar() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 8,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFF5FFF9),
-        border: Border(bottom: BorderSide(color: Color(0xFFD9EFE1))),
+        border: Border(
+          bottom: BorderSide(
+            color: Color(0xFFD9EFE1),
+          ),
+        ),
       ),
       child: Row(
         children: [
-          _statusBadge(icon: Icons.cloud_off, text: 'OFFLINE / 2G SYNC'),
-
+          _statusBadge(
+            icon: Icons.cloud_off,
+            text: 'OFFLINE / 2G SYNC',
+          ),
           const SizedBox(width: 8),
-
-          _statusBadge(icon: Icons.shield_outlined, text: 'SECURE DATA'),
+          _statusBadge(
+            icon: Icons.shield_outlined,
+            text: 'SECURE DATA',
+          ),
         ],
       ),
     );
   }
 
-  Widget _statusBadge({required IconData icon, required String text}) {
+  Widget _statusBadge({
+    required IconData icon,
+    required String text,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 5,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFE6F9EC),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: const Color(0xFFB8EACB)),
+        border: Border.all(
+          color: const Color(0xFFB8EACB),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: const Color(0xFF158B49)),
+          Icon(
+            icon,
+            size: 12,
+            color: const Color(0xFF158B49),
+          ),
           const SizedBox(width: 5),
           Text(
             text,
@@ -299,7 +428,10 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: const Color(0xFFE5F7EB),
-                border: Border.all(color: const Color(0xFFCAEBD7), width: 2),
+                border: Border.all(
+                  color: const Color(0xFFCAEBD7),
+                  width: 2,
+                ),
               ),
               child: const Icon(
                 Icons.agriculture,
@@ -336,7 +468,11 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
 
-            const Icon(Icons.chevron_right, color: Color(0xFF00A651), size: 28),
+            const Icon(
+              Icons.chevron_right,
+              color: Color(0xFF00A651),
+              size: 28,
+            ),
           ],
         ),
       ),
@@ -345,11 +481,16 @@ class _HomePageState extends State<HomePage> {
 
   Widget _profileBadge(String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 3,
+      ),
       decoration: BoxDecoration(
         color: const Color(0xFFF0FFF5),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFBCE8CA)),
+        border: Border.all(
+          color: const Color(0xFFBCE8CA),
+        ),
       ),
       child: Text(
         text,
@@ -366,7 +507,10 @@ class _HomePageState extends State<HomePage> {
   // SECTION TITLE
   // ============================================================
 
-  Widget _buildSectionTitle({required IconData icon, required String title}) {
+  Widget _buildSectionTitle({
+    required IconData icon,
+    required String title,
+  }) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
       child: Row(
@@ -378,7 +522,11 @@ class _HomePageState extends State<HomePage> {
               color: Color(0xFFDDF8E8),
               shape: BoxShape.circle,
             ),
-            child: Icon(icon, size: 18, color: const Color(0xFF0AA552)),
+            child: Icon(
+              icon,
+              size: 18,
+              color: const Color(0xFF0AA552),
+            ),
           ),
 
           const SizedBox(width: 9),
@@ -408,9 +556,14 @@ class _HomePageState extends State<HomePage> {
         decoration: BoxDecoration(
           color: const Color(0xFFFFFCEB),
           borderRadius: BorderRadius.circular(17),
-          border: Border.all(color: const Color(0xFFF5E8A2)),
+          border: Border.all(
+            color: const Color(0xFFF5E8A2),
+          ),
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(.04), blurRadius: 6),
+            BoxShadow(
+              color: Colors.black.withOpacity(.04),
+              blurRadius: 6,
+            ),
           ],
         ),
         child: Column(
@@ -444,7 +597,9 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFECCB50)),
+                    border: Border.all(
+                      color: const Color(0xFFECCB50),
+                    ),
                   ),
                   child: const Text(
                     'OFFICIAL SECURITY BADGE',
@@ -465,16 +620,23 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: Container(
                     height: 47,
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(13),
-                      border: Border.all(color: const Color(0xFFF0D75A)),
+                      border: Border.all(
+                        color: const Color(0xFFF0D75A),
+                      ),
                     ),
                     alignment: Alignment.centerLeft,
                     child: const Text(
                       'Enter Field ID or Name...',
-                      style: TextStyle(fontSize: 14, color: Color(0xFF858585)),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF858585),
+                      ),
                     ),
                   ),
                 ),
@@ -507,92 +669,90 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildCropTools() {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
-    child: Column(
-      children: [
-        // ---------------------------------------------------------
-        // ROW 1
-        // ---------------------------------------------------------
-        Row(
-          children: [
-            Expanded(
-              child: _featureCard(
-                icon: Icons.camera_alt_outlined,
-                title: 'IMAGE PEST\nDETECTION',
-                subtitle: 'SCAN FROM PHOTO',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CropHealthPage(),
-                    ),
-                  );
-                },
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+      child: Column(
+        children: [
+          // ROW 1
+          Row(
+            children: [
+              Expanded(
+                child: _featureCard(
+                  icon: Icons.camera_alt_outlined,
+                  title: 'IMAGE PEST\nDETECTION',
+                  subtitle: 'SCAN FROM PHOTO',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CropHealthPage(),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
 
-            const SizedBox(width: 11),
+              const SizedBox(width: 11),
 
-            Expanded(
-              child: _featureCard(
-                icon: Icons.bug_report_outlined,
-                title: 'CROP DISEASE\nDETECTION',
-                subtitle: 'CHECK LEAVES',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const CropHealthPage(),
-                    ),
-                  );
-                },
+              Expanded(
+                child: _featureCard(
+                  icon: Icons.bug_report_outlined,
+                  title: 'CROP DISEASE\nDETECTION',
+                  subtitle: 'CHECK LEAVES',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CropHealthPage(),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
+            ],
+          ),
 
-        const SizedBox(height: 11),
+          const SizedBox(height: 11),
 
-        // ---------------------------------------------------------
-        // ROW 2
-        // ---------------------------------------------------------
-        Row(
-          children: [
-            Expanded(
-              child: _featureCard(
-                icon: Icons.videocam_outlined,
-                title: 'LIVE CAMERA PEST',
-                subtitle: 'REAL-TIME SCAN',
-                onTap: () {
-                  showComingSoon('Live Camera Pest Detection');
-                },
+          // ROW 2
+          Row(
+            children: [
+              Expanded(
+                child: _featureCard(
+                  icon: Icons.videocam_outlined,
+                  title: 'LIVE CAMERA PEST',
+                  subtitle: 'REAL-TIME SCAN',
+                  onTap: () {
+                    showComingSoon(
+                      'Live Camera Pest Detection',
+                    );
+                  },
+                ),
               ),
-            ),
 
-            const SizedBox(width: 11),
+              const SizedBox(width: 11),
 
-            Expanded(
-              child: _featureCard(
-                icon: Icons.biotech_outlined,
-                title: 'SOIL HEALTH\nANALYSIS',
-                subtitle: 'TEST SOIL',
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SoilHealthPage(),
-                    ),
-                  );
-                },
+              Expanded(
+                child: _featureCard(
+                  icon: Icons.biotech_outlined,
+                  title: 'SOIL HEALTH\nANALYSIS',
+                  subtitle: 'TEST SOIL',
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const SoilHealthPage(),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  );
-}
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 
   // ============================================================
   // FEATURE CARD
@@ -611,7 +771,10 @@ class _HomePageState extends State<HomePage> {
         onTap: onTap,
         child: Container(
           height: 159,
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 14),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 14,
+          ),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(17),
@@ -633,7 +796,11 @@ class _HomePageState extends State<HomePage> {
                   color: Color(0xFFF0FBF4),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 30, color: const Color(0xFF222222)),
+                child: Icon(
+                  icon,
+                  size: 30,
+                  color: const Color(0xFF222222),
+                ),
               ),
 
               const SizedBox(height: 12),
@@ -803,7 +970,9 @@ class _HomePageState extends State<HomePage> {
         child: Container(
           height: 158,
           decoration: BoxDecoration(
-            color: green ? const Color(0xFF12A650) : Colors.white,
+            color: green
+                ? const Color(0xFF12A650)
+                : Colors.white,
             borderRadius: BorderRadius.circular(17),
             boxShadow: [
               BoxShadow(
@@ -828,7 +997,9 @@ class _HomePageState extends State<HomePage> {
                 child: Icon(
                   icon,
                   size: 30,
-                  color: green ? Colors.white : const Color(0xFF202020),
+                  color: green
+                      ? Colors.white
+                      : const Color(0xFF202020),
                 ),
               ),
 
@@ -841,7 +1012,9 @@ class _HomePageState extends State<HomePage> {
                   fontSize: 13,
                   fontWeight: FontWeight.w800,
                   height: 1.15,
-                  color: green ? Colors.white : const Color(0xFF252934),
+                  color: green
+                      ? Colors.white
+                      : const Color(0xFF252934),
                 ),
               ),
 
@@ -865,41 +1038,46 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
-  // LOCAL & OFFLINE
-  // ============================================================
+// LOCAL & OFFLINE
+// ============================================================
 
-  Widget _buildLocalTools() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      child: Row(
-        children: [
-          Expanded(
-            child: _featureCard(
-              icon: Icons.map_outlined,
-              title: 'PEST MAP',
-              subtitle: 'DISEASE AREAS',
-              onTap: () {
-                showComingSoon('Pest Map');
-              },
-            ),
+Widget _buildLocalTools() {
+  return Padding(
+    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+    child: Row(
+      children: [
+        Expanded(
+          child: _featureCard(
+            icon: Icons.map_outlined,
+            title: 'PEST MAP',
+            subtitle: 'DISEASE AREAS',
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const PestAlertPage(),
+                ),
+              );
+            },
           ),
+        ),
 
-          const SizedBox(width: 11),
+        const SizedBox(width: 11),
 
-          Expanded(
-            child: _featureCard(
-              icon: Icons.inventory_2_outlined,
-              title: 'NEARBY MARKET',
-              subtitle: 'GET WHAT YOU NEED',
-              onTap: () {
-                showComingSoon('Nearby Market');
-              },
-            ),
+        Expanded(
+          child: _featureCard(
+            icon: Icons.inventory_2_outlined,
+            title: 'NEARBY MARKET',
+            subtitle: 'GET WHAT YOU NEED',
+            onTap: () {
+              showComingSoon('Nearby Market');
+            },
           ),
-        ],
-      ),
-    );
-  }
+        ),
+      ],
+    ),
+  );
+}
 
   // ============================================================
   // TODAY'S ALERTS
@@ -914,7 +1092,11 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
-                const Icon(Icons.grass, size: 18, color: Color(0xFF11934B)),
+                const Icon(
+                  Icons.grass,
+                  size: 18,
+                  color: Color(0xFF11934B),
+                ),
 
                 const SizedBox(width: 7),
 
@@ -930,9 +1112,7 @@ class _HomePageState extends State<HomePage> {
                 ),
 
                 GestureDetector(
-                  onTap: () {
-                    showComingSoon('All Alerts');
-                  },
+                  onTap: openPestAlert,
                   child: const Text(
                     'See All',
                     style: TextStyle(
@@ -957,17 +1137,26 @@ class _HomePageState extends State<HomePage> {
                 _alertCard(
                   icon: Icons.eco_outlined,
                   title: 'Monsoon Care',
-                  description: 'Check wheat crops for yellow rust after rain.',
+                  description:
+                      'Check wheat crops for yellow rust after rain.',
                   green: true,
                 ),
 
                 const SizedBox(width: 11),
 
-                _alertCard(
-                  icon: Icons.shield_outlined,
-                  title: 'Pest Alert',
-                  description: 'Local pest activity detected nearby.',
-                  green: false,
+                // =================================================
+                // PEST ALERT - CLICKABLE
+                // =================================================
+
+                GestureDetector(
+                  onTap: openPestAlert,
+                  child: _alertCard(
+                    icon: Icons.shield_outlined,
+                    title: 'Pest Alert',
+                    description:
+                        'Local pest activity detected nearby.',
+                    green: false,
+                  ),
                 ),
               ],
             ),
@@ -987,7 +1176,9 @@ class _HomePageState extends State<HomePage> {
       width: 280,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: green ? const Color(0xFF11A650) : const Color(0xFFFFDE63),
+        color: green
+            ? const Color(0xFF11A650)
+            : const Color(0xFFFFDE63),
         borderRadius: BorderRadius.circular(17),
         boxShadow: [
           BoxShadow(
@@ -1010,7 +1201,9 @@ class _HomePageState extends State<HomePage> {
             ),
             child: Icon(
               icon,
-              color: green ? Colors.white : const Color(0xFF654A00),
+              color: green
+                  ? Colors.white
+                  : const Color(0xFF654A00),
               size: 23,
             ),
           ),
@@ -1027,7 +1220,9 @@ class _HomePageState extends State<HomePage> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w800,
-                    color: green ? Colors.white : const Color(0xFF594100),
+                    color: green
+                        ? Colors.white
+                        : const Color(0xFF594100),
                   ),
                 ),
 
@@ -1065,37 +1260,66 @@ class _HomePageState extends State<HomePage> {
       elevation: 10,
       selectedIndex: selectedBottomIndex,
       indicatorColor: Colors.transparent,
-
       onDestinationSelected: onBottomNavigation,
 
       destinations: const [
         NavigationDestination(
-          icon: Icon(Icons.home_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.home, color: Color(0xFF00A650)),
+          icon: Icon(
+            Icons.home_outlined,
+            color: Color(0xFF6C7471),
+          ),
+          selectedIcon: Icon(
+            Icons.home,
+            color: Color(0xFF00A650),
+          ),
           label: 'Home',
         ),
 
         NavigationDestination(
-          icon: Icon(Icons.camera_alt_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.camera_alt, color: Color(0xFF00A650)),
+          icon: Icon(
+            Icons.camera_alt_outlined,
+            color: Color(0xFF6C7471),
+          ),
+          selectedIcon: Icon(
+            Icons.camera_alt,
+            color: Color(0xFF00A650),
+          ),
           label: 'Scan',
         ),
 
         NavigationDestination(
-          icon: Icon(Icons.videocam_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.videocam, color: Color(0xFF00A650)),
+          icon: Icon(
+            Icons.videocam_outlined,
+            color: Color(0xFF6C7471),
+          ),
+          selectedIcon: Icon(
+            Icons.videocam,
+            color: Color(0xFF00A650),
+          ),
           label: 'Live Camera',
         ),
 
         NavigationDestination(
-          icon: Icon(Icons.help_outline, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.help, color: Color(0xFF00A650)),
+          icon: Icon(
+            Icons.help_outline,
+            color: Color(0xFF6C7471),
+          ),
+          selectedIcon: Icon(
+            Icons.help,
+            color: Color(0xFF00A650),
+          ),
           label: 'Advice/Help',
         ),
 
         NavigationDestination(
-          icon: Icon(Icons.location_on_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.location_on, color: Color(0xFF00A650)),
+          icon: Icon(
+            Icons.location_on_outlined,
+            color: Color(0xFF6C7471),
+          ),
+          selectedIcon: Icon(
+            Icons.location_on,
+            color: Color(0xFF00A650),
+          ),
           label: 'Nearby',
         ),
       ],
