@@ -16,87 +16,91 @@ class _HomePageState extends State<HomePage> {
   int selectedBottomIndex = 0;
   String selectedLanguage = 'English';
 
-  // ----------------------------------------------------------
-  // NAVIGATION
-  // ----------------------------------------------------------
-void _showLanguageSelector() {
-  showModalBottomSheet(
-    context: context,
-    backgroundColor: Colors.white,
-    shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(22),
-      ),
-    ),
-    builder: (context) {
-      return Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Select Language',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF195B37),
-              ),
-            ),
+  // ============================================================
+  // LANGUAGE SELECTOR
+  // ============================================================
 
-            const SizedBox(height: 15),
-
-            _languageOption(
-              'English',
-              'English',
-            ),
-
-            _languageOption(
-              'বাংলা',
-              'Bengali',
-            ),
-
-            _languageOption(
-              'मराठी',
-              'Marathi',
-            ),
-          ],
+  void _showLanguageSelector() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(22),
         ),
-      );
-    },
-  );
-}
-
-Widget _languageOption(String displayName, String languageName) {
-  final bool isSelected = selectedLanguage == languageName;
-
-  return ListTile(
-    contentPadding: EdgeInsets.zero,
-    leading: Icon(
-      isSelected
-          ? Icons.radio_button_checked
-          : Icons.radio_button_off,
-      color: const Color(0xFF0BA951),
-    ),
-    title: Text(
-      displayName,
-      style: TextStyle(
-        fontSize: 15,
-        fontWeight: isSelected
-            ? FontWeight.w800
-            : FontWeight.w600,
-        color: const Color(0xFF303030),
       ),
-    ),
-    onTap: () {
-      setState(() {
-        selectedLanguage = languageName;
-      });
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Select Language',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF195B37),
+                ),
+              ),
+              const SizedBox(height: 15),
+              _languageOption(
+                'English',
+                'English',
+              ),
+              _languageOption(
+                'বাংলা',
+                'Bengali',
+              ),
+              _languageOption(
+                'मराठी',
+                'Marathi',
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 
-      Navigator.pop(context);
-    },
-  );
-}
+  Widget _languageOption(
+    String displayName,
+    String languageName,
+  ) {
+    final bool isSelected =
+        selectedLanguage == languageName;
+
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(
+        isSelected
+            ? Icons.radio_button_checked
+            : Icons.radio_button_off,
+        color: const Color(0xFF0BA951),
+      ),
+      title: Text(
+        displayName,
+        style: TextStyle(
+          fontSize: 15,
+          fontWeight:
+              isSelected ? FontWeight.w800 : FontWeight.w600,
+          color: const Color(0xFF303030),
+        ),
+      ),
+      onTap: () {
+        setState(() {
+          selectedLanguage = languageName;
+        });
+
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  // ============================================================
+  // PAGE NAVIGATION
+  // ============================================================
 
   void openCropHealth() {
     Navigator.push(
@@ -116,6 +120,15 @@ Widget _languageOption(String displayName, String languageName) {
     );
   }
 
+  void openSoilHealth() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const SoilHealthPage(),
+      ),
+    );
+  }
+
   void showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -125,9 +138,9 @@ Widget _languageOption(String displayName, String languageName) {
     );
   }
 
-  // ----------------------------------------------------------
+  // ============================================================
   // BOTTOM NAVIGATION
-  // ----------------------------------------------------------
+  // ============================================================
 
   void onBottomNavigation(int index) {
     setState(() {
@@ -136,25 +149,29 @@ Widget _languageOption(String displayName, String languageName) {
 
     switch (index) {
       case 0:
+        // HOME
         break;
 
       case 1:
-        openCropHealth();
-        break;
-
-      case 2:
-        showComingSoon('Live Camera');
-        break;
-
-      case 3:
+        // ADVICE / HELP
         showComingSoon('Advice / Help');
         break;
 
-      case 4:
+      case 2:
+        // NEARBY
         showComingSoon('Nearby');
+        break;
+
+      case 3:
+        // PEST MAP
+        openPestAlert();
         break;
     }
   }
+
+  // ============================================================
+  // BUILD
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
@@ -167,45 +184,16 @@ Widget _languageOption(String displayName, String languageName) {
           padding: const EdgeInsets.only(bottom: 20),
           child: Column(
             children: [
-              // =================================================
               // HEADER
-              // =================================================
-
               _buildHeader(),
 
-              // =================================================
-              // STATUS BAR
-              // =================================================
-
-              _buildStatusBar(),
-
-              // =================================================
               // FARMER PROFILE
-              // =================================================
-
               _buildFarmerProfile(),
 
-              // =================================================
-              // CHECK MY CROP
-              // =================================================
-
-              _buildSectionTitle(
-                icon: Icons.crop_free,
-                title: 'CHECK MY CROP',
-              ),
-
-              _buildSecureFieldCheck(),
-
-              // =================================================
               // CROP TOOLS
-              // =================================================
-
               _buildCropTools(),
 
-              // =================================================
               // GET HELP
-              // =================================================
-
               _buildSectionTitle(
                 icon: Icons.help_outline,
                 title: 'GET HELP',
@@ -213,21 +201,7 @@ Widget _languageOption(String displayName, String languageName) {
 
               _buildHelpTools(),
 
-              // =================================================
-              // LOCAL & OFFLINE
-              // =================================================
-
-              _buildSectionTitle(
-                icon: Icons.location_on_outlined,
-                title: 'LOCAL & OFFLINE',
-              ),
-
-              _buildLocalTools(),
-
-              // =================================================
               // TODAY'S ALERTS
-              // =================================================
-
               _buildAlerts(),
 
               const SizedBox(height: 25),
@@ -236,10 +210,7 @@ Widget _languageOption(String displayName, String languageName) {
         ),
       ),
 
-      // =========================================================
       // BOTTOM NAVIGATION
-      // =========================================================
-
       bottomNavigationBar: _buildBottomNavigation(),
     );
   }
@@ -251,147 +222,131 @@ Widget _languageOption(String displayName, String languageName) {
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      color: const Color(0xFFDDF9E7),
-      padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
-      child: Column(
+      padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+      decoration: const BoxDecoration(
+        color: Color(0xFFDDF9E7),
+        borderRadius: BorderRadius.only(
+          bottomLeft: Radius.circular(24),
+          bottomRight: Radius.circular(24),
+        ),
+      ),
+      child: Row(
         children: [
-          const Text(
-            'KRISHI UNNATI',
-            style: TextStyle(
-              fontSize: 29,
-              fontWeight: FontWeight.w800,
-              letterSpacing: .2,
+          // LOGO CIRCLE
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(.06),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: const Icon(
+              Icons.agriculture,
+              size: 27,
               color: Color(0xFF0BA951),
             ),
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(width: 12),
 
-          Row(
-            children: [
-              const Expanded(
-                child: Text(
-                  "Farmer's Dashboard",
+          // APP NAME
+          const Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'KRISHI',
                   style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color(0xFF303030),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2.5,
+                    color: Color(0xFF195B37),
                   ),
+                ),
+                Text(
+                  'UNNATI',
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1.2,
+                    height: .95,
+                    color: Color(0xFF0BA951),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // LANGUAGE BUTTON
+          GestureDetector(
+            onTap: _showLanguageSelector,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 10,
+                vertical: 7,
+              ),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: const Color(0xFFB9E6C8),
                 ),
               ),
-
-              // LANGUAGE
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 11,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: const Color(0xFF1D5737),
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.language,
+                    size: 15,
+                    color: Color(0xFF1D5737),
                   ),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 15,
+                  const SizedBox(width: 4),
+                  Text(
+                    selectedLanguage == 'English'
+                        ? 'EN'
+                        : selectedLanguage == 'Bengali'
+                            ? 'BN'
+                            : 'MR',
+                    style: const TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
                       color: Color(0xFF1D5737),
                     ),
-                    SizedBox(width: 3),
-                    Text(
-                      'ENGLISH',
-                      style: TextStyle(
-                        fontSize: 9,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF1D5737),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 2),
+                  const Icon(
+                    Icons.keyboard_arrow_down,
+                    size: 14,
+                    color: Color(0xFF1D5737),
+                  ),
+                ],
               ),
+            ),
+          ),
 
-              const SizedBox(width: 25),
+          const SizedBox(width: 10),
 
-              const Icon(
-                Icons.notifications_none,
-                size: 25,
-                color: Color(0xFF1C1C1C),
+          // NOTIFICATION
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: const Color(0xFFB9E6C8),
               ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ============================================================
-  // STATUS BAR
-  // ============================================================
-
-  Widget _buildStatusBar() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 16,
-        vertical: 8,
-      ),
-      decoration: const BoxDecoration(
-        color: Color(0xFFF5FFF9),
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFFD9EFE1),
-          ),
-        ),
-      ),
-      child: Row(
-        children: [
-          _statusBadge(
-            icon: Icons.cloud_off,
-            text: 'OFFLINE / 2G SYNC',
-          ),
-          const SizedBox(width: 8),
-          _statusBadge(
-            icon: Icons.shield_outlined,
-            text: 'SECURE DATA',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _statusBadge({
-    required IconData icon,
-    required String text,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 5,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE6F9EC),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-          color: const Color(0xFFB8EACB),
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: 12,
-            color: const Color(0xFF158B49),
-          ),
-          const SizedBox(width: 5),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF197342),
+            ),
+            child: const Icon(
+              Icons.notifications_none,
+              size: 21,
+              color: Color(0xFF1C1C1C),
             ),
           ),
         ],
@@ -405,7 +360,7 @@ Widget _languageOption(String displayName, String languageName) {
 
   Widget _buildFarmerProfile() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 20),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
@@ -421,7 +376,7 @@ Widget _languageOption(String displayName, String languageName) {
         ),
         child: Row(
           children: [
-            // FARMER IMAGE / AVATAR
+            // FARMER AVATAR
             Container(
               width: 60,
               height: 60,
@@ -442,11 +397,12 @@ Widget _languageOption(String displayName, String languageName) {
 
             const SizedBox(width: 12),
 
-            Expanded(
+            const Expanded(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Welcome, Ramesh',
                     style: TextStyle(
                       fontSize: 16,
@@ -454,15 +410,13 @@ Widget _languageOption(String displayName, String languageName) {
                       color: Color(0xFF195C36),
                     ),
                   ),
-
-                  const SizedBox(height: 5),
-
-                  Row(
-                    children: [
-                      _profileBadge('Village: Solan'),
-                      const SizedBox(width: 6),
-                      _profileBadge('ID: #8821'),
-                    ],
+                  SizedBox(height: 5),
+                  Text(
+                    'Ready to take care of your crops?',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF777777),
+                    ),
                   ),
                 ],
               ),
@@ -474,30 +428,6 @@ Widget _languageOption(String displayName, String languageName) {
               size: 28,
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _profileBadge(String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 3,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0FFF5),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFBCE8CA),
-        ),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          fontSize: 8,
-          color: Color(0xFF198448),
-          fontWeight: FontWeight.w600,
         ),
       ),
     );
@@ -545,132 +475,12 @@ Widget _languageOption(String displayName, String languageName) {
   }
 
   // ============================================================
-  // SECURE FIELD CHECK
-  // ============================================================
-
-  Widget _buildSecureFieldCheck() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        padding: const EdgeInsets.all(13),
-        decoration: BoxDecoration(
-          color: const Color(0xFFFFFCEB),
-          borderRadius: BorderRadius.circular(17),
-          border: Border.all(
-            color: const Color(0xFFF5E8A2),
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.04),
-              blurRadius: 6,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                const Icon(
-                  Icons.verified_user_outlined,
-                  color: Color(0xFFB47B00),
-                  size: 18,
-                ),
-
-                const SizedBox(width: 7),
-
-                const Expanded(
-                  child: Text(
-                    'Secure Field Check',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF714916),
-                    ),
-                  ),
-                ),
-
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 7,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: const Color(0xFFECCB50),
-                    ),
-                  ),
-                  child: const Text(
-                    'OFFICIAL SECURITY BADGE',
-                    style: TextStyle(
-                      fontSize: 6.5,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFFB27B00),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 10),
-
-            Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 47,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(13),
-                      border: Border.all(
-                        color: const Color(0xFFF0D75A),
-                      ),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    child: const Text(
-                      'Enter Field ID or Name...',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF858585),
-                      ),
-                    ),
-                  ),
-                ),
-
-                const SizedBox(width: 8),
-
-                Container(
-                  width: 48,
-                  height: 47,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFE873),
-                    borderRadius: BorderRadius.circular(13),
-                  ),
-                  child: const Icon(
-                    Icons.search,
-                    color: Color(0xFF593D00),
-                    size: 24,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ============================================================
   // CROP TOOLS
   // ============================================================
 
   Widget _buildCropTools() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 24),
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       child: Column(
         children: [
           // ROW 1
@@ -681,14 +491,7 @@ Widget _languageOption(String displayName, String languageName) {
                   icon: Icons.camera_alt_outlined,
                   title: 'IMAGE PEST\nDETECTION',
                   subtitle: 'SCAN FROM PHOTO',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CropHealthPage(),
-                      ),
-                    );
-                  },
+                  onTap: openCropHealth,
                 ),
               ),
 
@@ -696,17 +499,10 @@ Widget _languageOption(String displayName, String languageName) {
 
               Expanded(
                 child: _featureCard(
-                  icon: Icons.bug_report_outlined,
-                  title: 'CROP DISEASE\nDETECTION',
-                  subtitle: 'CHECK LEAVES',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CropHealthPage(),
-                      ),
-                    );
-                  },
+                  icon: Icons.biotech_outlined,
+                  title: 'SOIL HEALTH\nANALYSIS',
+                  subtitle: 'TEST SOIL',
+                  onTap: openSoilHealth,
                 ),
               ),
             ],
@@ -734,16 +530,11 @@ Widget _languageOption(String displayName, String languageName) {
 
               Expanded(
                 child: _featureCard(
-                  icon: Icons.biotech_outlined,
-                  title: 'SOIL HEALTH\nANALYSIS',
-                  subtitle: 'TEST SOIL',
+                  icon: Icons.wb_sunny_outlined,
+                  title: 'WEATHER\nADVISORY',
+                  subtitle: 'LOCAL FORECAST',
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const SoilHealthPage(),
-                      ),
-                    );
+                    showComingSoon('Weather Advisory');
                   },
                 ),
               ),
@@ -843,37 +634,6 @@ Widget _languageOption(String displayName, String languageName) {
       padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
       child: Column(
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: _helpCard(
-                  icon: Icons.eco_outlined,
-                  title: 'DISEASE\nMANAGEMENT',
-                  subtitle: 'EXPERT ADVICE',
-                  green: true,
-                  onTap: () {
-                    showComingSoon('Disease Management');
-                  },
-                ),
-              ),
-
-              const SizedBox(width: 11),
-
-              Expanded(
-                child: _helpCard(
-                  icon: Icons.person_outline,
-                  title: 'EXPERT\nVALIDATION',
-                  subtitle: 'TRUST INDICATOR',
-                  onTap: () {
-                    showComingSoon('Expert Validation');
-                  },
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 11),
-
           // VOICE SUPPORT
           Material(
             color: Colors.transparent,
@@ -897,7 +657,8 @@ Widget _languageOption(String displayName, String languageName) {
                   ],
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment:
+                      MainAxisAlignment.center,
                   children: [
                     const Icon(
                       Icons.mic_none,
@@ -920,164 +681,10 @@ Widget _languageOption(String displayName, String languageName) {
               ),
             ),
           ),
-
-          const SizedBox(height: 11),
-
-          Row(
-            children: [
-              Expanded(
-                child: _helpCard(
-                  icon: Icons.chat_bubble_outline,
-                  title: 'REFERRAL HELP',
-                  subtitle: 'REQUEST VISIT',
-                  onTap: () {
-                    showComingSoon('Referral Help');
-                  },
-                ),
-              ),
-
-              const SizedBox(width: 11),
-
-              Expanded(
-                child: _helpCard(
-                  icon: Icons.warning_amber_outlined,
-                  title: 'REPORT ISSUE',
-                  subtitle: 'GOVT SUPPORT',
-                  onTap: () {
-                    showComingSoon('Report Issue');
-                  },
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
-
-  Widget _helpCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    bool green = false,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(17),
-        onTap: onTap,
-        child: Container(
-          height: 158,
-          decoration: BoxDecoration(
-            color: green
-                ? const Color(0xFF12A650)
-                : Colors.white,
-            borderRadius: BorderRadius.circular(17),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(.07),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                width: 54,
-                height: 54,
-                decoration: BoxDecoration(
-                  color: green
-                      ? Colors.white.withOpacity(.18)
-                      : const Color(0xFFF0FBF4),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 30,
-                  color: green
-                      ? Colors.white
-                      : const Color(0xFF202020),
-                ),
-              ),
-
-              const SizedBox(height: 11),
-
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
-                  color: green
-                      ? Colors.white
-                      : const Color(0xFF252934),
-                ),
-              ),
-
-              const SizedBox(height: 7),
-
-              Text(
-                subtitle,
-                style: TextStyle(
-                  fontSize: 9,
-                  letterSpacing: .7,
-                  color: green
-                      ? const Color(0xFFB9F1CC)
-                      : const Color(0xFF8A8A8A),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ============================================================
-// LOCAL & OFFLINE
-// ============================================================
-
-Widget _buildLocalTools() {
-  return Padding(
-    padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-    child: Row(
-      children: [
-        Expanded(
-          child: _featureCard(
-            icon: Icons.map_outlined,
-            title: 'PEST MAP',
-            subtitle: 'DISEASE AREAS',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const PestAlertPage(),
-                ),
-              );
-            },
-          ),
-        ),
-
-        const SizedBox(width: 11),
-
-        Expanded(
-          child: _featureCard(
-            icon: Icons.inventory_2_outlined,
-            title: 'NEARBY MARKET',
-            subtitle: 'GET WHAT YOU NEED',
-            onTap: () {
-              showComingSoon('Nearby Market');
-            },
-          ),
-        ),
-      ],
-    ),
-  );
-}
 
   // ============================================================
   // TODAY'S ALERTS
@@ -1089,7 +696,8 @@ Widget _buildLocalTools() {
       child: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 16),
             child: Row(
               children: [
                 const Icon(
@@ -1132,7 +740,8 @@ Widget _buildLocalTools() {
             height: 91,
             child: ListView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16),
               children: [
                 _alertCard(
                   icon: Icons.eco_outlined,
@@ -1143,10 +752,6 @@ Widget _buildLocalTools() {
                 ),
 
                 const SizedBox(width: 11),
-
-                // =================================================
-                // PEST ALERT - CLICKABLE
-                // =================================================
 
                 GestureDetector(
                   onTap: openPestAlert,
@@ -1212,8 +817,10 @@ Widget _buildLocalTools() {
 
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
+              mainAxisAlignment:
+                  MainAxisAlignment.center,
               children: [
                 Text(
                   title,
@@ -1261,7 +868,6 @@ Widget _buildLocalTools() {
       selectedIndex: selectedBottomIndex,
       indicatorColor: Colors.transparent,
       onDestinationSelected: onBottomNavigation,
-
       destinations: const [
         NavigationDestination(
           icon: Icon(
@@ -1277,30 +883,6 @@ Widget _buildLocalTools() {
 
         NavigationDestination(
           icon: Icon(
-            Icons.camera_alt_outlined,
-            color: Color(0xFF6C7471),
-          ),
-          selectedIcon: Icon(
-            Icons.camera_alt,
-            color: Color(0xFF00A650),
-          ),
-          label: 'Scan',
-        ),
-
-        NavigationDestination(
-          icon: Icon(
-            Icons.videocam_outlined,
-            color: Color(0xFF6C7471),
-          ),
-          selectedIcon: Icon(
-            Icons.videocam,
-            color: Color(0xFF00A650),
-          ),
-          label: 'Live Camera',
-        ),
-
-        NavigationDestination(
-          icon: Icon(
             Icons.help_outline,
             color: Color(0xFF6C7471),
           ),
@@ -1308,7 +890,7 @@ Widget _buildLocalTools() {
             Icons.help,
             color: Color(0xFF00A650),
           ),
-          label: 'Advice/Help',
+          label: 'Advice / Help',
         ),
 
         NavigationDestination(
@@ -1321,6 +903,18 @@ Widget _buildLocalTools() {
             color: Color(0xFF00A650),
           ),
           label: 'Nearby',
+        ),
+
+        NavigationDestination(
+          icon: Icon(
+            Icons.map_outlined,
+            color: Color(0xFF6C7471),
+          ),
+          selectedIcon: Icon(
+            Icons.map,
+            color: Color(0xFF00A650),
+          ),
+          label: 'Pest Map',
         ),
       ],
     );

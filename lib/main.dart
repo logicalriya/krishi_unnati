@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-
-import 'screens/login_page.dart';
+import 'startup.dart';
 
 void main() {
   runApp(const CropHealthApp());
@@ -24,8 +23,8 @@ class CropHealthApp extends StatelessWidget {
         ),
       ),
 
-      // Common starting page
-      home: const LoginPage(),
+      // First screen when app opens
+      home: const StartupPage(),
     );
   }
 }
