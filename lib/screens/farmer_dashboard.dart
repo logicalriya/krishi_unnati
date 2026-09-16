@@ -4,6 +4,7 @@ import 'admin_dashboard.dart';
 import 'crop_health_page.dart';
 import 'soil_health_page.dart';
 import 'pest_alert_page.dart';
+import 'help_assistance_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,6 +16,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int selectedBottomIndex = 0;
   String selectedLanguage = 'English';
+  bool accessibilityMode = false;
 
   // ============================================================
   // LANGUAGE SELECTOR
@@ -25,9 +27,7 @@ class _HomePageState extends State<HomePage> {
       context: context,
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(22),
-        ),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
       ),
       builder: (context) {
         return Padding(
@@ -45,18 +45,12 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(height: 15),
-              _languageOption(
-                'English',
-                'English',
-              ),
-              _languageOption(
-                'বাংলা',
-                'Bengali',
-              ),
-              _languageOption(
-                'मराठी',
-                'Marathi',
-              ),
+
+              _languageOption('English', 'English'),
+
+              _languageOption('বাংলা', 'Bengali'),
+
+              _languageOption('मराठी', 'Marathi'),
             ],
           ),
         );
@@ -64,27 +58,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _languageOption(
-    String displayName,
-    String languageName,
-  ) {
-    final bool isSelected =
-        selectedLanguage == languageName;
+  Widget _languageOption(String displayName, String languageName) {
+    final bool isSelected = selectedLanguage == languageName;
 
     return ListTile(
       contentPadding: EdgeInsets.zero,
       leading: Icon(
-        isSelected
-            ? Icons.radio_button_checked
-            : Icons.radio_button_off,
+        isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
         color: const Color(0xFF0BA951),
       ),
       title: Text(
         displayName,
         style: TextStyle(
           fontSize: 15,
-          fontWeight:
-              isSelected ? FontWeight.w800 : FontWeight.w600,
+          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
           color: const Color(0xFF303030),
         ),
       ),
@@ -105,27 +92,21 @@ class _HomePageState extends State<HomePage> {
   void openCropHealth() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const CropHealthPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const CropHealthPage()),
     );
   }
 
   void openPestAlert() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const PestAlertPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const PestAlertPage()),
     );
   }
 
   void openSoilHealth() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const SoilHealthPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const SoilHealthPage()),
     );
   }
 
@@ -153,18 +134,18 @@ class _HomePageState extends State<HomePage> {
         break;
 
       case 1:
-        // ADVICE / HELP
-        showComingSoon('Advice / Help');
+        // PEST MAP
+        openPestAlert();
         break;
 
       case 2:
-        // NEARBY
-        showComingSoon('Nearby');
+        // MARKETPLACE
+        showComingSoon('Marketplace');
         break;
 
       case 3:
-        // PEST MAP
-        openPestAlert();
+        // HELP
+        showComingSoon('Help');
         break;
     }
   }
@@ -187,24 +168,13 @@ class _HomePageState extends State<HomePage> {
               // HEADER
               _buildHeader(),
 
-              // FARMER PROFILE
-              _buildFarmerProfile(),
+              // ACCESSIBILITY
+              _buildAccessibilityBar(),
 
-              // CROP TOOLS
-              _buildCropTools(),
+              // MAIN FARMER CONTENT
+              _buildFarmerHome(),
 
-              // GET HELP
-              _buildSectionTitle(
-                icon: Icons.help_outline,
-                title: 'GET HELP',
-              ),
-
-              _buildHelpTools(),
-
-              // TODAY'S ALERTS
-              _buildAlerts(),
-
-              const SizedBox(height: 25),
+              const SizedBox(height: 10),
             ],
           ),
         ),
@@ -222,545 +192,361 @@ class _HomePageState extends State<HomePage> {
   Widget _buildHeader() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(18, 14, 18, 16),
+      height: 52,
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: const BoxDecoration(
-        color: Color(0xFFDDF9E7),
-        borderRadius: BorderRadius.only(
-          bottomLeft: Radius.circular(24),
-          bottomRight: Radius.circular(24),
-        ),
+        color: Colors.white,
+        border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
       ),
       child: Row(
         children: [
-          // LOGO CIRCLE
+          // BACK BUTTON
+          IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            padding: EdgeInsets.zero,
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              size: 18,
+              color: Color(0xFF20252B),
+            ),
+          ),
+
+          const Spacer(),
+
+          // LOGO
           Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: Colors.white,
+            width: 24,
+            height: 24,
+            decoration: const BoxDecoration(
+              color: Color(0xFF2D9B57),
               shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(.06),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
             ),
-            child: const Icon(
-              Icons.agriculture,
-              size: 27,
-              color: Color(0xFF0BA951),
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          // APP NAME
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'KRISHI',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 2.5,
-                    color: Color(0xFF195B37),
-                  ),
-                ),
-                Text(
-                  'UNNATI',
-                  style: TextStyle(
-                    fontSize: 25,
-                    fontWeight: FontWeight.w900,
-                    letterSpacing: 1.2,
-                    height: .95,
-                    color: Color(0xFF0BA951),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // LANGUAGE BUTTON
-          GestureDetector(
-            onTap: _showLanguageSelector,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 7,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(
-                  color: const Color(0xFFB9E6C8),
-                ),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.language,
-                    size: 15,
-                    color: Color(0xFF1D5737),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    selectedLanguage == 'English'
-                        ? 'EN'
-                        : selectedLanguage == 'Bengali'
-                            ? 'BN'
-                            : 'MR',
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF1D5737),
-                    ),
-                  ),
-                  const SizedBox(width: 2),
-                  const Icon(
-                    Icons.keyboard_arrow_down,
-                    size: 14,
-                    color: Color(0xFF1D5737),
-                  ),
-                ],
-              ),
-            ),
+            child: const Icon(Icons.eco, color: Colors.white, size: 16),
           ),
 
           const SizedBox(width: 10),
 
-          // NOTIFICATION
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: const Color(0xFFB9E6C8),
-              ),
+          // APP NAME
+          const Text(
+            'Krishi Unnati',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w800,
+              color: Color(0xFF172033),
             ),
+          ),
+
+          const Spacer(),
+
+          // LANGUAGE
+          GestureDetector(
+            onTap: _showLanguageSelector,
             child: const Icon(
-              Icons.notifications_none,
-              size: 21,
-              color: Color(0xFF1C1C1C),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ============================================================
-  // FARMER PROFILE
-  // ============================================================
-
-  Widget _buildFarmerProfile() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(17),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(.08),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            // FARMER AVATAR
-            Container(
-              width: 60,
-              height: 60,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFFE5F7EB),
-                border: Border.all(
-                  color: const Color(0xFFCAEBD7),
-                  width: 2,
-                ),
-              ),
-              child: const Icon(
-                Icons.agriculture,
-                size: 32,
-                color: Color(0xFF27864B),
-              ),
-            ),
-
-            const SizedBox(width: 12),
-
-            const Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Welcome, Ramesh',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF195C36),
-                    ),
-                  ),
-                  SizedBox(height: 5),
-                  Text(
-                    'Ready to take care of your crops?',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Color(0xFF777777),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            const Icon(
-              Icons.chevron_right,
-              color: Color(0xFF00A651),
-              size: 28,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ============================================================
-  // SECTION TITLE
-  // ============================================================
-
-  Widget _buildSectionTitle({
-    required IconData icon,
-    required String title,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
-      child: Row(
-        children: [
-          Container(
-            width: 31,
-            height: 31,
-            decoration: const BoxDecoration(
-              color: Color(0xFFDDF8E8),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: const Color(0xFF0AA552),
+              Icons.translate,
+              size: 24,
+              color: Color(0xFF20252B),
             ),
           ),
 
-          const SizedBox(width: 9),
+          const SizedBox(width: 7),
 
           Text(
-            title,
+            selectedLanguage == 'English'
+                ? 'A'
+                : selectedLanguage == 'Bengali'
+                ? 'অ'
+                : 'अ',
             style: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF195B37),
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: Color(0xFF20252B),
             ),
           ),
+
+          const SizedBox(width: 4),
         ],
       ),
     );
   }
 
   // ============================================================
-  // CROP TOOLS
+  // ACCESSIBILITY BAR
   // ============================================================
 
-  Widget _buildCropTools() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
-      child: Column(
+  Widget _buildAccessibilityBar() {
+    return Container(
+      height: 45,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF0F1F3),
+        border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
+      ),
+      child: Row(
         children: [
-          // ROW 1
-          Row(
-            children: [
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.camera_alt_outlined,
-                  title: 'IMAGE PEST\nDETECTION',
-                  subtitle: 'SCAN FROM PHOTO',
-                  onTap: openCropHealth,
-                ),
-              ),
-
-              const SizedBox(width: 11),
-
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.biotech_outlined,
-                  title: 'SOIL HEALTH\nANALYSIS',
-                  subtitle: 'TEST SOIL',
-                  onTap: openSoilHealth,
-                ),
-              ),
-            ],
+          // ACCESSIBILITY ICON
+          Container(
+            width: 30,
+            height: 30,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE1E5EA),
+              borderRadius: BorderRadius.circular(7),
+            ),
+            child: const Icon(
+              Icons.hearing,
+              size: 18,
+              color: Color(0xFF17375E),
+            ),
           ),
 
-          const SizedBox(height: 11),
+          const SizedBox(width: 8),
 
-          // ROW 2
-          Row(
-            children: [
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.videocam_outlined,
-                  title: 'LIVE CAMERA PEST',
-                  subtitle: 'REAL-TIME SCAN',
-                  onTap: () {
-                    showComingSoon(
-                      'Live Camera Pest Detection',
-                    );
-                  },
-                ),
-              ),
-
-              const SizedBox(width: 11),
-
-              Expanded(
-                child: _featureCard(
-                  icon: Icons.wb_sunny_outlined,
-                  title: 'WEATHER\nADVISORY',
-                  subtitle: 'LOCAL FORECAST',
-                  onTap: () {
-                    showComingSoon('Weather Advisory');
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ============================================================
-  // FEATURE CARD
-  // ============================================================
-
-  Widget _featureCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(17),
-        onTap: onTap,
-        child: Container(
-          height: 159,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 8,
-            vertical: 14,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(17),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(.07),
-                blurRadius: 8,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Column(
+          // TEXT
+          const Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 52,
-                height: 52,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFF0FBF4),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  size: 30,
-                  color: const Color(0xFF222222),
+              Text(
+                'Accessibility Mode',
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF26303A),
                 ),
               ),
-
-              const SizedBox(height: 12),
-
+              SizedBox(height: 1),
               Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w800,
-                  height: 1.15,
-                  color: Color(0xFF252934),
-                ),
-              ),
-
-              const SizedBox(height: 7),
-
-              Text(
-                subtitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 9,
-                  letterSpacing: .8,
-                  color: Color(0xFF8A8A8A),
+                'ASSISTANCE TOOLS',
+                style: TextStyle(
+                  fontSize: 6.5,
+                  letterSpacing: .4,
+                  color: Color(0xFF6C7075),
                 ),
               ),
             ],
           ),
-        ),
+
+          const Spacer(),
+
+          const Icon(
+            Icons.volume_up_outlined,
+            size: 16,
+            color: Color(0xFF596069),
+          ),
+
+          const SizedBox(width: 5),
+
+          Switch(
+            value: accessibilityMode,
+            onChanged: (value) {
+              setState(() {
+                accessibilityMode = value;
+              });
+            },
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            activeColor: const Color(0xFF0BA951),
+          ),
+        ],
       ),
     );
   }
 
   // ============================================================
-  // GET HELP
+  // FARMER HOME
   // ============================================================
 
-  Widget _buildHelpTools() {
+  Widget _buildFarmerHome() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+      padding: const EdgeInsets.fromLTRB(12, 14, 12, 0),
       child: Column(
         children: [
-          // VOICE SUPPORT
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(17),
-              onTap: () {
-                showComingSoon('Voice Support');
-              },
-              child: Container(
-                height: 96,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFDD62),
-                  borderRadius: BorderRadius.circular(17),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(.07),
-                      blurRadius: 8,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
+          // ------------------------------------------------------
+          // LOCATION + WEATHER
+          // ------------------------------------------------------
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
                 child: Column(
-                  mainAxisAlignment:
-                      MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(
-                      Icons.mic_none,
-                      size: 30,
-                      color: Color(0xFF533800),
+                    Row(
+                      children: const [
+                        Icon(
+                          Icons.location_on_outlined,
+                          size: 16,
+                          color: Color(0xFF1E6B38),
+                        ),
+                        SizedBox(width: 3),
+                        Text(
+                          'Maharashtra, India',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E6B38),
+                          ),
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 5),
 
                     const Text(
-                      'VOICE SUPPORT',
+                      'Hello, Ramesh!',
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 17,
                         fontWeight: FontWeight.w800,
-                        color: Color(0xFF533800),
+                        color: Color(0xFF172033),
+                      ),
+                    ),
+
+                    const SizedBox(height: 6),
+
+                    const Text(
+                      'Ready to get the best crop?',
+                      style: TextStyle(fontSize: 12, color: Color(0xFF454B52)),
+                    ),
+                  ],
+                ),
+              ),
+
+              // WEATHER CARD
+              Container(
+                width: 43,
+                height: 53,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: const Color(0xFFD4D7DA)),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x15000000),
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.wb_sunny_outlined,
+                      size: 19,
+                      color: Color(0xFF17375E),
+                    ),
+                    SizedBox(height: 3),
+                    Text(
+                      '32°C',
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF20252B),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
-    );
-  }
 
-  // ============================================================
-  // TODAY'S ALERTS
-  // ============================================================
+          const SizedBox(height: 20),
 
-  Widget _buildAlerts() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Column(
-        children: [
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16),
-            child: Row(
-              children: [
-                const Icon(
-                  Icons.grass,
-                  size: 18,
-                  color: Color(0xFF11934B),
-                ),
-
-                const SizedBox(width: 7),
-
-                const Expanded(
-                  child: Text(
-                    "TODAY'S ALERTS",
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF198047),
-                    ),
-                  ),
-                ),
-
-                GestureDetector(
-                  onTap: openPestAlert,
-                  child: const Text(
-                    'See All',
-                    style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0CA34E),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+          // ------------------------------------------------------
+          // FIND PEST OR DISEASES
+          // ------------------------------------------------------
+          _dashboardButton(
+            icon: Icons.eco_outlined,
+            iconBackground: const Color(0xFFE4E7E9),
+            title: 'Find Pest\nor Diseases',
+            onTap: openCropHealth,
           ),
 
           const SizedBox(height: 10),
 
-          SizedBox(
-            height: 91,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                _alertCard(
-                  icon: Icons.eco_outlined,
-                  title: 'Monsoon Care',
-                  description:
-                      'Check wheat crops for yellow rust after rain.',
-                  green: true,
+          // ------------------------------------------------------
+          // SOIL HEALTH
+          // ------------------------------------------------------
+          _dashboardButton(
+            icon: Icons.biotech_outlined,
+            iconBackground: const Color(0xFFCCFFF0),
+            title: 'Check Your\nSoil Health',
+            onTap: openSoilHealth,
+          ),
+
+          const SizedBox(height: 29),
+
+          // ------------------------------------------------------
+          // ASK A QUESTION
+          // ------------------------------------------------------
+          _buildAskQuestion(),
+
+          const SizedBox(height: 15),
+
+          // ------------------------------------------------------
+          // HISTORY
+          // ------------------------------------------------------
+          GestureDetector(
+            onTap: () {
+              showComingSoon('History');
+            },
+            child: Container(
+              height: 42,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFC7CBD0), width: 1.3),
+              ),
+              child: Row(
+                children: const [
+                  SizedBox(width: 12),
+
+                  Icon(Icons.history, size: 26, color: Color(0xFF172033)),
+
+                  SizedBox(width: 8),
+
+                  Text(
+                    'HISTORY (last 30 days)',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF172033),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 15),
+
+          // ------------------------------------------------------
+          // NEED HELP
+          // ------------------------------------------------------
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HelpAssistancePage(),
                 ),
+              );
+            },
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.help_outline, size: 19, color: Color(0xFF444A51)),
 
-                const SizedBox(width: 11),
+                SizedBox(width: 9),
 
-                GestureDetector(
-                  onTap: openPestAlert,
-                  child: _alertCard(
-                    icon: Icons.shield_outlined,
-                    title: 'Pest Alert',
-                    description:
-                        'Local pest activity detected nearby.',
-                    green: false,
+                Text(
+                  'Need any help?',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF30363D),
                   ),
                 ),
               ],
@@ -771,80 +557,169 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _alertCard({
+  // ============================================================
+  // DASHBOARD BUTTON
+  // ============================================================
+
+  Widget _dashboardButton({
     required IconData icon,
+    required Color iconBackground,
     required String title,
-    required String description,
-    required bool green,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: green
-            ? const Color(0xFF11A650)
-            : const Color(0xFFFFDE63),
-        borderRadius: BorderRadius.circular(17),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(.07),
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        height: 74,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(11),
+          border: Border.all(color: const Color(0xFFC7CBD0), width: 1.3),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x0C000000),
+              blurRadius: 2,
+              offset: Offset(0, 1),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 19),
+
+            // ICON
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                color: iconBackground,
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, size: 24, color: const Color(0xFF263F35)),
+            ),
+
+            const Spacer(),
+
+            // TITLE
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 16,
+                height: 1.15,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF172033),
+              ),
+            ),
+
+            const Spacer(),
+
+            const SizedBox(width: 19),
+          ],
+        ),
       ),
-      child: Row(
+    );
+  }
+
+  // ============================================================
+  // ASK QUESTION
+  // ============================================================
+
+  Widget _buildAskQuestion() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(8, 9, 8, 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(11),
+        border: Border.all(color: const Color(0xFFC7CBD0), width: 1.3),
+      ),
+      child: Column(
         children: [
-          Container(
-            width: 43,
-            height: 43,
-            decoration: BoxDecoration(
-              color: green
-                  ? Colors.white.withOpacity(.18)
-                  : Colors.white.withOpacity(.45),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              icon,
-              color: green
-                  ? Colors.white
-                  : const Color(0xFF654A00),
-              size: 23,
-            ),
+          // ASK A QUESTION TITLE
+          Row(
+            children: [
+              Container(
+                height: 33,
+                width: 33,
+                decoration: const BoxDecoration(
+                  color: Color(0xFF17375E),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.chat_bubble_outline,
+                  color: Colors.white,
+                  size: 19,
+                ),
+              ),
+
+              const SizedBox(width: 10),
+
+              const Text(
+                'Ask a Question',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: Color(0xFF172033),
+                ),
+              ),
+            ],
           ),
 
-          const SizedBox(width: 10),
+          const SizedBox(height: 7),
 
-          Expanded(
+          // ASK EXPERTS AREA
+          Container(
+            padding: const EdgeInsets.fromLTRB(7, 8, 7, 9),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFFBE8),
+              borderRadius: BorderRadius.circular(11),
+            ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              mainAxisAlignment:
-                  MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w800,
-                    color: green
-                        ? Colors.white
-                        : const Color(0xFF594100),
+                const Padding(
+                  padding: EdgeInsets.only(left: 2),
+                  child: Text(
+                    'ASK EXPERTS',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF814B18),
+                    ),
                   ),
                 ),
 
-                const SizedBox(height: 4),
+                const SizedBox(height: 6),
 
-                Text(
-                  description,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
-                    fontSize: 9,
-                    height: 1.2,
-                    color: green
-                        ? const Color(0xFFE2F9E9)
-                        : const Color(0xFF725900),
+                // QUESTION FIELD
+                Container(
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(9),
+                    border: Border.all(color: const Color(0xFFFFD940)),
+                  ),
+                  child: const TextField(
+                    style: TextStyle(fontSize: 11),
+                    decoration: InputDecoration(
+                      hintText: 'What you want to know...',
+                      hintStyle: TextStyle(
+                        fontSize: 11,
+                        color: Color(0xFF7C8187),
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 8,
+                      ),
+                      suffixIcon: Icon(
+                        Icons.mic_none,
+                        size: 21,
+                        color: Color(0xFF444A51),
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -868,53 +743,34 @@ class _HomePageState extends State<HomePage> {
       selectedIndex: selectedBottomIndex,
       indicatorColor: Colors.transparent,
       onDestinationSelected: onBottomNavigation,
+
       destinations: const [
+        // HOME
         NavigationDestination(
-          icon: Icon(
-            Icons.home_outlined,
-            color: Color(0xFF6C7471),
-          ),
-          selectedIcon: Icon(
-            Icons.home,
-            color: Color(0xFF00A650),
-          ),
+          icon: Icon(Icons.eco_outlined, color: Color(0xFF6C7471)),
+          selectedIcon: Icon(Icons.eco, color: Color(0xFF00A650)),
           label: 'Home',
         ),
 
+        // PEST MAP
         NavigationDestination(
-          icon: Icon(
-            Icons.help_outline,
-            color: Color(0xFF6C7471),
-          ),
-          selectedIcon: Icon(
-            Icons.help,
-            color: Color(0xFF00A650),
-          ),
-          label: 'Advice / Help',
-        ),
-
-        NavigationDestination(
-          icon: Icon(
-            Icons.location_on_outlined,
-            color: Color(0xFF6C7471),
-          ),
-          selectedIcon: Icon(
-            Icons.location_on,
-            color: Color(0xFF00A650),
-          ),
-          label: 'Nearby',
-        ),
-
-        NavigationDestination(
-          icon: Icon(
-            Icons.map_outlined,
-            color: Color(0xFF6C7471),
-          ),
-          selectedIcon: Icon(
-            Icons.map,
-            color: Color(0xFF00A650),
-          ),
+          icon: Icon(Icons.map_outlined, color: Color(0xFF6C7471)),
+          selectedIcon: Icon(Icons.map, color: Color(0xFF00A650)),
           label: 'Pest Map',
+        ),
+
+        // MARKETPLACE
+        NavigationDestination(
+          icon: Icon(Icons.shopping_cart_outlined, color: Color(0xFF6C7471)),
+          selectedIcon: Icon(Icons.shopping_cart, color: Color(0xFF00A650)),
+          label: 'Marketplace',
+        ),
+
+        // HELP
+        NavigationDestination(
+          icon: Icon(Icons.help_outline, color: Color(0xFF6C7471)),
+          selectedIcon: Icon(Icons.help, color: Color(0xFF00A650)),
+          label: 'Help',
         ),
       ],
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'farmer_dashboard.dart';
+import 'farmer_create_account_page.dart';
 import 'admin_dashboard.dart';
 // import 'extension_officer_dashboard.dart';
 
@@ -42,7 +42,7 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
   void _openFarmerDashboard() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const HomePage(),
+        builder: (context) => const FarmerCreateAccountPage(),
       ),
     );
   }
