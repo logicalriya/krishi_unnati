@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'startup.dart';
+import 'screens/startup.dart';
 
 void main() {
   runApp(const CropHealthApp());

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'admin_dashboard.dart';
+import '../admins/admin_dashboard.dart';
 import 'crop_health_page.dart';
 import 'soil_health_page.dart';
 import 'pest_alert_page.dart';
 import 'help_assistance_page.dart';
+import 'marketplace_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -47,9 +48,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 15),
 
               _languageOption('English', 'English'),
-
               _languageOption('বাংলা', 'Bengali'),
-
               _languageOption('मराठी', 'Marathi'),
             ],
           ),
@@ -110,6 +109,13 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void openHelpAssistance() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const HelpAssistancePage()),
+    );
+  }
+
   void showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -140,12 +146,15 @@ class _HomePageState extends State<HomePage> {
 
       case 2:
         // MARKETPLACE
-        showComingSoon('Marketplace');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MarketplacePage()),
+        );
         break;
 
       case 3:
         // HELP
-        showComingSoon('Help');
+        openHelpAssistance();
         break;
     }
   }
@@ -520,38 +529,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
 
-          const SizedBox(height: 15),
-
-          // ------------------------------------------------------
-          // NEED HELP
-          // ------------------------------------------------------
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const HelpAssistancePage(),
-                ),
-              );
-            },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.help_outline, size: 19, color: Color(0xFF444A51)),
-
-                SizedBox(width: 9),
-
-                Text(
-                  'Need any help?',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Color(0xFF30363D),
-                  ),
-                ),
-              ],
-            ),
-          ),
+          // "Need any help?" REMOVED
         ],
       ),
     );

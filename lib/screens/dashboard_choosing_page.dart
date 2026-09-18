@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'farmer_create_account_page.dart';
-import 'admin_dashboard.dart';
-// import 'extension_officer_dashboard.dart';
+import 'farmers/farmer_create_account_page.dart';
+import 'admins/admin_dashboard.dart';
+import 'officers/create_account_screen.dart';
 
 class DashboardChoosingPage extends StatefulWidget {
   const DashboardChoosingPage({super.key});
@@ -63,13 +63,13 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
   // OPEN EXTENSION OFFICER DASHBOARD
   // =========================================================================
 
-  // void _openExtensionOfficerDashboard() {
-  //   Navigator.of(context).push(
-  //     MaterialPageRoute(
-  //       builder: (context) => const ExtensionOfficerDashboard(),
-  //     ),
-  //   );
-  // }
+  void _openExtensionOficerLoginScreen() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const ExtensionOfficerLoginScreen(),
+      ),
+    );
+  }
 
   // =========================================================================
   // MAIN BUILD
@@ -198,11 +198,11 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                     // EXTENSION OFFICER
                     // --------------------------------------------------------
 
-                    // _buildRoleCard(
-                    //   title: 'Extension Officer',
-                    //   type: RoleType.officer,
-                    //   onTap: _openExtensionOfficerDashboard,
-                    // ),
+                    _buildRoleCard(
+                      title: 'Extension Officer',
+                      type: RoleType.officer,
+                      onTap: _openExtensionOficerLoginScreen,
+                    ),
 
                     const SizedBox(height: 30),
 
@@ -872,8 +872,6 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
     );
   }
 }
-
-
 
 // =========================================================================
 // ROLE TYPE

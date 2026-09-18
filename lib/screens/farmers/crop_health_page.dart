@@ -16,6 +16,10 @@ class _CropHealthPageState extends State<CropHealthPage> {
 
   XFile? selectedImage;
 
+  // ============================================================
+  // PICK IMAGE
+  // ============================================================
+
   Future<void> pickImage(ImageSource source) async {
     try {
       final XFile? image = await picker.pickImage(
@@ -28,19 +32,25 @@ class _CropHealthPageState extends State<CropHealthPage> {
           selectedImage = image;
         });
 
-        // For now this only displays the image.
-        // Later we will send this image to the AI disease model.
+        // Later:
+        // Send selectedImage to the AI disease detection model.
       }
     } catch (e) {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Could not select image: $e'),
+          content: Text(
+            'Could not select image: $e',
+          ),
         ),
       );
     }
   }
+
+  // ============================================================
+  // SYMPTOMS DIALOG
+  // ============================================================
 
   void showSymptomsDialog() {
     final TextEditingController controller =
@@ -53,6 +63,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
           title: const Text(
             'Describe Symptoms',
           ),
+
           content: TextField(
             controller: controller,
             maxLines: 4,
@@ -62,12 +73,15 @@ class _CropHealthPageState extends State<CropHealthPage> {
               border: OutlineInputBorder(),
             ),
           ),
+
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text('Cancel'),
+              child: const Text(
+                'Cancel',
+              ),
             ),
 
             ElevatedButton(
@@ -84,13 +98,19 @@ class _CropHealthPageState extends State<CropHealthPage> {
                   );
                 }
               },
-              child: const Text('Submit'),
+              child: const Text(
+                'Submit',
+              ),
             ),
           ],
         );
       },
     );
   }
+
+  // ============================================================
+  // SELECTED IMAGE PREVIEW
+  // ============================================================
 
   Widget selectedImageWidget() {
     if (selectedImage == null) {
@@ -109,6 +129,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
       );
     }
 
+    // Web image preview
     if (kIsWeb) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(8),
@@ -121,6 +142,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
       );
     }
 
+    // Android / iOS image preview
     return ClipRRect(
       borderRadius: BorderRadius.circular(8),
       child: Image.file(
@@ -132,10 +154,18 @@ class _CropHealthPageState extends State<CropHealthPage> {
     );
   }
 
+  // ============================================================
+  // BUILD
+  // ============================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF3FBF7),
+
+      // ========================================================
+      // APP BAR
+      // ========================================================
 
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -146,6 +176,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
           icon: const Icon(
             Icons.arrow_back,
             size: 20,
+            color: Color(0xFF263238),
           ),
           onPressed: () {
             Navigator.pop(context);
@@ -162,13 +193,17 @@ class _CropHealthPageState extends State<CropHealthPage> {
         ),
       ),
 
+      // ========================================================
+      // BODY
+      // ========================================================
+
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.fromLTRB(
             10,
             12,
             10,
-            15,
+            20,
           ),
           child: Column(
             children: [
@@ -190,10 +225,14 @@ class _CropHealthPageState extends State<CropHealthPage> {
                     ),
                   ],
                 ),
+
                 child: Column(
                   children: [
 
+                    // ==========================================
                     // IMAGE PREVIEW
+                    // ==========================================
+
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -210,6 +249,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
                                   selectedImage = null;
                                 });
                               },
+
                               child: Container(
                                 width: 18,
                                 height: 18,
@@ -218,6 +258,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
                                   color: Color(0xFFEF4444),
                                   shape: BoxShape.circle,
                                 ),
+
                                 child: const Icon(
                                   Icons.close,
                                   color: Colors.white,
@@ -230,6 +271,10 @@ class _CropHealthPageState extends State<CropHealthPage> {
                     ),
 
                     const SizedBox(height: 10),
+
+                    // ==========================================
+                    // TITLE
+                    // ==========================================
 
                     const Text(
                       'Upload Leaf Photo',
@@ -252,13 +297,14 @@ class _CropHealthPageState extends State<CropHealthPage> {
 
                     const SizedBox(height: 10),
 
-                    // ==================================================
+                    // ==========================================
                     // GALLERY BUTTON
-                    // ==================================================
+                    // ==========================================
 
                     SizedBox(
                       width: double.infinity,
                       height: 28,
+
                       child: ElevatedButton.icon(
                         onPressed: () {
                           pickImage(
@@ -283,7 +329,10 @@ class _CropHealthPageState extends State<CropHealthPage> {
                           backgroundColor:
                               const Color(0xFF16A34A),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
+                          elevation: 0,
+
+                          shape:
+                              RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(6),
                           ),
@@ -293,13 +342,14 @@ class _CropHealthPageState extends State<CropHealthPage> {
 
                     const SizedBox(height: 6),
 
-                    // ==================================================
+                    // ==========================================
                     // CAMERA BUTTON
-                    // ==================================================
+                    // ==========================================
 
                     SizedBox(
                       width: double.infinity,
                       height: 28,
+
                       child: ElevatedButton.icon(
                         onPressed: () {
                           pickImage(
@@ -324,7 +374,10 @@ class _CropHealthPageState extends State<CropHealthPage> {
                           backgroundColor:
                               const Color(0xFF2563EB),
                           foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
+                          elevation: 0,
+
+                          shape:
+                              RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(6),
                           ),
@@ -334,13 +387,14 @@ class _CropHealthPageState extends State<CropHealthPage> {
 
                     const SizedBox(height: 6),
 
-                    // ==================================================
-                    // SYMPTOMS BUTTON
-                    // ==================================================
+                    // ==========================================
+                    // VOICE SYMPTOMS BUTTON
+                    // ==========================================
 
                     SizedBox(
                       width: double.infinity,
                       height: 28,
+
                       child: OutlinedButton.icon(
                         onPressed: showSymptomsDialog,
 
@@ -358,11 +412,14 @@ class _CropHealthPageState extends State<CropHealthPage> {
                           ),
                         ),
 
-                        style: OutlinedButton.styleFrom(
+                        style:
+                            OutlinedButton.styleFrom(
                           side: const BorderSide(
                             color: Color(0xFFD9D9D9),
                           ),
-                          shape: RoundedRectangleBorder(
+
+                          shape:
+                              RoundedRectangleBorder(
                             borderRadius:
                                 BorderRadius.circular(6),
                           ),
@@ -380,9 +437,12 @@ class _CropHealthPageState extends State<CropHealthPage> {
               // ==================================================
 
               DiseaseResultCard(
-                diseaseName: 'Cotton Curl Virus',
-                probability: '96.91%',
-                description: 'Tap to see details',
+                diseaseName:
+                    'Cotton Curl Virus',
+                probability:
+                    '96.91%',
+                description:
+                    'Tap to see details',
                 highRisk: true,
               ),
 
@@ -393,80 +453,17 @@ class _CropHealthPageState extends State<CropHealthPage> {
               // ==================================================
 
               DiseaseResultCard(
-                diseaseName: 'Cotton Fusarium Wilt',
-                probability: '0.53%',
-                description: 'Tap to see details',
+                diseaseName:
+                    'Cotton Fusarium Wilt',
+                probability:
+                    '0.53%',
+                description:
+                    'Tap to see details',
                 highRisk: false,
               ),
             ],
           ),
         ),
-      ),
-
-      // ==========================================================
-      // BOTTOM NAVIGATION
-      // ==========================================================
-
-      bottomNavigationBar: NavigationBar(
-        height: 62,
-        backgroundColor: Colors.white,
-        selectedIndex: 1,
-        indicatorColor: const Color(0xFFDDF7E9),
-
-        onDestinationSelected: (index) {
-
-          if (index == 0) {
-            Navigator.pop(context);
-          }
-
-          if (index == 1) {
-            return;
-          }
-
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                index == 2
-                    ? 'Soil Health coming soon.'
-                    : 'Market Prices coming soon.',
-              ),
-            ),
-          );
-        },
-
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
-          ),
-
-          NavigationDestination(
-            icon: Icon(Icons.grass_outlined),
-            selectedIcon: Icon(Icons.grass),
-            label: 'Crop Health',
-          ),
-
-          NavigationDestination(
-            icon: Icon(
-              Icons.health_and_safety_outlined,
-            ),
-            selectedIcon: Icon(
-              Icons.health_and_safety,
-            ),
-            label: 'Soil Health',
-          ),
-
-          NavigationDestination(
-            icon: Icon(
-              Icons.currency_rupee,
-            ),
-            selectedIcon: Icon(
-              Icons.currency_rupee,
-            ),
-            label: 'Market Prices',
-          ),
-        ],
       ),
     );
   }
@@ -496,35 +493,47 @@ class DiseaseResultCard extends StatelessWidget {
       onTap: () {
         showDialog(
           context: context,
+
           builder: (context) {
             return AlertDialog(
-              title: Text(diseaseName),
-              content: Text(
-                'AI detection confidence: $probability\n\n'
-                'More detailed information about this '
-                'disease will be displayed here later.',
+              title: Text(
+                diseaseName,
               ),
+
+              content: Text(
+                'AI detection confidence: '
+                '$probability\n\n'
+                'More detailed information about '
+                'this disease will be displayed here later.',
+              ),
+
               actions: [
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
-                  child: const Text('Close'),
+
+                  child: const Text(
+                    'Close',
+                  ),
                 ),
               ],
             );
           },
         );
       },
+
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(
           horizontal: 10,
           vertical: 10,
         ),
+
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(10),
+
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.04),
@@ -532,8 +541,13 @@ class DiseaseResultCard extends StatelessWidget {
             ),
           ],
         ),
+
         child: Row(
           children: [
+
+            // ================================================
+            // LEAF ICON
+            // ================================================
 
             const Icon(
               Icons.eco_outlined,
@@ -543,10 +557,15 @@ class DiseaseResultCard extends StatelessWidget {
 
             const SizedBox(width: 6),
 
+            // ================================================
+            // DISEASE INFORMATION
+            // ================================================
+
             Expanded(
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
+
                 children: [
                   Text(
                     diseaseName,
@@ -569,19 +588,28 @@ class DiseaseResultCard extends StatelessWidget {
               ),
             ),
 
+            // ================================================
+            // PROBABILITY
+            // ================================================
+
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 7,
                 vertical: 4,
               ),
+
               decoration: BoxDecoration(
                 color: highRisk
                     ? const Color(0xFFE8F8EF)
                     : const Color(0xFFE8F8EF),
-                borderRadius: BorderRadius.circular(10),
+
+                borderRadius:
+                    BorderRadius.circular(10),
               ),
+
               child: Text(
                 'Possibility: $probability',
+
                 style: const TextStyle(
                   fontSize: 6.5,
                   color: Color(0xFF18894F),
