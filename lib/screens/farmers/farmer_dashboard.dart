@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:geolocator/geolocator.dart';
 
-import '../admins/admin_dashboard.dart';
+import '../../widgets/bottom_nav.dart';
+import '../../state/app_locale.dart';
+import '../../state/app_session.dart';
+import '../../welcome/startup.dart';
 import 'crop_health_page.dart';
-import 'soil_health_page.dart';
+import 'soil_health_hub_page.dart';
 import 'pest_alert_page.dart';
 import 'help_assistance_page.dart';
 import 'marketplace_page.dart';
+import 'farmer_profile_page.dart';
+import 'farmer_history_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,72 +23,74 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedBottomIndex = 0;
-  String selectedLanguage = 'English';
   bool accessibilityMode = false;
+  String _liveLocationText = 'Getting your location...';
+  bool _liveLocationLoading = true;
 
-  // ============================================================
-  // LANGUAGE SELECTOR
-  // ============================================================
-
-  void _showLanguageSelector() {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 18, 20, 25),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Select Language',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF195B37),
-                ),
-              ),
-              const SizedBox(height: 15),
-
-              _languageOption('English', 'English'),
-              _languageOption('বাংলা', 'Bengali'),
-              _languageOption('मराठी', 'Marathi'),
-            ],
-          ),
-        );
-      },
-    );
+  @override
+  void initState() {
+    super.initState();
+    _loadLiveLocation();
   }
 
-  Widget _languageOption(String displayName, String languageName) {
-    final bool isSelected = selectedLanguage == languageName;
-
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Icon(
-        isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-        color: const Color(0xFF0BA951),
-      ),
-      title: Text(
-        displayName,
-        style: TextStyle(
-          fontSize: 15,
-          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-          color: const Color(0xFF303030),
-        ),
-      ),
-      onTap: () {
+  Future<void> _loadLiveLocation() async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        if (!mounted) return;
         setState(() {
-          selectedLanguage = languageName;
+          _liveLocationText = 'Location services are off';
+          _liveLocationLoading = false;
         });
+        return;
+      }
 
-        Navigator.pop(context);
-      },
-    );
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        setState(() {
+          _liveLocationText = 'Location permission denied';
+          _liveLocationLoading = false;
+        });
+        return;
+      }
+
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
+        position.latitude,
+        position.longitude,
+      );
+
+      if (!mounted) return;
+
+      final Placemark? place = placemarks.isNotEmpty ? placemarks.first : null;
+      final area = [
+        place?.subLocality,
+        place?.locality,
+        place?.administrativeArea,
+      ].whereType<String>().where((value) => value.isNotEmpty).join(', ');
+
+      setState(() {
+        _liveLocationText = area.isNotEmpty ? area : 'Live location detected';
+        _liveLocationLoading = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _liveLocationText = 'Unable to get live location';
+        _liveLocationLoading = false;
+      });
+    }
   }
 
   // ============================================================
@@ -103,9 +112,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void openSoilHealth() {
+
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const SoilHealthPage()),
+      MaterialPageRoute(builder: (context) => const SoilHealthHubPage()),
     );
   }
 
@@ -133,60 +143,48 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       selectedBottomIndex = index;
     });
-
-    switch (index) {
-      case 0:
-        // HOME
-        break;
-
-      case 1:
-        // PEST MAP
-        openPestAlert();
-        break;
-
-      case 2:
-        // MARKETPLACE
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const MarketplacePage()),
-        );
-        break;
-
-      case 3:
-        // HELP
-        openHelpAssistance();
-        break;
-    }
   }
 
   // ============================================================
   // BUILD
   // ============================================================
 
+  Widget _buildHomeTab() {
+    return SafeArea(
+      child: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.only(bottom: 20),
+        child: Column(
+          children: [
+            // HEADER
+            _buildHeader(),
+
+            // ACCESSIBILITY
+            _buildAccessibilityBar(),
+
+            // MAIN FARMER CONTENT
+            _buildFarmerHome(),
+
+            const SizedBox(height: 10),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFEFFBF5),
 
-      body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.only(bottom: 20),
-          child: Column(
-            children: [
-              // HEADER
-              _buildHeader(),
-
-              // ACCESSIBILITY
-              _buildAccessibilityBar(),
-
-              // MAIN FARMER CONTENT
-              _buildFarmerHome(),
-
-              const SizedBox(height: 10),
-            ],
-          ),
-        ),
+      body: IndexedStack(
+        index: selectedBottomIndex,
+        children: [
+          _buildHomeTab(),
+          const PestAlertPage(embedded: true),
+          const MarketplacePage(embedded: true),
+          const HelpAssistancePage(),
+        ],
       ),
 
       // BOTTOM NAVIGATION
@@ -198,83 +196,58 @@ class _HomePageState extends State<HomePage> {
   // HEADER
   // ============================================================
 
+  Future<void> _logout() async {
+    final session = AppSession.of(context);
+    await session.logout();
+
+    if (!mounted) return;
+
+    Navigator.of(context).pop();
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const StartupPage()),
+      (route) => false,
+    );
+  }
+
+  void _openProfile() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => const FarmerProfilePage(),
+      ),
+    );
+  }
+
   Widget _buildHeader() {
+    final t = AppLocale.of(context).t;
+
     return Container(
       width: double.infinity,
-      height: 52,
-      padding: const EdgeInsets.symmetric(horizontal: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: const BoxDecoration(
         color: Colors.white,
         border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
       ),
       child: Row(
         children: [
-          // BACK BUTTON
+          Expanded(
+            child: Text(
+              t('appName'),
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Color(0xFF195B37),
+              ),
+            ),
+          ),
           IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            padding: EdgeInsets.zero,
+            onPressed: _openProfile,
             icon: const Icon(
-              Icons.arrow_back_ios_new,
-              size: 18,
+              Icons.settings_outlined,
+              size: 22,
               color: Color(0xFF20252B),
             ),
+            tooltip: t('settings'),
           ),
-
-          const Spacer(),
-
-          // LOGO
-          Container(
-            width: 24,
-            height: 24,
-            decoration: const BoxDecoration(
-              color: Color(0xFF2D9B57),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.eco, color: Colors.white, size: 16),
-          ),
-
-          const SizedBox(width: 10),
-
-          // APP NAME
-          const Text(
-            'Krishi Unnati',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF172033),
-            ),
-          ),
-
-          const Spacer(),
-
-          // LANGUAGE
-          GestureDetector(
-            onTap: _showLanguageSelector,
-            child: const Icon(
-              Icons.translate,
-              size: 24,
-              color: Color(0xFF20252B),
-            ),
-          ),
-
-          const SizedBox(width: 7),
-
-          Text(
-            selectedLanguage == 'English'
-                ? 'A'
-                : selectedLanguage == 'Bengali'
-                ? 'অ'
-                : 'अ',
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF20252B),
-            ),
-          ),
-
-          const SizedBox(width: 4),
         ],
       ),
     );
@@ -366,6 +339,22 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildFarmerHome() {
+    final user = AppSession.of(context).user;
+    final fullName = (user?['fullName'] ?? 'Farmer').toString();
+    final village = (user?['village'] ?? '').toString().trim();
+    final district = (user?['district'] ?? '').toString().trim();
+    final registeredLocation = [village, district]
+        .where((value) => value.isNotEmpty)
+        .join(', ');
+    final displayLocation = _liveLocationLoading
+        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Maharashtra, India')
+        : (_liveLocationText == 'Location permission denied' ||
+                _liveLocationText == 'Location services are off' ||
+                _liveLocationText == 'Unable to get live location'
+            ? (registeredLocation.isNotEmpty ? registeredLocation : 'Maharashtra, India')
+            : _liveLocationText);
+    final greetingName = fullName.isEmpty ? 'Farmer' : fullName.split(RegExp(r'\s+')).take(2).join(' ');
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(12, 14, 12, 0),
       child: Column(
@@ -382,19 +371,21 @@ class _HomePageState extends State<HomePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.location_on_outlined,
                           size: 16,
                           color: Color(0xFF1E6B38),
                         ),
-                        SizedBox(width: 3),
-                        Text(
-                          'Maharashtra, India',
-                          style: TextStyle(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            color: Color(0xFF1E6B38),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            displayLocation,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: Color(0xFF1E6B38),
+                            ),
                           ),
                         ),
                       ],
@@ -402,9 +393,9 @@ class _HomePageState extends State<HomePage> {
 
                     const SizedBox(height: 5),
 
-                    const Text(
-                      'Hello, Ramesh!',
-                      style: TextStyle(
+                    Text(
+                      'Hello, $greetingName!',
+                      style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.w800,
                         color: Color(0xFF172033),
@@ -498,7 +489,11 @@ class _HomePageState extends State<HomePage> {
           // ------------------------------------------------------
           GestureDetector(
             onTap: () {
-              showComingSoon('History');
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => const FarmerHistoryPage(),
+                ),
+              );
             },
             child: Container(
               height: 42,
@@ -713,44 +708,11 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildBottomNavigation() {
-    return NavigationBar(
-      height: 72,
-      backgroundColor: const Color(0xFFE1FBEA),
-      surfaceTintColor: Colors.transparent,
-      elevation: 10,
+    // Design lives in widgets/bottom_nav.dart now so every screen that
+    // needs it (just this shell, currently) shares one implementation.
+    return KrishiBottomNav(
       selectedIndex: selectedBottomIndex,
-      indicatorColor: Colors.transparent,
       onDestinationSelected: onBottomNavigation,
-
-      destinations: const [
-        // HOME
-        NavigationDestination(
-          icon: Icon(Icons.eco_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.eco, color: Color(0xFF00A650)),
-          label: 'Home',
-        ),
-
-        // PEST MAP
-        NavigationDestination(
-          icon: Icon(Icons.map_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.map, color: Color(0xFF00A650)),
-          label: 'Pest Map',
-        ),
-
-        // MARKETPLACE
-        NavigationDestination(
-          icon: Icon(Icons.shopping_cart_outlined, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.shopping_cart, color: Color(0xFF00A650)),
-          label: 'Marketplace',
-        ),
-
-        // HELP
-        NavigationDestination(
-          icon: Icon(Icons.help_outline, color: Color(0xFF6C7471)),
-          selectedIcon: Icon(Icons.help, color: Color(0xFF00A650)),
-          label: 'Help',
-        ),
-      ],
     );
   }
 }

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'farmer_login_page.dart';
+import '../../services/local_db.dart';
+import '../../state/app_locale.dart';
 
 // ============================================================
 // APP COLORS
@@ -103,7 +105,7 @@ class _FarmerCreateAccountPageState
     // Name validation
     if (name.isEmpty) {
       _showMessage(
-        'Please enter your full name',
+        AppLocale.of(context).t('enterYourFullName'),
       );
       return;
     }
@@ -111,14 +113,14 @@ class _FarmerCreateAccountPageState
     // Mobile validation
     if (mobile.isEmpty) {
       _showMessage(
-        'Please enter your mobile number',
+        AppLocale.of(context).t('enterYourMobileNumber'),
       );
       return;
     }
 
     if (mobile.length != 10) {
       _showMessage(
-        'Please enter a valid 10-digit mobile number',
+        AppLocale.of(context).t('enterValidMobileNumber'),
       );
       return;
     }
@@ -171,7 +173,7 @@ class _FarmerCreateAccountPageState
     });
 
     _showMessage(
-      'Mobile number verified successfully',
+      AppLocale.of(context).t('mobileVerified'),
     );
 
     // Open PIN page after OTP verification.
@@ -202,7 +204,7 @@ class _FarmerCreateAccountPageState
   // CREATE ACCOUNT
   // ==========================================================
 
-  void _createAccount() {
+  Future<void> _createAccount() async {
     final String pin =
         _pinController.text.trim();
 
@@ -212,7 +214,7 @@ class _FarmerCreateAccountPageState
     // OTP validation
     if (!_otpVerified) {
       _showMessage(
-        'Please verify your mobile number first',
+        AppLocale.of(context).t('verifyMobileFirst'),
       );
       return;
     }
@@ -220,7 +222,7 @@ class _FarmerCreateAccountPageState
     // PIN validation
     if (pin.isEmpty) {
       _showMessage(
-        'Please create your Farmer PIN',
+        AppLocale.of(context).t('createFarmerPin'),
       );
       return;
     }
@@ -228,7 +230,7 @@ class _FarmerCreateAccountPageState
     // PIN must be 4 to 6 characters
     if (pin.length < 4 || pin.length > 6) {
       _showMessage(
-        'PIN must contain 4 to 6 characters',
+        AppLocale.of(context).t('pinLengthError'),
       );
       return;
     }
@@ -236,7 +238,7 @@ class _FarmerCreateAccountPageState
     // Confirm PIN
     if (confirmPin.isEmpty) {
       _showMessage(
-        'Please confirm your PIN',
+        AppLocale.of(context).t('confirmPinRequired'),
       );
       return;
     }
@@ -244,8 +246,26 @@ class _FarmerCreateAccountPageState
     // PIN matching
     if (pin != confirmPin) {
       _showMessage(
-        'PINs do not match',
+        AppLocale.of(context).t('pinsDoNotMatch'),
       );
+      return;
+    }
+
+    // Actually persist the account (previously this only validated the
+    // form and then showed a success dialog without saving anything, so
+    // the login screen couldn't recognize any account afterwards).
+    final String error = await LocalDb.register(
+          fullName: _nameController.text.trim(),
+          phone: _mobileController.text.trim(),
+          password: pin,
+          role: 'farmer',
+        ) ??
+        '';
+
+    if (!mounted) return;
+
+    if (error.isNotEmpty) {
+      _showMessage(error);
       return;
     }
 
@@ -287,8 +307,8 @@ class _FarmerCreateAccountPageState
 
               const SizedBox(height: 18),
 
-              const Text(
-                'Registration Successful!',
+              Text(
+                AppLocale.of(context).t('registrationSuccessful'),
                 textAlign:
                     TextAlign.center,
                 style: TextStyle(
@@ -302,8 +322,8 @@ class _FarmerCreateAccountPageState
 
               const SizedBox(height: 8),
 
-              const Text(
-                'Your farmer account has been created successfully.',
+              Text(
+                AppLocale.of(context).t('farmerAccountCreated'),
                 textAlign:
                     TextAlign.center,
                 style: TextStyle(
@@ -349,8 +369,8 @@ class _FarmerCreateAccountPageState
                               .circular(12),
                     ),
                   ),
-                  child: const Text(
-                    'Go to Farmer Login',
+                  child: Text(
+                    AppLocale.of(context).t('goToFarmerLogin'),
                     style: TextStyle(
                       fontWeight:
                           FontWeight.w600,
@@ -560,6 +580,8 @@ class _FarmerCreateAccountPageState
   // ==========================================================
 
   Widget _buildRegistrationContainer() {
+    final t = AppLocale.of(context).t;
+
     return Container(
       padding:
           const EdgeInsets.all(18),
@@ -616,9 +638,9 @@ class _FarmerCreateAccountPageState
                 width: 12,
               ),
 
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Registration',
+                  t('registration'),
                   style:
                       TextStyle(
                     fontSize: 16,
@@ -640,8 +662,8 @@ class _FarmerCreateAccountPageState
           // NAME
           // ----------------------------------------------------
 
-          const Text(
-            'FULL NAME',
+          Text(
+            t('fullName').toUpperCase(),
             style: TextStyle(
               fontSize: 11.5,
               fontWeight:
@@ -666,8 +688,8 @@ class _FarmerCreateAccountPageState
           // MOBILE
           // ----------------------------------------------------
 
-          const Text(
-            'MOBILE NUMBER',
+          Text(
+            t('phoneNumber').toUpperCase(),
             style: TextStyle(
               fontSize: 11.5,
               fontWeight:
@@ -738,7 +760,7 @@ class _FarmerCreateAccountPageState
                         ),
                       ),
                     )
-                  : const Row(
+                    : Row(
                       mainAxisAlignment:
                           MainAxisAlignment
                               .center,
@@ -756,7 +778,7 @@ class _FarmerCreateAccountPageState
                         ),
 
                         Text(
-                          'Get Verification Code',
+                          t('getVerificationCode'),
                           style:
                               TextStyle(
                             color:
@@ -860,6 +882,8 @@ class _FarmerCreateAccountPageState
   @override
   Widget build(
       BuildContext context) {
+    final t = AppLocale.of(context).t;
+
     return Scaffold(
       backgroundColor:
           AppColors.background,
@@ -889,8 +913,8 @@ class _FarmerCreateAccountPageState
                     // HEADER
                     // ==================================================
 
-                    const Text(
-                      'Create your account',
+                    Text(
+                      t('createYourAccount'),
                       textAlign:
                           TextAlign.center,
                       style:
@@ -927,8 +951,8 @@ class _FarmerCreateAccountPageState
                         mainAxisSize:
                             MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Already have an account? ',
+                          Text(
+                            '${t('alreadyHaveAccount')} ',
                             style:
                                 TextStyle(
                               fontSize:
@@ -951,8 +975,8 @@ class _FarmerCreateAccountPageState
                               );
                             },
                             child:
-                                const Text(
-                              'Farmer Login',
+                                Text(
+                              t('farmerLogin'),
                               style:
                                   TextStyle(
                                 fontSize:

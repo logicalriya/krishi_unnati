@@ -9,7 +9,14 @@ import 'farming_tools_page.dart';
 import 'fertilizers_page.dart';
 
 class MarketplacePage extends StatefulWidget {
-  const MarketplacePage({super.key});
+  const MarketplacePage({super.key, this.embedded = false});
+
+  /// When true, this page is being shown as a tab inside the persistent
+  /// bottom-nav shell (see farmer_dashboard.dart). In that case the shell
+  /// already provides the bottom nav bar, so this page's own (duplicated)
+  /// bottom nav row is not rendered, avoiding a double nav bar. The rest
+  /// of the Marketplace UI is completely unchanged either way.
+  final bool embedded;
 
   @override
   State<MarketplacePage> createState() => _MarketplacePageState();
@@ -273,7 +280,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
               ),
             ),
 
-            _buildBottomNavBar(),
+            if (!widget.embedded) _buildBottomNavBar(),
           ],
         ),
       ),
@@ -296,16 +303,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back,
-              color: kTextDark,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-
           Container(
             width: 38,
             height: 38,

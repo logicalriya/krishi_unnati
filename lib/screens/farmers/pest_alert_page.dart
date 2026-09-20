@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import '../farmer_extras/pest_map_screen.dart';
 
 class PestAlertPage extends StatefulWidget {
-  const PestAlertPage({super.key});
+  const PestAlertPage({super.key, this.embedded = false});
+
+
+  final bool embedded;
 
   @override
   State<PestAlertPage> createState() => _PestAlertPageState();
@@ -27,10 +31,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
   // ------------------------------------------------------------
   // SAMPLE PEST ALERT DATA
   // ------------------------------------------------------------
-  //
-  // These coordinates are examples for the SIH prototype.
-  // Later, replace this list with data coming from your backend/API.
-  //
+
 
   final List<PestAlert> _allAlerts = [
     PestAlert(
@@ -188,11 +189,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
   // ============================================================
 
   bool _isInMaharashtra(Position position) {
-    // Approximate bounding box of Maharashtra.
-    //
-    // This is sufficient for the prototype.
-    // For production, use proper reverse geocoding/boundaries.
-
     return position.latitude >= 15.5 &&
         position.latitude <= 22.1 &&
         position.longitude >= 72.5 &&
@@ -416,17 +412,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Color(0xFF278052),
-            size: 20,
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+        automaticallyImplyLeading: false,
 
         title: const Text(
           'Pest Alerts',
@@ -436,6 +422,27 @@ class _PestAlertPageState extends State<PestAlertPage> {
             fontWeight: FontWeight.bold,
           ),
         ),
+
+        // Extra feature brought over from the reference project: a live,
+        // interactive hotspot map alongside the existing alert list.
+        // Purely additive — nothing about this page's own layout changes.
+        actions: [
+          IconButton(
+            tooltip: 'Live Pest Map',
+            icon: const Icon(
+              Icons.map_outlined,
+              color: Color(0xFF278052),
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const PestMapScreen(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
 
       body: RefreshIndicator(

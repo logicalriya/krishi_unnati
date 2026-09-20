@@ -787,14 +787,6 @@ class _ExtensionOfficerCreateAccountScreenState
       ),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.chevron_left,
-              color: text,
-              size: 27,
-            ),
-          ),
           const Spacer(),
           const _BrandLogo(),
           const SizedBox(width: 10),
@@ -1261,14 +1253,6 @@ class _OTPVerificationScreenState
       ),
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.chevron_left,
-              color: text,
-              size: 27,
-            ),
-          ),
           const Spacer(),
           const _BrandLogo(),
           const SizedBox(width: 10),

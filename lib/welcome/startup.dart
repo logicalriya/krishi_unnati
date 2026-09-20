@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'dashboard_choosing_page.dart';
+import '../state/app_locale.dart';
 
 class StartupPage extends StatefulWidget {
   const StartupPage({super.key});
@@ -137,11 +138,6 @@ class _StartupPageState extends State<StartupPage>
       ),
     );
 
-    // ==========================================================
-    // TITLE
-    // 0.20 - 0.48
-    // ==========================================================
-
     _titleFadeAnimation = CurvedAnimation(
       parent: _introController,
       curve: const Interval(
@@ -165,10 +161,6 @@ class _StartupPageState extends State<StartupPage>
       ),
     );
 
-    // ==========================================================
-    // TAGLINE
-    // 0.36 - 0.64
-    // ==========================================================
 
     _taglineFadeAnimation = CurvedAnimation(
       parent: _introController,
@@ -236,6 +228,24 @@ class _StartupPageState extends State<StartupPage>
     );
   }
 
+  bool _localeSynced = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Reflect any previously saved language choice in the popup instead
+    // of always defaulting to English.
+    if (!_localeSynced) {
+      _localeSynced = true;
+      final saved = AppLocale.of(context).language;
+      selectedLanguage = switch (saved) {
+        AppLanguage.hindi => 'Hindi',
+        AppLanguage.marathi => 'Marathi',
+        AppLanguage.english => 'English',
+      };
+    }
+  }
+
   @override
   void dispose() {
     _introController.dispose();
@@ -246,7 +256,51 @@ class _StartupPageState extends State<StartupPage>
   // CONTINUE AFTER LANGUAGE
   // ============================================================
 
+  String get _popupTitle {
+    return switch (selectedLanguage) {
+      'Hindi' => 'भाषा चुनें',
+      'Marathi' => 'भाषा निवडा',
+      _ => 'Choose Language',
+    };
+  }
+
+  String get _popupSubtitle {
+    return switch (selectedLanguage) {
+      'Hindi' => 'अपनी पसंदीदा भाषा चुनें',
+      'Marathi' => 'आपली आवडती भाषा निवडा',
+      _ => 'Select your preferred language',
+    };
+  }
+
+  String get _continueButtonText {
+    return switch (selectedLanguage) {
+      'Hindi' => 'जारी रखें',
+      'Marathi' => 'पुढे जा',
+      _ => 'Continue',
+    };
+  }
+
+  void _setSelectedLanguage(String value) {
+    final AppLanguage language = switch (value) {
+      'Hindi' => AppLanguage.hindi,
+      'Marathi' => AppLanguage.marathi,
+      _ => AppLanguage.english,
+    };
+
+    AppLocale.of(context).setLanguage(language);
+    setState(() {
+      selectedLanguage = value;
+    });
+  }
+
   void _continueFromLanguage() {
+    final AppLanguage language = switch (selectedLanguage) {
+      'Hindi' => AppLanguage.hindi,
+      'Marathi' => AppLanguage.marathi,
+      _ => AppLanguage.english,
+    };
+    AppLocale.of(context).setLanguage(language);
+
     setState(() {
       showLanguagePopup = false;
       showIntroPopup = true;
@@ -416,10 +470,10 @@ class _StartupPageState extends State<StartupPage>
               // TITLE
               // ==================================================
 
-              const Text(
-                'Choose Language',
+              Text(
+                _popupTitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
                   color: darkNavy,
@@ -428,10 +482,10 @@ class _StartupPageState extends State<StartupPage>
 
               const SizedBox(height: 7),
 
-              const Text(
-                'Select your preferred language',
+              Text(
+                _popupSubtitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   color: secondaryText,
                 ),
@@ -489,18 +543,18 @@ class _StartupPageState extends State<StartupPage>
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
-                  child: const Row(
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Continue',
-                        style: TextStyle(
+                        _continueButtonText,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(
+                      const SizedBox(width: 8),
+                      const Icon(
                         Icons.arrow_forward_rounded,
                         size: 20,
                       ),
@@ -526,11 +580,7 @@ class _StartupPageState extends State<StartupPage>
     final bool selected = selectedLanguage == value;
 
     return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedLanguage = value;
-        });
-      },
+      onTap: () => _setSelectedLanguage(value),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 220),
         width: double.infinity,

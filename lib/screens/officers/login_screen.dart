@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../state/app_locale.dart';
 import 'create_account_screen.dart';
 
 /// Extension Officer – Login
@@ -55,8 +56,8 @@ class _ExtensionOfficerLoginScreenState
     setState(() => _loading = false);
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Signed in'),
+      SnackBar(
+        content: Text(AppLocale.of(context).t('signedIn')),
       ),
     );
   }
@@ -73,6 +74,8 @@ class _ExtensionOfficerLoginScreenState
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocale.of(context).t;
+
     return Scaffold(
       backgroundColor: _surface,
       body: SafeArea(
@@ -110,6 +113,8 @@ class _ExtensionOfficerLoginScreenState
 
   // ── Header ─────────────────────────────────────────────────────
   Widget _buildHeader() {
+    final t = AppLocale.of(context).t;
+
     return SizedBox(
       height: 60,
       child: Row(
@@ -130,7 +135,7 @@ class _ExtensionOfficerLoginScreenState
           ),
           const SizedBox(width: 10),
           Text(
-            'Krishi Unnati',
+            t('appName'),
             style: GoogleFonts.plusJakartaSans(
               fontSize: 15,
               fontWeight: FontWeight.w700,
@@ -144,6 +149,8 @@ class _ExtensionOfficerLoginScreenState
 
   // ── Body ───────────────────────────────────────────────────────
   Widget _buildBody() {
+    final t = AppLocale.of(context).t;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -168,7 +175,7 @@ class _ExtensionOfficerLoginScreenState
               ),
               const SizedBox(height: 12),
               Text(
-                'Officer Login',
+                t('adminLogin'),
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 23,
                   fontWeight: FontWeight.w800,
@@ -177,7 +184,7 @@ class _ExtensionOfficerLoginScreenState
               ),
               const SizedBox(height: 5),
               Text(
-                'Sign in to access your officer account.',
+                t('accessAdminSuite'),
                 textAlign: TextAlign.center,
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 12,
@@ -219,7 +226,7 @@ class _ExtensionOfficerLoginScreenState
                     ),
                   )
                 : Text(
-                    'LOGIN',
+                  t('signIn').toUpperCase(),
                     style: GoogleFonts.plusJakartaSans(
                       fontSize: 11,
                       fontWeight: FontWeight.w800,
@@ -243,7 +250,7 @@ class _ExtensionOfficerLoginScreenState
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 10),
               child: Text(
-                'Haven\'t registered yet?',
+                t('newOfficial'),
                 style: GoogleFonts.plusJakartaSans(
                   fontSize: 10.5,
                   color: _muted,
@@ -278,7 +285,7 @@ class _ExtensionOfficerLoginScreenState
               ),
             ),
             child: Text(
-              'REGISTER',
+              t('register').toUpperCase(),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -296,7 +303,7 @@ class _ExtensionOfficerLoginScreenState
               // TODO: navigate to forgot-password flow
             },
             child: Text(
-              'Forgot Password?',
+              t('forgotPassword'),
               style: GoogleFonts.plusJakartaSans(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,

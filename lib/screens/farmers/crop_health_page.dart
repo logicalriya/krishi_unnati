@@ -172,17 +172,6 @@ class _CropHealthPageState extends State<CropHealthPage> {
         elevation: 0,
         centerTitle: true,
 
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            size: 20,
-            color: Color(0xFF263238),
-          ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-
         title: const Text(
           'Leaf Disease Detection',
           style: TextStyle(

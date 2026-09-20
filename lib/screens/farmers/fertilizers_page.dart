@@ -1082,13 +1082,6 @@ class _FertilizersPageState extends State<FertilizersPage> {
       color: Colors.white,
       child: Row(
         children: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(
-              Icons.arrow_back,
-              color: kTextDark,
-            ),
-          ),
           Container(
             width: 42,
             height: 42,

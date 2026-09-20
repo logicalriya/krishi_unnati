@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 
 import 'farmer_create_account_page.dart';
 import 'farmer_dashboard.dart';
+import 'forgot_pin_page.dart';
+import '../../services/local_db.dart';
+import '../../state/app_locale.dart';
 
 /// ============================================================
 /// KRISHI UNNATI — FARMER LOGIN PAGE
@@ -48,14 +51,14 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
     // Check mobile number
     if (mobile.isEmpty) {
       _showMessage(
-        'Please enter your mobile number',
+        AppLocale.of(context).t('enterYourMobileNumber'),
       );
       return;
     }
 
     if (mobile.length != 10) {
       _showMessage(
-        'Please enter a valid 10-digit mobile number',
+        AppLocale.of(context).t('enterValidMobileNumber'),
       );
       return;
     }
@@ -63,14 +66,14 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
     // Check PIN
     if (pin.isEmpty) {
       _showMessage(
-        'Please enter your login PIN',
+        AppLocale.of(context).t('enterYourPin'),
       );
       return;
     }
 
     if (pin.length < 4 || pin.length > 6) {
       _showMessage(
-        'PIN must contain 4 to 6 characters',
+        AppLocale.of(context).t('pinLengthError'),
       );
       return;
     }
@@ -79,9 +82,11 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
       _isLoggingIn = true;
     });
 
-    // Small delay for login effect.
-    await Future.delayed(
-      const Duration(milliseconds: 700),
+
+    final String? error = await LocalDb.login(
+      phone: mobile,
+      password: pin,
+      role: 'farmer',
     );
 
     if (!mounted) return;
@@ -90,15 +95,10 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
       _isLoggingIn = false;
     });
 
-    // ==========================================================
-    // DEMO LOGIN
-    //
-    // For now, any valid 10-digit mobile number
-    // and valid 4-6 character PIN will open the dashboard.
-    //
-    // Later you can replace this with Firebase/API/database
-    // authentication.
-    // ==========================================================
+    if (error != null) {
+      _showMessage(error);
+      return;
+    }
 
     Navigator.pushReplacement(
       context,
@@ -129,8 +129,11 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
   // ============================================================
 
   void _forgotPin() {
-    _showMessage(
-      'PIN recovery will be available soon',
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ForgotPinPage(),
+      ),
     );
   }
 
@@ -140,6 +143,8 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocale.of(context).t;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -201,17 +206,6 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              color: AppColors.textPrimary,
-              size: 28,
-            ),
-            onPressed: () {
-              Navigator.of(context).maybePop();
-            },
-          ),
-
           const Spacer(),
 
           Container(
@@ -237,6 +231,8 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
   // ============================================================
 
   Widget _buildAccessibilityBar() {
+    final t = AppLocale.of(context).t;
+
     return Container(
       margin: const EdgeInsets.symmetric(
         horizontal: 20,
@@ -259,9 +255,9 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
 
           const SizedBox(width: 10),
 
-          const Expanded(
+          Expanded(
             child: Text(
-              'Accessibility Mode',
+              t('accessibilityMode'),
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -315,10 +311,12 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
   // ============================================================
 
   Widget _buildHeader() {
-    return const Column(
+    final t = AppLocale.of(context).t;
+
+    return Column(
       children: [
         Text(
-          'Login',
+          t('signIn'),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 23,
@@ -330,7 +328,7 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
         SizedBox(height: 6),
 
         Text(
-          'Enter your details to continue',
+          t('welcomeBack'),
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 13,
@@ -346,6 +344,8 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
   // ============================================================
 
   Widget _buildLoginCard() {
+    final t = AppLocale.of(context).t;
+
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
@@ -361,7 +361,7 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
         children: [
           _buildFieldLabel(
             Icons.call_outlined,
-            'MOBILE NUMBER',
+            t('phoneNumber').toUpperCase(),
           ),
 
           const SizedBox(height: 8),
@@ -376,13 +376,13 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
             children: [
               _buildFieldLabel(
                 Icons.lock_outline,
-                'LOGIN PIN',
+                t('loginPin').toUpperCase(),
               ),
 
               GestureDetector(
                 onTap: _forgotPin,
-                child: const Text(
-                  'FORGOT PIN?',
+                child: Text(
+                  t('forgotPin').toUpperCase(),
                   style: TextStyle(
                     fontSize: 11.5,
                     fontWeight: FontWeight.bold,
@@ -629,12 +629,12 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
                   ),
                 ),
               )
-            : const Row(
+            : Row(
                 mainAxisAlignment:
                     MainAxisAlignment.center,
                 children: [
                   Text(
-                    'Login Securely',
+                    AppLocale.of(context).t('secureLogin'),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 15.5,
@@ -661,7 +661,9 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
   // ============================================================
 
   Widget _buildOrDivider() {
-    return const Row(
+    final t = AppLocale.of(context).t;
+
+    return Row(
       children: [
         Expanded(
           child: Divider(
@@ -676,7 +678,7 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
             horizontal: 10,
           ),
           child: Text(
-            'OR',
+            t('orLabel'),
             style: TextStyle(
               fontSize: 11,
               color: AppColors.mutedText,
@@ -725,8 +727,8 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
           ),
         ),
 
-        child: const Text(
-          'New Farmer? Register Now',
+        child: Text(
+          AppLocale.of(context).t('newFarmerRegister'),
           style: TextStyle(
             color: AppColors.primaryGreen,
             fontSize: 14.5,
@@ -772,13 +774,13 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
 
           const SizedBox(width: 10),
 
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment:
                   CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Need help logging in?',
+                  AppLocale.of(context).t('needHelpLogin'),
                   style: TextStyle(
                     fontWeight:
                         FontWeight.w700,
@@ -788,17 +790,6 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
                   ),
                 ),
 
-                SizedBox(height: 3),
-
-                Text(
-                  'Visit your nearest Gram Panchayat office or call our toll-free helpline at 1800-123-4567.',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color:
-                        AppColors.mutedText,
-                    height: 1.35,
-                  ),
-                ),
               ],
             ),
           ),

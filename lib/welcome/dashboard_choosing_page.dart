@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'farmers/farmer_create_account_page.dart';
-import 'admins/admin_dashboard.dart';
-import 'officers/create_account_screen.dart';
+import '../screens/farmers/farmer_create_account_page.dart';
+import '../screens/admins/admin_dashboard.dart';
+import '../screens/officers/create_account_screen.dart';
+import 'registration_help_page.dart';
+import '../state/app_locale.dart';
 
 class DashboardChoosingPage extends StatefulWidget {
   const DashboardChoosingPage({super.key});
@@ -15,10 +17,32 @@ class DashboardChoosingPage extends StatefulWidget {
 
 class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
   String selectedLanguage = 'English';
+  bool _localeSynced = false;
 
-  // =========================================================================
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_localeSynced) {
+      _localeSynced = true;
+      final saved = AppLocale.of(context).language;
+      selectedLanguage = switch (saved) {
+        AppLanguage.hindi => 'Hindi',
+        AppLanguage.marathi => 'Marathi',
+        AppLanguage.english => 'English',
+      };
+    }
+  }
+
+  void _persistLanguage(String value) {
+    final language = switch (value) {
+      'Hindi' => AppLanguage.hindi,
+      'Marathi' => AppLanguage.marathi,
+      _ => AppLanguage.english,
+    };
+    AppLocale.of(context).setLanguage(language);
+  }
+
   // THEME COLORS
-  // =========================================================================
 
   static const Color primaryGreen = Color(0xFF3F713F);
   static const Color iconGreen = Color(0xFF00966C);
@@ -27,17 +51,13 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
   static const Color borderGreen = Color(0xFFD0DCCF);
   static const Color footerGreen = Color(0xFFF5F7F4);
 
-  // =========================================================================
   // CLOSE APP
-  // =========================================================================
 
   void _closeApp() {
     SystemNavigator.pop();
   }
 
-  // =========================================================================
   // OPEN FARMER DASHBOARD
-  // =========================================================================
 
   void _openFarmerDashboard() {
     Navigator.of(context).push(
@@ -99,20 +119,6 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                 child: Row(
                   children: [
                     // --------------------------------------------------------
-                    // BACK / CLOSE BUTTON
-                    // --------------------------------------------------------
-
-                    IconButton(
-                      onPressed: _closeApp,
-                      tooltip: 'Exit',
-                      icon: const Icon(
-                        Icons.arrow_back_rounded,
-                        size: 29,
-                        color: darkNavy,
-                      ),
-                    ),
-
-                    // --------------------------------------------------------
                     // LOGO
                     // --------------------------------------------------------
 
@@ -120,8 +126,6 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                       child: _buildKrishiUnnatiLogo(),
                     ),
 
-                    // Keeps logo visually centered
-                    const SizedBox(width: 48),
                   ],
                 ),
               ),
@@ -147,9 +151,9 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                     // GET STARTED
                     // --------------------------------------------------------
 
-                    const Text(
-                      'Get Started',
-                      style: TextStyle(
+                    Text(
+                      AppLocale.of(context).t('getStarted'),
+                      style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w800,
                         color: darkNavy,
@@ -159,9 +163,9 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
 
                     const SizedBox(height: 6),
 
-                    const Text(
-                      'Select your role :',
-                      style: TextStyle(
+                    Text(
+                      AppLocale.of(context).t('selectRole'),
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                         color: Color(0xFF555B68),
@@ -175,7 +179,7 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                     // --------------------------------------------------------
 
                     _buildRoleCard(
-                      title: 'Farmer Portal',
+                      title: AppLocale.of(context).t('farmerPortal'),
                       type: RoleType.farmer,
                       onTap: _openFarmerDashboard,
                     ),
@@ -187,7 +191,7 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                     // --------------------------------------------------------
 
                     _buildRoleCard(
-                      title: 'Govt. Admin',
+                      title: AppLocale.of(context).t('govAdmin'),
                       type: RoleType.admin,
                       onTap: _openAdminDashboard,
                     ),
@@ -199,7 +203,7 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                     // --------------------------------------------------------
 
                     _buildRoleCard(
-                      title: 'Extension Officer',
+                      title: AppLocale.of(context).t('extensionOfficer'),
                       type: RoleType.officer,
                       onTap: _openExtensionOficerLoginScreen,
                     ),
@@ -307,9 +311,9 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
 
             const SizedBox(width: 7),
 
-            const Text(
-              'CHOOSE LANGUAGE',
-              style: TextStyle(
+            Text(
+              AppLocale.of(context).t('selectLanguage').toUpperCase(),
+              style: const TextStyle(
                 fontSize: 19,
                 fontWeight: FontWeight.w800,
                 color: darkNavy,
@@ -411,11 +415,13 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                   ),
                 ),
               ],
+
               onChanged: (value) {
                 if (value != null) {
                   setState(() {
                     selectedLanguage = value;
                   });
+                  _persistLanguage(value);
                 }
               },
             ),
@@ -434,6 +440,8 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
     required RoleType type,
     required VoidCallback onTap,
   }) {
+    final t = AppLocale.of(context).t;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -530,7 +538,7 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
                       Row(
                         children: [
                           Text(
-                            'Continue',
+                            t('continueLabel'),
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
@@ -788,9 +796,15 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
   // =========================================================================
 
   Widget _buildHelpSection() {
+    final t = AppLocale.of(context).t;
+
     return InkWell(
       onTap: () {
-        // TODO: registration help page
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const RegistrationHelpPage(),
+          ),
+        );
       },
       child: Container(
         width: double.infinity,
@@ -801,8 +815,8 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
-              'Need help with registration?',
+            Text(
+              t('needHelpRegistration'),
               style: TextStyle(
                 fontSize: 14.5,
                 fontWeight: FontWeight.w700,

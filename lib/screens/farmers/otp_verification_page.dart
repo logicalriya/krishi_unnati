@@ -215,17 +215,6 @@ class _OTPVerificationPageState
       ),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary,
-              size: 20,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-
           const Spacer(),
 
           Container(

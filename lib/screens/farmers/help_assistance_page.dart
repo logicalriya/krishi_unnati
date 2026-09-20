@@ -82,18 +82,6 @@ class HelpAssistancePage extends StatelessWidget {
 
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(
-              Icons.chevron_left,
-              color: AppColors.textPrimary,
-              size: 28,
-            ),
-
-            onPressed: () {
-              Navigator.of(context).maybePop();
-            },
-          ),
-
           const Spacer(),
 
           Container(
