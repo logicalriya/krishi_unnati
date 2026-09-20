@@ -1,7 +1,36 @@
 import 'package:flutter/material.dart';
+import 'marketplace_page.dart';
 
 class FertilizersPage extends StatefulWidget {
-  const FertilizersPage({super.key});
+  const FertilizersPage({
+    super.key,
+    this.products = const [],
+  });
+
+  // Dynamic backend/API data.
+  //
+  // Expected structure:
+  //
+  // [
+  //   {
+  //     'id': 'fert_001',
+  //     'name': 'Urea',
+  //     'category': 'Chemical Fertilizers',
+  //     'description': 'Nitrogen fertilizer',
+  //     'image': '',
+  //     'icon': Icons.grass,
+  //     'warning': false,
+  //     'sellers': [
+  //       {
+  //         'shop': 'Local Agri Store',
+  //         'price': 270.0,
+  //         'distance': 1.4,
+  //         'phone': '+91 9876543001',
+  //       },
+  //     ],
+  //   },
+  // ]
+  final List<Map<String, dynamic>> products;
 
   @override
   State<FertilizersPage> createState() =>
@@ -33,808 +62,6 @@ class _FertilizersPageState extends State<FertilizersPage> {
     'Crop Protection',
   ];
 
-  // Frontend demo data.
-  // Replace this list with API/database data later.
-  final List<Map<String, dynamic>> products = [
-    // -----------------------------------------------------
-    // CHEMICAL FERTILIZERS
-    // -----------------------------------------------------
-    {
-      'id': 'fert_001',
-      'name': 'Urea',
-      'category': 'Chemical Fertilizers',
-      'description': 'Nitrogen fertilizer',
-      'image': '',
-      'icon': Icons.grass,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Agri Store',
-          'price': 270.0,
-          'distance': 1.4,
-          'phone': '+91 9876543001',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 285.0,
-          'distance': 2.7,
-          'phone': '+91 9876543002',
-        },
-      ],
-    },
-    {
-      'id': 'fert_002',
-      'name': 'DAP',
-      'category': 'Chemical Fertilizers',
-      'description': 'Diammonium Phosphate',
-      'image': '',
-      'icon': Icons.eco,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Green Farm Centre',
-          'price': 1350.0,
-          'distance': 1.8,
-          'phone': '+91 9876543003',
-        },
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 1390.0,
-          'distance': 3.2,
-          'phone': '+91 9876543004',
-        },
-      ],
-    },
-    {
-      'id': 'fert_003',
-      'name': 'NPK 10:26:26',
-      'category': 'Chemical Fertilizers',
-      'description': 'NPK complex fertilizer',
-      'image': '',
-      'icon': Icons.local_florist,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 1450.0,
-          'distance': 2.2,
-          'phone': '+91 9876543005',
-        },
-        {
-          'shop': 'Local Agri Store',
-          'price': 1490.0,
-          'distance': 3.8,
-          'phone': '+91 9876543006',
-        },
-      ],
-    },
-    {
-      'id': 'fert_004',
-      'name': 'NPK 12:32:16',
-      'category': 'Chemical Fertilizers',
-      'description': 'NPK complex fertilizer',
-      'image': '',
-      'icon': Icons.local_florist,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 1500.0,
-          'distance': 1.9,
-          'phone': '+91 9876543007',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 1540.0,
-          'distance': 4.1,
-          'phone': '+91 9876543008',
-        },
-      ],
-    },
-    {
-      'id': 'fert_005',
-      'name': 'NPK 19:19:19',
-      'category': 'Chemical Fertilizers',
-      'description': 'Balanced NPK fertilizer',
-      'image': '',
-      'icon': Icons.spa,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 1700.0,
-          'distance': 2.0,
-          'phone': '+91 9876543009',
-        },
-        {
-          'shop': 'Farm Input Centre',
-          'price': 1750.0,
-          'distance': 3.5,
-          'phone': '+91 9876543010',
-        },
-      ],
-    },
-    {
-      'id': 'fert_006',
-      'name': 'MOP',
-      'category': 'Chemical Fertilizers',
-      'description': 'Muriate of Potash / Potassium Chloride',
-      'image': '',
-      'icon': Icons.agriculture,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Agri Store',
-          'price': 850.0,
-          'distance': 1.5,
-          'phone': '+91 9876543011',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 890.0,
-          'distance': 2.9,
-          'phone': '+91 9876543012',
-        },
-      ],
-    },
-    {
-      'id': 'fert_007',
-      'name': 'SSP',
-      'category': 'Chemical Fertilizers',
-      'description': 'Single Super Phosphate',
-      'image': '',
-      'icon': Icons.grass,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 500.0,
-          'distance': 1.7,
-          'phone': '+91 9876543013',
-        },
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 530.0,
-          'distance': 3.0,
-          'phone': '+91 9876543014',
-        },
-      ],
-    },
-    {
-      'id': 'fert_008',
-      'name': 'Ammonium Sulphate',
-      'category': 'Chemical Fertilizers',
-      'description': 'Nitrogen and sulphur fertilizer',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Green Farm Centre',
-          'price': 650.0,
-          'distance': 2.1,
-          'phone': '+91 9876543015',
-        },
-        {
-          'shop': 'Local Agri Store',
-          'price': 690.0,
-          'distance': 3.7,
-          'phone': '+91 9876543016',
-        },
-      ],
-    },
-    {
-      'id': 'fert_009',
-      'name': 'Calcium Ammonium Nitrate',
-      'category': 'Chemical Fertilizers',
-      'description': 'CAN fertilizer',
-      'image': '',
-      'icon': Icons.science,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 900.0,
-          'distance': 2.3,
-          'phone': '+91 9876543017',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 930.0,
-          'distance': 4.0,
-          'phone': '+91 9876543018',
-        },
-      ],
-    },
-    {
-      'id': 'fert_010',
-      'name': 'Potassium Nitrate 13:0:45',
-      'category': 'Chemical Fertilizers',
-      'description': 'Potassium nitrate',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Green Farm Centre',
-          'price': 2200.0,
-          'distance': 2.5,
-          'phone': '+91 9876543019',
-        },
-        {
-          'shop': 'Farm Input Centre',
-          'price': 2280.0,
-          'distance': 4.2,
-          'phone': '+91 9876543020',
-        },
-      ],
-    },
-    {
-      'id': 'fert_011',
-      'name': 'Monopotassium Phosphate 0:52:34',
-      'category': 'Chemical Fertilizers',
-      'description': 'MKP fertilizer',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Agri Store',
-          'price': 2400.0,
-          'distance': 1.9,
-          'phone': '+91 9876543021',
-        },
-        {
-          'shop': 'Farm Input Centre',
-          'price': 2480.0,
-          'distance': 3.9,
-          'phone': '+91 9876543022',
-        },
-      ],
-    },
-
-    // -----------------------------------------------------
-    // ORGANIC & BIO
-    // -----------------------------------------------------
-    {
-      'id': 'fert_012',
-      'name': 'Vermicompost',
-      'category': 'Organic & Bio',
-      'description': 'Organic soil amendment',
-      'image': '',
-      'icon': Icons.compost,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Organic Farm Store',
-          'price': 300.0,
-          'distance': 1.3,
-          'phone': '+91 9876543023',
-        },
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 350.0,
-          'distance': 2.8,
-          'phone': '+91 9876543024',
-        },
-      ],
-    },
-    {
-      'id': 'fert_013',
-      'name': 'Farmyard Manure',
-      'category': 'Organic & Bio',
-      'description': 'FYM / Cow dung manure',
-      'image': '',
-      'icon': Icons.grass,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Organic Farm',
-          'price': 200.0,
-          'distance': 1.1,
-          'phone': '+91 9876543025',
-        },
-        {
-          'shop': 'Organic Farm Store',
-          'price': 250.0,
-          'distance': 3.0,
-          'phone': '+91 9876543026',
-        },
-      ],
-    },
-    {
-      'id': 'fert_014',
-      'name': 'Neem Cake',
-      'category': 'Organic & Bio',
-      'description': 'Organic soil amendment',
-      'image': '',
-      'icon': Icons.eco,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Organic Farm Store',
-          'price': 450.0,
-          'distance': 1.6,
-          'phone': '+91 9876543027',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 490.0,
-          'distance': 3.3,
-          'phone': '+91 9876543028',
-        },
-      ],
-    },
-    {
-      'id': 'fert_015',
-      'name': 'Mustard Cake',
-      'category': 'Organic & Bio',
-      'description': 'Organic manure',
-      'image': '',
-      'icon': Icons.eco,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Organic Farm Store',
-          'price': 500.0,
-          'distance': 1.8,
-          'phone': '+91 9876543029',
-        },
-        {
-          'shop': 'Local Organic Farm',
-          'price': 540.0,
-          'distance': 3.5,
-          'phone': '+91 9876543030',
-        },
-      ],
-    },
-    {
-      'id': 'fert_016',
-      'name': 'Bone Meal',
-      'category': 'Organic & Bio',
-      'description': 'Organic phosphorus source',
-      'image': '',
-      'icon': Icons.grass,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Organic Farm Store',
-          'price': 600.0,
-          'distance': 2.0,
-          'phone': '+91 9876543031',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 650.0,
-          'distance': 3.8,
-          'phone': '+91 9876543032',
-        },
-      ],
-    },
-    {
-      'id': 'fert_017',
-      'name': 'Rhizobium Culture',
-      'category': 'Organic & Bio',
-      'description': 'Biofertilizer culture',
-      'image': '',
-      'icon': Icons.biotech_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Bio Agri Centre',
-          'price': 180.0,
-          'distance': 2.2,
-          'phone': '+91 9876543033',
-        },
-        {
-          'shop': 'Organic Farm Store',
-          'price': 210.0,
-          'distance': 4.0,
-          'phone': '+91 9876543034',
-        },
-      ],
-    },
-    {
-      'id': 'fert_018',
-      'name': 'Azotobacter',
-      'category': 'Organic & Bio',
-      'description': 'Nitrogen-fixing biofertilizer',
-      'image': '',
-      'icon': Icons.biotech_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Bio Agri Centre',
-          'price': 190.0,
-          'distance': 1.9,
-          'phone': '+91 9876543035',
-        },
-        {
-          'shop': 'Organic Farm Store',
-          'price': 230.0,
-          'distance': 3.4,
-          'phone': '+91 9876543036',
-        },
-      ],
-    },
-    {
-      'id': 'fert_019',
-      'name': 'Phosphate Solubilizing Bacteria',
-      'category': 'Organic & Bio',
-      'description': 'PSB biofertilizer',
-      'image': '',
-      'icon': Icons.biotech_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Bio Agri Centre',
-          'price': 200.0,
-          'distance': 2.1,
-          'phone': '+91 9876543037',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 240.0,
-          'distance': 3.7,
-          'phone': '+91 9876543038',
-        },
-      ],
-    },
-    {
-      'id': 'fert_020',
-      'name': 'Green Manure',
-      'category': 'Organic & Bio',
-      'description': 'Organic soil improvement',
-      'image': '',
-      'icon': Icons.grass,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Organic Farm',
-          'price': 250.0,
-          'distance': 1.5,
-          'phone': '+91 9876543039',
-        },
-        {
-          'shop': 'Organic Farm Store',
-          'price': 290.0,
-          'distance': 3.1,
-          'phone': '+91 9876543040',
-        },
-      ],
-    },
-
-    // -----------------------------------------------------
-    // MICRONUTRIENTS
-    // -----------------------------------------------------
-    {
-      'id': 'fert_021',
-      'name': 'Bentonite Sulphur',
-      'category': 'Micronutrients',
-      'description': 'Sulphur soil conditioner',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 700.0,
-          'distance': 2.0,
-          'phone': '+91 9876543041',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 750.0,
-          'distance': 3.8,
-          'phone': '+91 9876543042',
-        },
-      ],
-    },
-    {
-      'id': 'fert_022',
-      'name': 'Zinc Sulphate',
-      'category': 'Micronutrients',
-      'description': 'Zinc micronutrient',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Agri Store',
-          'price': 900.0,
-          'distance': 1.7,
-          'phone': '+91 9876543043',
-        },
-        {
-          'shop': 'Farm Input Centre',
-          'price': 950.0,
-          'distance': 3.2,
-          'phone': '+91 9876543044',
-        },
-      ],
-    },
-    {
-      'id': 'fert_023',
-      'name': 'Ferrous Sulphate',
-      'category': 'Micronutrients',
-      'description': 'Iron micronutrient',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 450.0,
-          'distance': 2.2,
-          'phone': '+91 9876543045',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 500.0,
-          'distance': 4.0,
-          'phone': '+91 9876543046',
-        },
-      ],
-    },
-    {
-      'id': 'fert_024',
-      'name': 'Borax',
-      'category': 'Micronutrients',
-      'description': 'Boron source',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Local Agri Store',
-          'price': 300.0,
-          'distance': 1.9,
-          'phone': '+91 9876543047',
-        },
-        {
-          'shop': 'Farm Input Centre',
-          'price': 340.0,
-          'distance': 3.5,
-          'phone': '+91 9876543048',
-        },
-      ],
-    },
-    {
-      'id': 'fert_025',
-      'name': 'Magnesium Sulphate',
-      'category': 'Micronutrients',
-      'description': 'Magnesium and sulphur source',
-      'image': '',
-      'icon': Icons.science_outlined,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Green Farm Centre',
-          'price': 550.0,
-          'distance': 2.3,
-          'phone': '+91 9876543049',
-        },
-        {
-          'shop': 'Local Agri Store',
-          'price': 600.0,
-          'distance': 3.7,
-          'phone': '+91 9876543050',
-        },
-      ],
-    },
-    {
-      'id': 'fert_026',
-      'name': 'Gypsum',
-      'category': 'Micronutrients',
-      'description': 'Calcium and sulphur source',
-      'image': '',
-      'icon': Icons.grass,
-      'warning': false,
-      'sellers': [
-        {
-          'shop': 'Farm Input Centre',
-          'price': 400.0,
-          'distance': 1.8,
-          'phone': '+91 9876543051',
-        },
-        {
-          'shop': 'Green Farm Centre',
-          'price': 440.0,
-          'distance': 3.1,
-          'phone': '+91 9876543052',
-        },
-      ],
-    },
-
-    // -----------------------------------------------------
-    // CROP PROTECTION
-    // -----------------------------------------------------
-    {
-      'id': 'fert_027',
-      'name': 'Glyphosate',
-      'category': 'Crop Protection',
-      'description': 'Non-selective herbicide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 650.0,
-          'distance': 2.0,
-          'phone': '+91 9876543053',
-        },
-        {
-          'shop': 'Farm Input Centre',
-          'price': 700.0,
-          'distance': 3.8,
-          'phone': '+91 9876543054',
-        },
-      ],
-    },
-    {
-      'id': 'fert_028',
-      'name': 'Paraquat',
-      'category': 'Crop Protection',
-      'description': 'Contact herbicide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 700.0,
-          'distance': 2.4,
-          'phone': '+91 9876543055',
-        },
-        {
-          'shop': 'Agri Care Store',
-          'price': 750.0,
-          'distance': 4.0,
-          'phone': '+91 9876543056',
-        },
-      ],
-    },
-    {
-      'id': 'fert_029',
-      'name': 'Thiamethoxam',
-      'category': 'Crop Protection',
-      'description': 'Systemic insecticide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Agri Care Store',
-          'price': 550.0,
-          'distance': 1.9,
-          'phone': '+91 9876543057',
-        },
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 590.0,
-          'distance': 3.3,
-          'phone': '+91 9876543058',
-        },
-      ],
-    },
-    {
-      'id': 'fert_030',
-      'name': 'Chlorpyrifos',
-      'category': 'Crop Protection',
-      'description': 'Insecticide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 600.0,
-          'distance': 2.1,
-          'phone': '+91 9876543059',
-        },
-        {
-          'shop': 'Agri Care Store',
-          'price': 650.0,
-          'distance': 3.7,
-          'phone': '+91 9876543060',
-        },
-      ],
-    },
-    {
-      'id': 'fert_031',
-      'name': 'Dimethoate',
-      'category': 'Crop Protection',
-      'description': 'Insecticide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Agri Care Store',
-          'price': 500.0,
-          'distance': 1.8,
-          'phone': '+91 9876543061',
-        },
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 540.0,
-          'distance': 3.5,
-          'phone': '+91 9876543062',
-        },
-      ],
-    },
-    {
-      'id': 'fert_032',
-      'name': 'Mancozeb',
-      'category': 'Crop Protection',
-      'description': 'Fungicide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 650.0,
-          'distance': 2.2,
-          'phone': '+91 9876543063',
-        },
-        {
-          'shop': 'Agri Care Store',
-          'price': 700.0,
-          'distance': 4.0,
-          'phone': '+91 9876543064',
-        },
-      ],
-    },
-    {
-      'id': 'fert_033',
-      'name': 'Carbendazim',
-      'category': 'Crop Protection',
-      'description': 'Fungicide',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Agri Care Store',
-          'price': 500.0,
-          'distance': 1.7,
-          'phone': '+91 9876543065',
-        },
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 550.0,
-          'distance': 3.2,
-          'phone': '+91 9876543066',
-        },
-      ],
-    },
-    {
-      'id': 'fert_034',
-      'name': 'Copper Sulphate',
-      'category': 'Crop Protection',
-      'description': 'Crop protection chemical',
-      'image': '',
-      'icon': Icons.warning_amber_outlined,
-      'warning': true,
-      'sellers': [
-        {
-          'shop': 'Crop Protection Centre',
-          'price': 750.0,
-          'distance': 2.3,
-          'phone': '+91 9876543067',
-        },
-        {
-          'shop': 'Agri Care Store',
-          'price': 800.0,
-          'distance': 4.1,
-          'phone': '+91 9876543068',
-        },
-      ],
-    },
-  ];
-
   @override
   void dispose() {
     searchController.dispose();
@@ -842,14 +69,15 @@ class _FertilizersPageState extends State<FertilizersPage> {
   }
 
   List<Map<String, dynamic>> get filteredProducts {
-    final result = products.where((product) {
+    final result = widget.products.where((product) {
       final categoryMatch =
           selectedCategory == 'All' ||
-              product['category'] == selectedCategory;
+          product['category'] == selectedCategory;
 
       final query = searchQuery.toLowerCase();
 
-      final searchMatch = query.isEmpty ||
+      final searchMatch =
+          query.isEmpty ||
           product['name']
               .toString()
               .toLowerCase()
@@ -885,7 +113,9 @@ class _FertilizersPageState extends State<FertilizersPage> {
     return result;
   }
 
-  double _cheapestPrice(Map<String, dynamic> product) {
+  double _cheapestPrice(
+    Map<String, dynamic> product,
+  ) {
     final sellers =
         List<Map<String, dynamic>>.from(
       product['sellers'] ?? [],
@@ -898,7 +128,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
           .compareTo(b['price'] as num),
     );
 
-    return (sellers.first['price'] as num).toDouble();
+    return (sellers.first['price'] as num)
+        .toDouble();
   }
 
   Map<String, dynamic>? _cheapestSeller(
@@ -1005,10 +236,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
                                   ),
                                   child: Icon(
                                     lowToHigh
-                                        ? Icons
-                                            .arrow_upward
-                                        : Icons
-                                            .arrow_downward,
+                                        ? Icons.arrow_upward
+                                        : Icons.arrow_downward,
                                     color: kGreen,
                                     size: 18,
                                   ),
@@ -1048,11 +277,13 @@ class _FertilizersPageState extends State<FertilizersPage> {
                     )
                   else
                     SliverPadding(
-                      padding: const EdgeInsets.symmetric(
+                      padding:
+                          const EdgeInsets.symmetric(
                         horizontal: 16,
                       ),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
+                        delegate:
+                            SliverChildBuilderDelegate(
                           (context, index) {
                             return _buildProductCard(
                               filteredProducts[index],
@@ -1078,16 +309,40 @@ class _FertilizersPageState extends State<FertilizersPage> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(8, 10, 16, 12),
+      padding:
+          const EdgeInsets.fromLTRB(8, 10, 16, 12),
       color: Colors.white,
       child: Row(
         children: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const MarketplacePage(),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.arrow_back_ios_new,
+              color: kTextDark,
+              size: 21,
+            ),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(
+              minWidth: 42,
+              minHeight: 42,
+            ),
+          ),
+
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
               color: kSoftGreen,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius:
+                  BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.eco_outlined,
@@ -1095,7 +350,9 @@ class _FertilizersPageState extends State<FertilizersPage> {
               size: 25,
             ),
           ),
+
           const SizedBox(width: 10),
+
           const Expanded(
             child: Text(
               'Fertilizers & Chemicals',
@@ -1138,7 +395,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
                 });
               },
               decoration: const InputDecoration(
-                hintText: 'Search fertilizers...',
+                hintText:
+                    'Search fertilizers...',
                 border: InputBorder.none,
               ),
             ),
@@ -1194,14 +452,16 @@ class _FertilizersPageState extends State<FertilizersPage> {
       height: 45,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
+        physics:
+            const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemCount: categories.length,
         separatorBuilder: (_, __) =>
             const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final category = categories[index];
-          final selected = category == selectedCategory;
+          final selected =
+              category == selectedCategory;
 
           return GestureDetector(
             onTap: () {
@@ -1210,14 +470,16 @@ class _FertilizersPageState extends State<FertilizersPage> {
               });
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(
+              padding:
+                  const EdgeInsets.symmetric(
                 horizontal: 15,
               ),
               decoration: BoxDecoration(
                 color: selected
                     ? kGreen
                     : Colors.white,
-                borderRadius: BorderRadius.circular(22),
+                borderRadius:
+                    BorderRadius.circular(22),
                 border: Border.all(
                   color: selected
                       ? kGreen
@@ -1233,7 +495,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
                         ? Colors.white
                         : kPrimaryGreen,
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
                 ),
               ),
@@ -1247,14 +510,17 @@ class _FertilizersPageState extends State<FertilizersPage> {
   Widget _buildProductCard(
     Map<String, dynamic> product,
   ) {
-    final cheapest = _cheapestSeller(product);
+    final cheapest =
+        _cheapestSeller(product);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 13),
+      margin:
+          const EdgeInsets.only(bottom: 13),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius:
+            BorderRadius.circular(18),
         border: Border.all(
           color: product['warning'] == true
               ? const Color(0xFFFFE082)
@@ -1262,7 +528,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.035),
+            color: Colors.black
+                .withOpacity(0.035),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -1289,11 +556,14 @@ class _FertilizersPageState extends State<FertilizersPage> {
                       children: [
                         Expanded(
                           child: Text(
-                            product['name'],
+                            product['name']
+                                ?.toString() ??
+                                '',
                             maxLines: 2,
                             overflow:
                                 TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style:
+                                const TextStyle(
                               fontSize: 16,
                               fontWeight:
                                   FontWeight.w700,
@@ -1301,21 +571,29 @@ class _FertilizersPageState extends State<FertilizersPage> {
                             ),
                           ),
                         ),
-                        if (product['warning'] == true)
+
+                        if (product['warning'] ==
+                            true)
                           Container(
                             margin:
-                                const EdgeInsets.only(
+                                const EdgeInsets
+                                    .only(
                               left: 6,
                             ),
                             padding:
-                                const EdgeInsets.all(5),
-                            decoration: BoxDecoration(
+                                const EdgeInsets
+                                    .all(5),
+                            decoration:
+                                BoxDecoration(
                               color: kSoftAmber,
                               borderRadius:
-                                  BorderRadius.circular(8),
+                                  BorderRadius
+                                      .circular(8),
                             ),
-                            child: const Icon(
-                              Icons.warning_amber_rounded,
+                            child:
+                                const Icon(
+                              Icons
+                                  .warning_amber_rounded,
                               color: kAmber,
                               size: 17,
                             ),
@@ -1326,10 +604,14 @@ class _FertilizersPageState extends State<FertilizersPage> {
                     const SizedBox(height: 5),
 
                     Text(
-                      product['description'],
+                      product['description']
+                              ?.toString() ??
+                          '',
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      overflow:
+                          TextOverflow.ellipsis,
+                      style:
+                          const TextStyle(
                         fontSize: 12,
                         color: kTextGrey,
                       ),
@@ -1338,11 +620,15 @@ class _FertilizersPageState extends State<FertilizersPage> {
                     const SizedBox(height: 7),
 
                     Text(
-                      product['category'],
-                      style: const TextStyle(
+                      product['category']
+                              ?.toString() ??
+                          '',
+                      style:
+                          const TextStyle(
                         fontSize: 11,
                         color: kGreen,
-                        fontWeight: FontWeight.w600,
+                        fontWeight:
+                            FontWeight.w600,
                       ),
                     ),
                   ],
@@ -1354,10 +640,12 @@ class _FertilizersPageState extends State<FertilizersPage> {
           const SizedBox(height: 12),
 
           Container(
-            padding: const EdgeInsets.all(10),
+            padding:
+                const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: kPaleGreen,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius:
+                  BorderRadius.circular(12),
             ),
             child: Row(
               children: [
@@ -1369,11 +657,14 @@ class _FertilizersPageState extends State<FertilizersPage> {
                 const SizedBox(width: 7),
                 Expanded(
                   child: Text(
-                    cheapest?['shop'] ??
+                    cheapest?['shop']
+                            ?.toString() ??
                         'No nearby seller',
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style:
+                        const TextStyle(
                       fontSize: 12,
                       color: kTextGrey,
                     ),
@@ -1382,9 +673,11 @@ class _FertilizersPageState extends State<FertilizersPage> {
                 if (cheapest != null)
                   Text(
                     '₹${_formatPrice(cheapest['price'])}',
-                    style: const TextStyle(
+                    style:
+                        const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w800,
+                      fontWeight:
+                          FontWeight.w800,
                       color: kPrimaryGreen,
                     ),
                   ),
@@ -1405,10 +698,12 @@ class _FertilizersPageState extends State<FertilizersPage> {
                 const SizedBox(width: 3),
                 Text(
                   '${cheapest['distance']} km away',
-                  style: const TextStyle(
+                  style:
+                      const TextStyle(
                     fontSize: 12,
                     color: kGreen,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
                 ),
                 const Spacer(),
@@ -1416,7 +711,10 @@ class _FertilizersPageState extends State<FertilizersPage> {
                   'Lowest nearby price',
                   style: TextStyle(
                     fontSize: 11,
-                    color: kGreen.withOpacity(0.8),
+                    color:
+                        kGreen.withOpacity(
+                      0.8,
+                    ),
                   ),
                 ),
               ],
@@ -1427,7 +725,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton.icon(
+                child:
+                    OutlinedButton.icon(
                   onPressed: () {
                     _showContactDialog(
                       context,
@@ -1438,15 +737,21 @@ class _FertilizersPageState extends State<FertilizersPage> {
                     Icons.phone_outlined,
                     size: 17,
                   ),
-                  label: const Text('Contact'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: kGreen,
-                    side: const BorderSide(
+                  label:
+                      const Text('Contact'),
+                  style:
+                      OutlinedButton.styleFrom(
+                    foregroundColor:
+                        kGreen,
+                    side:
+                        const BorderSide(
                       color: kGreen,
                     ),
-                    shape: RoundedRectangleBorder(
+                    shape:
+                        RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(11),
+                          BorderRadius
+                              .circular(11),
                     ),
                   ),
                 ),
@@ -1467,13 +772,18 @@ class _FertilizersPageState extends State<FertilizersPage> {
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kGreen,
-                    foregroundColor: Colors.white,
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor:
+                        kGreen,
+                    foregroundColor:
+                        Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
+                    shape:
+                        RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(11),
+                          BorderRadius
+                              .circular(11),
                     ),
                   ),
                   child: const Text(
@@ -1491,24 +801,31 @@ class _FertilizersPageState extends State<FertilizersPage> {
   Widget _buildProductImage(
     Map<String, dynamic> product,
   ) {
-    final image = product['image']?.toString() ?? '';
+    final image =
+        product['image']?.toString() ?? '';
 
     if (image.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
         child: Image.network(
           image,
           width: 72,
           height: 72,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) {
-            return _fallbackProductIcon(product);
+          errorBuilder:
+              (_, __, ___) {
+            return _fallbackProductIcon(
+              product,
+            );
           },
         ),
       );
     }
 
-    return _fallbackProductIcon(product);
+    return _fallbackProductIcon(
+      product,
+    );
   }
 
   Widget _fallbackProductIcon(
@@ -1521,10 +838,12 @@ class _FertilizersPageState extends State<FertilizersPage> {
         color: product['warning'] == true
             ? kSoftAmber
             : kSoftGreen,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
       ),
       child: Icon(
-        product['icon'] ?? Icons.eco_outlined,
+        product['icon'] ??
+            Icons.eco_outlined,
         color: product['warning'] == true
             ? kAmber
             : kGreen,
@@ -1542,20 +861,28 @@ class _FertilizersPageState extends State<FertilizersPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Contact Seller'),
+        title:
+            const Text('Contact Seller'),
         content: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize:
+              MainAxisSize.min,
           crossAxisAlignment:
               CrossAxisAlignment.start,
           children: [
             Text(
-              seller['shop'],
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
+              seller['shop']?.toString() ??
+                  '',
+              style:
+                  const TextStyle(
+                fontWeight:
+                    FontWeight.w700,
               ),
             ),
             const SizedBox(height: 8),
-            Text(seller['phone']),
+            Text(
+              seller['phone']?.toString() ??
+                  '',
+            ),
           ],
         ),
         actions: [
@@ -1564,7 +891,9 @@ class _FertilizersPageState extends State<FertilizersPage> {
                 Navigator.pop(context),
             child: const Text(
               'Close',
-              style: TextStyle(color: kGreen),
+              style: TextStyle(
+                color: kGreen,
+              ),
             ),
           ),
         ],
@@ -1573,9 +902,11 @@ class _FertilizersPageState extends State<FertilizersPage> {
   }
 
   String _formatPrice(dynamic value) {
-    final price = (value as num).toDouble();
+    final price =
+        (value as num).toDouble();
 
-    if (price == price.roundToDouble()) {
+    if (price ==
+        price.roundToDouble()) {
       return price.toInt().toString();
     }
 
@@ -1587,7 +918,8 @@ class _FertilizersPageState extends State<FertilizersPage> {
 // ALL NEARBY SELLERS FOR A SPECIFIC FERTILIZER
 // =========================================================
 
-class FertilizerSellersPage extends StatelessWidget {
+class FertilizerSellersPage
+    extends StatelessWidget {
   final Map<String, dynamic> product;
 
   const FertilizerSellersPage({
@@ -1595,16 +927,25 @@ class FertilizerSellersPage extends StatelessWidget {
     required this.product,
   });
 
-  static const Color kGreen = Color(0xFF2E7D32);
-  static const Color kPrimaryGreen = Color(0xFF1B5E20);
-  static const Color kSoftGreen = Color(0xFFE8F5E9);
-  static const Color kPaleGreen = Color(0xFFF4FAF4);
-  static const Color kTextDark = Color(0xFF263238);
-  static const Color kTextGrey = Color(0xFF607D8B);
-  static const Color kAmber = Color(0xFFF9A825);
-  static const Color kSoftAmber = Color(0xFFFFF8E1);
+  static const Color kGreen =
+      Color(0xFF2E7D32);
+  static const Color kPrimaryGreen =
+      Color(0xFF1B5E20);
+  static const Color kSoftGreen =
+      Color(0xFFE8F5E9);
+  static const Color kPaleGreen =
+      Color(0xFFF4FAF4);
+  static const Color kTextDark =
+      Color(0xFF263238);
+  static const Color kTextGrey =
+      Color(0xFF607D8B);
+  static const Color kAmber =
+      Color(0xFFF9A825);
+  static const Color kSoftAmber =
+      Color(0xFFFFF8E1);
 
-  List<Map<String, dynamic>> get sortedSellers {
+  List<Map<String, dynamic>>
+      get sortedSellers {
     final sellers =
         List<Map<String, dynamic>>.from(
       product['sellers'] ?? [],
@@ -1612,7 +953,9 @@ class FertilizerSellersPage extends StatelessWidget {
 
     sellers.sort(
       (a, b) => (a['price'] as num)
-          .compareTo(b['price'] as num),
+          .compareTo(
+        b['price'] as num,
+      ),
     );
 
     return sellers;
@@ -1625,22 +968,27 @@ class FertilizerSellersPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(
+        iconTheme:
+            const IconThemeData(
           color: kTextDark,
         ),
         title: Text(
-          product['name'],
-          style: const TextStyle(
+          product['name']?.toString() ?? '',
+          style:
+              const TextStyle(
             color: kPrimaryGreen,
-            fontWeight: FontWeight.w700,
+            fontWeight:
+                FontWeight.w700,
           ),
         ),
       ),
       body: CustomScrollView(
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverToBoxAdapter(
+            padding:
+                const EdgeInsets.all(16),
+            sliver:
+                SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
@@ -1651,9 +999,11 @@ class FertilizerSellersPage extends StatelessWidget {
 
                   Text(
                     '${sortedSellers.length} Nearby Sellers',
-                    style: const TextStyle(
+                    style:
+                        const TextStyle(
                       fontSize: 19,
-                      fontWeight: FontWeight.w700,
+                      fontWeight:
+                          FontWeight.w700,
                       color: kTextDark,
                     ),
                   ),
@@ -1662,7 +1012,8 @@ class FertilizerSellersPage extends StatelessWidget {
 
                   const Text(
                     'Sorted from lowest to highest price',
-                    style: TextStyle(
+                    style:
+                        TextStyle(
                       fontSize: 12,
                       color: kTextGrey,
                     ),
@@ -1675,11 +1026,13 @@ class FertilizerSellersPage extends StatelessWidget {
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.symmetric(
+            padding:
+                const EdgeInsets.symmetric(
               horizontal: 16,
             ),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
+              delegate:
+                  SliverChildBuilderDelegate(
                 (context, index) {
                   return _buildSellerCard(
                     context,
@@ -1687,7 +1040,8 @@ class FertilizerSellersPage extends StatelessWidget {
                     index == 0,
                   );
                 },
-                childCount: sortedSellers.length,
+                childCount:
+                    sortedSellers.length,
               ),
             ),
           ),
@@ -1701,13 +1055,16 @@ class FertilizerSellersPage extends StatelessWidget {
   }
 
   Widget _buildProductSummary() {
-    final warning = product['warning'] == true;
+    final warning =
+        product['warning'] == true;
 
     return Container(
-      padding: const EdgeInsets.all(15),
+      padding:
+          const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius:
+            BorderRadius.circular(18),
         border: Border.all(
           color: warning
               ? const Color(0xFFFFE082)
@@ -1720,14 +1077,18 @@ class FertilizerSellersPage extends StatelessWidget {
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color:
-                  warning ? kSoftAmber : kSoftGreen,
+              color: warning
+                  ? kSoftAmber
+                  : kSoftGreen,
               borderRadius:
                   BorderRadius.circular(15),
             ),
             child: Icon(
-              product['icon'] ?? Icons.eco_outlined,
-              color: warning ? kAmber : kGreen,
+              product['icon'] ??
+                  Icons.eco_outlined,
+              color: warning
+                  ? kAmber
+                  : kGreen,
               size: 32,
             ),
           ),
@@ -1740,28 +1101,43 @@ class FertilizerSellersPage extends StatelessWidget {
                   CrossAxisAlignment.start,
               children: [
                 Text(
-                  product['name'],
-                  style: const TextStyle(
+                  product['name']
+                          ?.toString() ??
+                      '',
+                  style:
+                      const TextStyle(
                     fontSize: 18,
-                    fontWeight: FontWeight.w700,
+                    fontWeight:
+                        FontWeight.w700,
                     color: kTextDark,
                   ),
                 ),
+
                 const SizedBox(height: 5),
+
                 Text(
-                  product['description'],
-                  style: const TextStyle(
+                  product['description']
+                          ?.toString() ??
+                      '',
+                  style:
+                      const TextStyle(
                     fontSize: 12,
                     color: kTextGrey,
                   ),
                 ),
+
                 const SizedBox(height: 5),
+
                 Text(
-                  product['category'],
-                  style: const TextStyle(
+                  product['category']
+                          ?.toString() ??
+                      '',
+                  style:
+                      const TextStyle(
                     fontSize: 11,
                     color: kGreen,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
                 ),
               ],
@@ -1778,11 +1154,16 @@ class FertilizerSellersPage extends StatelessWidget {
     bool cheapest,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
+      margin:
+          const EdgeInsets.only(
+        bottom: 12,
+      ),
+      padding:
+          const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(17),
+        borderRadius:
+            BorderRadius.circular(17),
         border: Border.all(
           color: cheapest
               ? const Color(0xFFA5D6A7)
@@ -1797,13 +1178,18 @@ class FertilizerSellersPage extends StatelessWidget {
               Container(
                 width: 48,
                 height: 48,
-                decoration: BoxDecoration(
+                decoration:
+                    BoxDecoration(
                   color: kSoftGreen,
                   borderRadius:
-                      BorderRadius.circular(13),
+                      BorderRadius.circular(
+                    13,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.storefront_outlined,
+                child:
+                    const Icon(
+                  Icons
+                      .storefront_outlined,
                   color: kGreen,
                 ),
               ),
@@ -1813,21 +1199,28 @@ class FertilizerSellersPage extends StatelessWidget {
               Expanded(
                 child: Column(
                   crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      CrossAxisAlignment
+                          .start,
                   children: [
                     Row(
                       children: [
                         Expanded(
                           child: Text(
-                            seller['shop'],
+                            seller['shop']
+                                    ?.toString() ??
+                                '',
                             maxLines: 2,
                             overflow:
-                                TextOverflow.ellipsis,
-                            style: const TextStyle(
+                                TextOverflow
+                                    .ellipsis,
+                            style:
+                                const TextStyle(
                               fontSize: 15,
                               fontWeight:
-                                  FontWeight.w700,
-                              color: kTextDark,
+                                  FontWeight
+                                      .w700,
+                              color:
+                                  kTextDark,
                             ),
                           ),
                         ),
@@ -1840,18 +1233,27 @@ class FertilizerSellersPage extends StatelessWidget {
                               horizontal: 7,
                               vertical: 4,
                             ),
-                            decoration: BoxDecoration(
-                              color: kSoftGreen,
+                            decoration:
+                                BoxDecoration(
+                              color:
+                                  kSoftGreen,
                               borderRadius:
-                                  BorderRadius.circular(8),
+                                  BorderRadius
+                                      .circular(
+                                8,
+                              ),
                             ),
-                            child: const Text(
+                            child:
+                                const Text(
                               'LOWEST',
-                              style: TextStyle(
+                              style:
+                                  TextStyle(
                                 fontSize: 9,
                                 fontWeight:
-                                    FontWeight.w800,
-                                color: kGreen,
+                                    FontWeight
+                                        .w800,
+                                color:
+                                    kGreen,
                               ),
                             ),
                           ),
@@ -1863,16 +1265,21 @@ class FertilizerSellersPage extends StatelessWidget {
                     Row(
                       children: [
                         const Icon(
-                          Icons.location_on_outlined,
+                          Icons
+                              .location_on_outlined,
                           size: 15,
                           color: kGreen,
                         ),
-                        const SizedBox(width: 3),
+                        const SizedBox(
+                          width: 3,
+                        ),
                         Text(
                           '${seller['distance']} km away',
-                          style: const TextStyle(
+                          style:
+                              const TextStyle(
                             fontSize: 12,
-                            color: kTextGrey,
+                            color:
+                                kTextGrey,
                           ),
                         ),
                       ],
@@ -1890,10 +1297,13 @@ class FertilizerSellersPage extends StatelessWidget {
               Expanded(
                 child: Text(
                   '₹${_formatPrice(seller['price'])}',
-                  style: const TextStyle(
+                  style:
+                      const TextStyle(
                     fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    color: kPrimaryGreen,
+                    fontWeight:
+                        FontWeight.w800,
+                    color:
+                        kPrimaryGreen,
                   ),
                 ),
               ),
@@ -1902,36 +1312,53 @@ class FertilizerSellersPage extends StatelessWidget {
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text(
+                    builder: (_) =>
+                        AlertDialog(
+                      title:
+                          const Text(
                         'Contact Seller',
                       ),
                       content: Column(
                         mainAxisSize:
                             MainAxisSize.min,
                         crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                            CrossAxisAlignment
+                                .start,
                         children: [
                           Text(
-                            seller['shop'],
+                            seller['shop']
+                                    ?.toString() ??
+                                '',
                             style:
                                 const TextStyle(
                               fontWeight:
-                                  FontWeight.w700,
+                                  FontWeight
+                                      .w700,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(seller['phone']),
+                          const SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            seller['phone']
+                                    ?.toString() ??
+                                '',
+                          ),
                         ],
                       ),
                       actions: [
                         TextButton(
                           onPressed: () =>
-                              Navigator.pop(context),
-                          child: const Text(
+                              Navigator.pop(
+                            context,
+                          ),
+                          child:
+                              const Text(
                             'Close',
-                            style: TextStyle(
-                              color: kGreen,
+                            style:
+                                TextStyle(
+                              color:
+                                  kGreen,
                             ),
                           ),
                         ),
@@ -1943,10 +1370,14 @@ class FertilizerSellersPage extends StatelessWidget {
                   Icons.phone_outlined,
                   size: 17,
                 ),
-                label: const Text('Contact'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: kGreen,
-                  side: const BorderSide(
+                label:
+                    const Text('Contact'),
+                style:
+                    OutlinedButton.styleFrom(
+                  foregroundColor:
+                      kGreen,
+                  side:
+                      const BorderSide(
                     color: kGreen,
                   ),
                 ),
@@ -1959,9 +1390,11 @@ class FertilizerSellersPage extends StatelessWidget {
   }
 
   String _formatPrice(dynamic value) {
-    final price = (value as num).toDouble();
+    final price =
+        (value as num).toDouble();
 
-    if (price == price.roundToDouble()) {
+    if (price ==
+        price.roundToDouble()) {
       return price.toInt().toString();
     }
 

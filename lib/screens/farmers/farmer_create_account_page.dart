@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'farmer_login_page.dart';
+import 'farmer_dashboard.dart';
 import '../../services/local_db.dart';
 import '../../state/app_locale.dart';
 
@@ -269,120 +270,34 @@ class _FarmerCreateAccountPageState
       return;
     }
 
-    // SUCCESS DIALOG
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor:
-              AppColors.cardWhite,
-          shape:
-              RoundedRectangleBorder(
-            borderRadius:
-                BorderRadius.circular(20),
-          ),
-          content: Column(
-            mainAxisSize:
-                MainAxisSize.min,
-            children: [
-              // SUCCESS ICON
-              Container(
-                width: 70,
-                height: 70,
-                decoration:
-                    const BoxDecoration(
-                  color:
-                      AppColors.infoBg,
-                  shape:
-                      BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle_outline,
-                  color:
-                      AppColors.primaryGreen,
-                  size: 45,
-                ),
-              ),
-
-              const SizedBox(height: 18),
-
-              Text(
-                AppLocale.of(context).t('registrationSuccessful'),
-                textAlign:
-                    TextAlign.center,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight:
-                      FontWeight.bold,
-                  color:
-                      AppColors.textPrimary,
-                ),
-              ),
-
-              const SizedBox(height: 8),
-
-              Text(
-                AppLocale.of(context).t('farmerAccountCreated'),
-                textAlign:
-                    TextAlign.center,
-                style: TextStyle(
-                  fontSize: 13,
-                  color:
-                      AppColors.mutedText,
-                  height: 1.4,
-                ),
-              ),
-
-              const SizedBox(height: 22),
-
-              SizedBox(
-                width:
-                    double.infinity,
-                height: 48,
-                child:
-                    ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(
-                        context);
-
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder:
-                            (context) =>
-                                const FarmerLoginPage(),
-                      ),
-                    );
-                  },
-                  style:
-                      ElevatedButton.styleFrom(
-                    backgroundColor:
-                        AppColors.darkGreen,
-                    foregroundColor:
-                        Colors.white,
-                    elevation: 0,
-                    shape:
-                        RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius
-                              .circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    AppLocale.of(context).t('goToFarmerLogin'),
-                    style: TextStyle(
-                      fontWeight:
-                          FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      },
+    // Auto-login the newly registered farmer and go to the dashboard
+    final String? loginError = await LocalDb.login(
+      phone: _mobileController.text.trim(),
+      password: pin,
+      role: 'farmer',
     );
+
+    if (!mounted) return;
+
+    if (loginError != null) {
+      _showMessage(loginError);
+      return;
+    }
+
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomePage()),
+      (route) => false,
+    );
+  }
+
+  // ==========================================================
+  // BACK TO PORTAL CHOOSER
+  // ==========================================================
+
+  void _backToPortalChooser() {
+    final nav = Navigator.of(context);
+    nav.pop();                    // registration page
+    if (nav.canPop()) nav.pop();  // login page -> portal chooser
   }
 
   // ==========================================================
@@ -814,6 +729,14 @@ class _FarmerCreateAccountPageState
       ),
       child: Row(
         children: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: _backToPortalChooser,
+          ),
+
           const Icon(
             Icons.eco,
             color:
@@ -965,14 +888,7 @@ class _FarmerCreateAccountPageState
 
                           InkWell(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) =>
-                                          const FarmerLoginPage(),
-                                ),
-                              );
+                              Navigator.pop(context);
                             },
                             child:
                                 Text(

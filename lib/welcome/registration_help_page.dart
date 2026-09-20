@@ -14,33 +14,33 @@ class _RegistrationHelpPageState extends State<RegistrationHelpPage> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
 
-  static const _green = Color(0xFF3F713F);
-  static const _darkNavy = Color(0xFF17233D);
-  static const _softGreen = Color(0xFFF4F8F2);
-  static const _border = Color(0xFFD0DCCF);
+  static const _green = Color(0xFF2E7D4F);
+  static const _darkNavy = Color(0xFF18352A);
+  static const _softGreen = Color(0xFFF3F8F4);
+  static const _border = Color(0xFFD5E4D9);
 
   final List<_RegistrationStep> _steps = const [
     _RegistrationStep(
       icon: Icons.person_add_alt_1_rounded,
-      color: Color(0xFF3F713F),
+      color: Color(0xFF2E7D4F),
       titleKey: 'registrationStepOneTitle',
       descriptionKey: 'registrationStepOneDescription',
     ),
     _RegistrationStep(
       icon: Icons.phone_android_rounded,
-      color: Color(0xFF167A48),
+      color: Color(0xFF287A4D),
       titleKey: 'registrationStepTwoTitle',
       descriptionKey: 'registrationStepTwoDescription',
     ),
     _RegistrationStep(
       icon: Icons.verified_user_rounded,
-      color: Color(0xFF244B78),
+      color: Color(0xFF35765A),
       titleKey: 'registrationStepThreeTitle',
       descriptionKey: 'registrationStepThreeDescription',
     ),
     _RegistrationStep(
       icon: Icons.login_rounded,
-      color: Color(0xFF9A6318),
+      color: Color(0xFFB47A22),
       titleKey: 'registrationStepFourTitle',
       descriptionKey: 'registrationStepFourDescription',
     ),
@@ -68,7 +68,7 @@ class _RegistrationHelpPageState extends State<RegistrationHelpPage> {
     return Scaffold(
       backgroundColor: _softGreen,
       appBar: AppBar(
-        backgroundColor: _softGreen,
+        backgroundColor: Colors.white,
         foregroundColor: _darkNavy,
         elevation: 0,
         title: Text(
@@ -108,7 +108,7 @@ class _RegistrationHelpPageState extends State<RegistrationHelpPage> {
                           t(item.descriptionKey),
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            color: Color(0xFF596271),
+                            color: Color(0xFF596B61),
                             fontSize: 15,
                             height: 1.45,
                           ),
@@ -225,7 +225,7 @@ class _StepIllustration extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFD0DCCF)),
+        border: Border.all(color: const Color(0xFFD5E4D9)),
       ),
       child: Stack(
         alignment: Alignment.center,
@@ -257,9 +257,17 @@ class _StepIllustration extends StatelessWidget {
               children: [
                 Icon(Icons.arrow_forward_rounded, color: item.color, size: 19),
                 const SizedBox(width: 6),
-                Icon(Icons.arrow_forward_rounded, color: item.color.withOpacity(0.45), size: 19),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  color: item.color.withOpacity(0.45),
+                  size: 19,
+                ),
                 const SizedBox(width: 6),
-                Icon(Icons.arrow_forward_rounded, color: item.color.withOpacity(0.2), size: 19),
+                Icon(
+                  Icons.arrow_forward_rounded,
+                  color: item.color.withOpacity(0.2),
+                  size: 19,
+                ),
               ],
             ),
           ),

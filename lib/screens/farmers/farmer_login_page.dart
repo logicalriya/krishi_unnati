@@ -206,6 +206,14 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
       ),
       child: Row(
         children: [
+          IconButton(
+            icon: const Icon(
+              Icons.arrow_back,
+              color: AppColors.textPrimary,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+
           const Spacer(),
 
           Container(

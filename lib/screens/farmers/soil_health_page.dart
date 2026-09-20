@@ -9,6 +9,15 @@ class SoilHealthPage extends StatefulWidget {
 }
 
 class _SoilHealthPageState extends State<SoilHealthPage> {
+  // ── Agriculture theme ────────────────────────────────────────
+  static const _green = Color(0xFF2E7D32);
+  static const _greenDark = Color(0xFF1B5E20);
+  static const _greenLight = Color(0xFFE8F3E8);
+  static const _greenSurface = Color(0xFFF4F8F3);
+  static const _greenBorder = Color(0xFFCFE3CF);
+  static const _text = Color(0xFF17321C);
+  static const _muted = Color(0xFF607064);
+
   String? selectedFileName;
 
   final List<Map<String, TextEditingController>> fertilizers = [
@@ -74,7 +83,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F8),
+      backgroundColor: _greenSurface,
 
       // ---------------- HEADER ----------------
       appBar: AppBar(
@@ -84,10 +93,13 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
         title: const Text(
           'Soil Health Analysis',
           style: TextStyle(
-            color: Color(0xFF087F3F),
+            color: _greenDark,
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
+        ),
+        iconTheme: const IconThemeData(
+          color: _greenDark,
         ),
       ),
 
@@ -103,11 +115,14 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _greenBorder,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
-                      blurRadius: 8,
+                      color: _greenDark.withOpacity(0.06),
+                      blurRadius: 9,
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -118,9 +133,10 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
 
                     Row(
                       children: const [
-                        Text(
-                          '📄',
-                          style: TextStyle(fontSize: 14),
+                        Icon(
+                          Icons.description_outlined,
+                          size: 16,
+                          color: _greenDark,
                         ),
                         SizedBox(width: 5),
                         Text(
@@ -128,7 +144,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF30343B),
+                            color: _text,
                           ),
                         ),
                       ],
@@ -142,7 +158,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                       style: TextStyle(
                         fontSize: 9,
                         height: 1.4,
-                        color: Color(0xFF707780),
+                        color: _muted,
                       ),
                     ),
 
@@ -155,10 +171,10 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                         width: double.infinity,
                         height: 76,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFAFBFC),
-                          borderRadius: BorderRadius.circular(8),
+                          color: _greenSurface,
+                          borderRadius: BorderRadius.circular(10),
                           border: Border.all(
-                            color: const Color(0xFF8D969F),
+                            color: _greenBorder,
                             width: 1,
                           ),
                         ),
@@ -170,9 +186,9 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                               children: [
 
                                 const Icon(
-                                  Icons.upload_outlined,
+                                  Icons.cloud_upload_outlined,
                                   size: 21,
-                                  color: Color(0xFF929AA3),
+                                  color: _greenDark,
                                 ),
 
                                 const SizedBox(height: 3),
@@ -185,7 +201,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                                     fontWeight: selectedFileName != null
                                         ? FontWeight.w600
                                         : FontWeight.normal,
-                                    color: const Color(0xFF606870),
+                                    color: _text,
                                   ),
                                   textAlign: TextAlign.center,
                                   overflow: TextOverflow.ellipsis,
@@ -197,7 +213,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                                   'Supported: JPG, PNG, PDF (Max 5MB)',
                                   style: TextStyle(
                                     fontSize: 7,
-                                    color: Color(0xFF90979E),
+                                    color: _muted,
                                   ),
                                 ),
                               ],
@@ -218,11 +234,14 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                 padding: const EdgeInsets.fromLTRB(10, 10, 10, 12),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: _greenBorder,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.07),
-                      blurRadius: 8,
+                      color: _greenDark.withOpacity(0.05),
+                      blurRadius: 9,
                       offset: const Offset(0, 2),
                     ),
                   ],
@@ -233,9 +252,10 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
 
                     const Row(
                       children: [
-                        Text(
-                          '🌱',
-                          style: TextStyle(fontSize: 15),
+                        Icon(
+                          Icons.eco_outlined,
+                          size: 17,
+                          color: _greenDark,
                         ),
                         SizedBox(width: 5),
                         Text(
@@ -243,7 +263,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF30343B),
+                            color: _text,
                           ),
                         ),
                       ],
@@ -261,10 +281,10 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                         child: Container(
                           padding: const EdgeInsets.all(7),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF3F5F7),
-                            borderRadius: BorderRadius.circular(7),
+                            color: _greenSurface,
+                            borderRadius: BorderRadius.circular(9),
                             border: Border.all(
-                              color: const Color(0xFFDDE1E5),
+                              color: _greenBorder,
                             ),
                           ),
                           child: Column(
@@ -294,13 +314,16 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                                   context,
                                   fertilizer['date']!,
                                 ),
-                                style: const TextStyle(fontSize: 9),
+                                style: const TextStyle(
+                                  fontSize: 9,
+                                  color: _text,
+                                ),
                                 decoration: InputDecoration(
                                   hintText:
                                       'Application Date (dd-mm-yyyy)',
                                   hintStyle: const TextStyle(
                                     fontSize: 9,
-                                    color: Color(0xFFB0B6BC),
+                                    color: Color(0xFF8A968D),
                                   ),
                                   filled: true,
                                   fillColor: Colors.white,
@@ -312,20 +335,28 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                                   suffixIcon: const Icon(
                                     Icons.calendar_today_outlined,
                                     size: 15,
-                                    color: Color(0xFF9BA2A9),
+                                    color: _greenDark,
                                   ),
                                   border: OutlineInputBorder(
                                     borderRadius:
-                                        BorderRadius.circular(5),
+                                        BorderRadius.circular(7),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFD9DDE1),
+                                      color: _greenBorder,
                                     ),
                                   ),
                                   enabledBorder: OutlineInputBorder(
                                     borderRadius:
-                                        BorderRadius.circular(5),
+                                        BorderRadius.circular(7),
                                     borderSide: const BorderSide(
-                                      color: Color(0xFFD9DDE1),
+                                      color: _greenBorder,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius:
+                                        BorderRadius.circular(7),
+                                    borderSide: const BorderSide(
+                                      color: _green,
+                                      width: 1.3,
                                     ),
                                   ),
                                 ),
@@ -351,7 +382,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                                       'Remove',
                                       style: TextStyle(
                                         fontSize: 9,
-                                        color: Colors.red,
+                                        color: Color(0xFFC62828),
                                       ),
                                     ),
                                   ),
@@ -369,14 +400,14 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                         icon: const Icon(
                           Icons.add_circle_outline,
                           size: 15,
-                          color: Color(0xFF00A94F),
+                          color: _green,
                         ),
                         label: const Text(
                           'Add More Fertilizer',
                           style: TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w600,
-                            color: Color(0xFF00A94F),
+                            color: _greenDark,
                           ),
                         ),
                         style: TextButton.styleFrom(
@@ -402,6 +433,7 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                     // Add your soil analysis API logic here
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
+                        backgroundColor: _greenDark,
                         content: Text(
                           'Soil analysis submitted successfully',
                         ),
@@ -409,11 +441,11 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00A94F),
+                    backgroundColor: _green,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(9),
                     ),
                   ),
                   child: const Text(
@@ -438,12 +470,15 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
   }) {
     return TextField(
       controller: controller,
-      style: const TextStyle(fontSize: 9),
+      style: const TextStyle(
+        fontSize: 9,
+        color: _text,
+      ),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(
           fontSize: 9,
-          color: Color(0xFFB0B6BC),
+          color: Color(0xFF8A968D),
         ),
         filled: true,
         fillColor: Colors.white,
@@ -452,15 +487,22 @@ class _SoilHealthPageState extends State<SoilHealthPage> {
           vertical: 8,
         ),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(7),
           borderSide: const BorderSide(
-            color: Color(0xFFD9DDE1),
+            color: _greenBorder,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(5),
+          borderRadius: BorderRadius.circular(7),
           borderSide: const BorderSide(
-            color: Color(0xFFD9DDE1),
+            color: _greenBorder,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(7),
+          borderSide: const BorderSide(
+            color: _green,
+            width: 1.3,
           ),
         ),
       ),
@@ -477,7 +519,7 @@ class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF8D969F)
+      ..color = const Color(0xFF8CAF91)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 

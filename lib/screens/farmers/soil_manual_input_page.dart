@@ -17,6 +17,15 @@ class SoilManualInputPage extends StatefulWidget {
 }
 
 class _SoilManualInputPageState extends State<SoilManualInputPage> {
+  // ── Agriculture theme ────────────────────────────────────────
+  static const _green = Color(0xFF2E7D32);
+  static const _greenDark = Color(0xFF1B5E20);
+  static const _greenLight = Color(0xFFE8F3E8);
+  static const _greenSurface = Color(0xFFF4F8F3);
+  static const _greenBorder = Color(0xFFCFE3CF);
+  static const _text = Color(0xFF17321C);
+  static const _muted = Color(0xFF607064);
+
   bool accessibilityMode = false;
 
   final _nitrogenController = TextEditingController();
@@ -47,6 +56,7 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
     // same way the existing soil_health_page.dart submit button does.
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
+        backgroundColor: _greenDark,
         content: Text('Soil analysis submitted successfully'),
       ),
     );
@@ -55,7 +65,7 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F8),
+      backgroundColor: _greenSurface,
       appBar: const FarmerPageHeader(title: 'Krishi Unnati'),
       body: SafeArea(
         child: Column(
@@ -72,15 +82,18 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
                   children: [
                     Row(
                       children: const [
-                        Icon(Icons.science_outlined,
-                            color: Color(0xFFDB6E1F), size: 18),
+                        Icon(
+                          Icons.science_outlined,
+                          color: _greenDark,
+                          size: 18,
+                        ),
                         SizedBox(width: 6),
                         Text(
                           'Manual Input Soil Health Details',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: Color(0xFFDB6E1F),
+                            color: _greenDark,
                           ),
                         ),
                       ],
@@ -94,7 +107,7 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
                       'recommendations.',
                       style: TextStyle(
                         fontSize: 11,
-                        color: Color(0xFF707780),
+                        color: _muted,
                         height: 1.4,
                       ),
                     ),
@@ -103,8 +116,11 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
 
                     const Row(
                       children: [
-                        Icon(Icons.eco_outlined,
-                            size: 14, color: Color(0xFF00A94F)),
+                        Icon(
+                          Icons.eco_outlined,
+                          size: 14,
+                          color: _green,
+                        ),
                         SizedBox(width: 5),
                         Text(
                           'SOIL PARAMETERS',
@@ -112,7 +128,7 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
                             fontSize: 11,
                             fontWeight: FontWeight.bold,
                             letterSpacing: .3,
-                            color: Color(0xFF30343B),
+                            color: _text,
                           ),
                         ),
                       ],
@@ -176,11 +192,11 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00A94F),
+                          backgroundColor: _green,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: const Text(
@@ -219,7 +235,7 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
             style: const TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF30343B),
+              color: _text,
             ),
           ),
           const SizedBox(height: 6),
@@ -229,17 +245,21 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
               decimal: true,
               signed: true,
             ),
-            style: const TextStyle(fontSize: 13),
+            style: const TextStyle(
+              fontSize: 13,
+              color: _text,
+            ),
             decoration: InputDecoration(
               hintText: hint,
               hintStyle: const TextStyle(
                 fontSize: 12,
-                color: Color(0xFFB0B6BC),
+                color: Color(0xFF8A968D),
               ),
               suffixText: unit,
               suffixStyle: const TextStyle(
                 fontSize: 11,
-                color: Color(0xFF9BA2A9),
+                color: _greenDark,
+                fontWeight: FontWeight.w600,
               ),
               filled: true,
               fillColor: Colors.white,
@@ -248,16 +268,23 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
                 vertical: 12,
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFD9DDE1)),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: _greenBorder,
+                ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFFD9DDE1)),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: _greenBorder,
+                ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(8),
-                borderSide: const BorderSide(color: Color(0xFF00A94F)),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(
+                  color: _green,
+                  width: 1.5,
+                ),
               ),
             ),
           ),

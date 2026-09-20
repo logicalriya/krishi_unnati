@@ -1,7 +1,33 @@
 import 'package:flutter/material.dart';
 
+import 'marketplace_page.dart';
+
 class FarmingToolsPage extends StatefulWidget {
-  const FarmingToolsPage({super.key});
+  const FarmingToolsPage({
+    super.key,
+    this.tools = const [],
+  });
+
+  /// Dynamic data supplied by the backend/API.
+  ///
+  /// Expected structure:
+  ///
+  /// {
+  ///   'id': 'tool_001',
+  ///   'name': 'Agricultural Plough',
+  ///   'category': 'Plough',
+  ///   'image': 'image_url',
+  ///   'icon': Icons.agriculture,
+  ///   'sellers': [
+  ///     {
+  ///       'shop': 'Shop Name',
+  ///       'price': 4500,
+  ///       'distance': 2.1,
+  ///       'phone': '+91 XXXXX XXXXX',
+  ///     }
+  ///   ]
+  /// }
+  final List<Map<String, dynamic>> tools;
 
   @override
   State<FarmingToolsPage> createState() => _FarmingToolsPageState();
@@ -32,164 +58,6 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     'Spade',
   ];
 
-  // Frontend demo data.
-  // Replace this list with your API/database data later.
-  final List<Map<String, dynamic>> tools = [
-    {
-      'id': 'tool_001',
-      'name': 'Agricultural Plough',
-      'category': 'Plough',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Local Farm Equipment Store',
-          'price': 4500.0,
-          'distance': 2.1,
-          'phone': '+91 9876543210',
-        },
-        {
-          'shop': 'Farm Machinery Centre',
-          'price': 4800.0,
-          'distance': 3.5,
-          'phone': '+91 9876543211',
-        },
-        {
-          'shop': 'Agri Equipment Dealer',
-          'price': 5200.0,
-          'distance': 5.2,
-          'phone': '+91 9876543212',
-        },
-      ],
-      'icon': Icons.agriculture,
-    },
-    {
-      'id': 'tool_002',
-      'name': 'Blade Harrow',
-      'category': 'Blade Harrow',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Farm Machinery Centre',
-          'price': 6200.0,
-          'distance': 1.8,
-          'phone': '+91 9876543213',
-        },
-        {
-          'shop': 'Farm Tools Store',
-          'price': 6500.0,
-          'distance': 4.2,
-          'phone': '+91 9876543214',
-        },
-      ],
-      'icon': Icons.grid_view,
-    },
-    {
-      'id': 'tool_003',
-      'name': 'Clod Crusher',
-      'category': 'Clod Crusher',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Agri Equipment Dealer',
-          'price': 7200.0,
-          'distance': 2.5,
-          'phone': '+91 9876543215',
-        },
-        {
-          'shop': 'Local Farm Equipment Store',
-          'price': 7600.0,
-          'distance': 4.8,
-          'phone': '+91 9876543216',
-        },
-      ],
-      'icon': Icons.construction,
-    },
-    {
-      'id': 'tool_004',
-      'name': 'Leveling Plank',
-      'category': 'Leveling Plank',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Farm Tools Store',
-          'price': 3800.0,
-          'distance': 1.4,
-          'phone': '+91 9876543217',
-        },
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 4100.0,
-          'distance': 3.1,
-          'phone': '+91 9876543218',
-        },
-      ],
-      'icon': Icons.straighten,
-    },
-    {
-      'id': 'tool_005',
-      'name': 'Agricultural Sickle',
-      'category': 'Sickle',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 350.0,
-          'distance': 1.2,
-          'phone': '+91 9876543219',
-        },
-        {
-          'shop': 'Farm Tools Store',
-          'price': 400.0,
-          'distance': 2.7,
-          'phone': '+91 9876543220',
-        },
-      ],
-      'icon': Icons.content_cut,
-    },
-    {
-      'id': 'tool_006',
-      'name': 'Weeding Hoe',
-      'category': 'Weeding Hoe',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Farm Tools Store',
-          'price': 550.0,
-          'distance': 1.9,
-          'phone': '+91 9876543221',
-        },
-        {
-          'shop': 'Local Farm Equipment Store',
-          'price': 600.0,
-          'distance': 3.4,
-          'phone': '+91 9876543222',
-        },
-      ],
-      'icon': Icons.handyman_outlined,
-    },
-    {
-      'id': 'tool_007',
-      'name': 'Agricultural Spade',
-      'category': 'Spade',
-      'image': '',
-      'sellers': [
-        {
-          'shop': 'Local Farm Equipment Store',
-          'price': 700.0,
-          'distance': 1.6,
-          'phone': '+91 9876543223',
-        },
-        {
-          'shop': 'Village Agriculture Store',
-          'price': 750.0,
-          'distance': 2.9,
-          'phone': '+91 9876543224',
-        },
-      ],
-      'icon': Icons.hardware,
-    },
-  ];
-
   @override
   void dispose() {
     searchController.dispose();
@@ -197,18 +65,28 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
   }
 
   List<Map<String, dynamic>> get filteredTools {
-    final result = tools.where((tool) {
-      final categoryMatch = selectedCategory == 'All' ||
-          tool['category'] == selectedCategory;
+    final result = widget.tools.where((tool) {
+      final categoryMatch =
+          selectedCategory == 'All' ||
+              tool['category'] == selectedCategory;
 
       final query = searchQuery.toLowerCase();
 
-      final searchMatch = query.isEmpty ||
-          tool['name'].toString().toLowerCase().contains(query) ||
-          tool['category'].toString().toLowerCase().contains(query);
+      final searchMatch =
+          query.isEmpty ||
+          tool['name']
+              .toString()
+              .toLowerCase()
+              .contains(query) ||
+          tool['category']
+              .toString()
+              .toLowerCase()
+              .contains(query);
 
       final sellers =
-          List<Map<String, dynamic>>.from(tool['sellers'] ?? []);
+          List<Map<String, dynamic>>.from(
+        tool['sellers'] ?? [],
+      );
 
       return categoryMatch &&
           searchMatch &&
@@ -217,20 +95,30 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
 
     // Sort tools according to their cheapest nearby seller.
     result.sort(
-      (a, b) => _cheapestPrice(a).compareTo(_cheapestPrice(b)),
+      (a, b) => _cheapestPrice(a).compareTo(
+        _cheapestPrice(b),
+      ),
     );
 
     return result;
   }
 
-  double _cheapestPrice(Map<String, dynamic> tool) {
+  double _cheapestPrice(
+    Map<String, dynamic> tool,
+  ) {
     final sellers =
-        List<Map<String, dynamic>>.from(tool['sellers'] ?? []);
+        List<Map<String, dynamic>>.from(
+      tool['sellers'] ?? [],
+    );
 
-    if (sellers.isEmpty) return double.infinity;
+    if (sellers.isEmpty) {
+      return double.infinity;
+    }
 
     sellers.sort(
-      (a, b) => (a['price'] as num).compareTo(b['price'] as num),
+      (a, b) => (a['price'] as num).compareTo(
+        b['price'] as num,
+      ),
     );
 
     return (sellers.first['price'] as num).toDouble();
@@ -240,12 +128,18 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     Map<String, dynamic> tool,
   ) {
     final sellers =
-        List<Map<String, dynamic>>.from(tool['sellers'] ?? []);
+        List<Map<String, dynamic>>.from(
+      tool['sellers'] ?? [],
+    );
 
-    if (sellers.isEmpty) return null;
+    if (sellers.isEmpty) {
+      return null;
+    }
 
     sellers.sort(
-      (a, b) => (a['price'] as num).compareTo(b['price'] as num),
+      (a, b) => (a['price'] as num).compareTo(
+        b['price'] as num,
+      ),
     );
 
     return sellers.first;
@@ -259,6 +153,7 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
         child: Column(
           children: [
             _buildHeader(),
+
             Expanded(
               child: CustomScrollView(
                 keyboardDismissBehavior:
@@ -302,17 +197,22 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                                   'Farming Tools Near You',
                                   style: TextStyle(
                                     fontSize: 19,
-                                    fontWeight: FontWeight.w700,
+                                    fontWeight:
+                                        FontWeight.w700,
                                     color: kTextDark,
                                   ),
                                 ),
                               ),
+
                               Container(
-                                padding: const EdgeInsets.all(7),
+                                padding:
+                                    const EdgeInsets.all(7),
                                 decoration: BoxDecoration(
                                   color: kSoftGreen,
                                   borderRadius:
-                                      BorderRadius.circular(10),
+                                      BorderRadius.circular(
+                                    10,
+                                  ),
                                 ),
                                 child: const Icon(
                                   Icons.location_on_outlined,
@@ -358,13 +258,15 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                         horizontal: 16,
                       ),
                       sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
+                        delegate:
+                            SliverChildBuilderDelegate(
                           (context, index) {
                             return _buildToolCard(
                               filteredTools[index],
                             );
                           },
-                          childCount: filteredTools.length,
+                          childCount:
+                              filteredTools.length,
                         ),
                       ),
                     ),
@@ -383,16 +285,39 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
 
   Widget _buildHeader() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(8, 10, 16, 12),
+      padding: const EdgeInsets.fromLTRB(
+        4,
+        8,
+        16,
+        10,
+      ),
       color: Colors.white,
       child: Row(
         children: [
+          IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                  builder: (_) =>
+                      const MarketplacePage(),
+                ),
+              );
+            },
+            icon: const Icon(
+              Icons.arrow_back,
+              color: kTextDark,
+              size: 24,
+            ),
+          ),
+
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
               color: kSoftGreen,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius:
+                  BorderRadius.circular(12),
             ),
             child: const Icon(
               Icons.handyman_outlined,
@@ -400,7 +325,9 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
               size: 25,
             ),
           ),
+
           const SizedBox(width: 10),
+
           const Text(
             'Farming Tools',
             style: TextStyle(
@@ -431,7 +358,9 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
             Icons.search,
             color: kGreen,
           ),
+
           const SizedBox(width: 8),
+
           Expanded(
             child: TextField(
               controller: searchController,
@@ -441,11 +370,13 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                 });
               },
               decoration: const InputDecoration(
-                hintText: 'Search farming tools...',
+                hintText:
+                    'Search farming tools...',
                 border: InputBorder.none,
               ),
             ),
           ),
+
           IconButton(
             onPressed: () {},
             icon: const Icon(
@@ -464,32 +395,43 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
       height: 45,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        physics: const BouncingScrollPhysics(),
+        physics:
+            const BouncingScrollPhysics(),
         shrinkWrap: true,
         itemCount: categories.length,
         separatorBuilder: (_, __) =>
             const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final category = categories[index];
-          final selected = category == selectedCategory;
+          final category =
+              categories[index];
+
+          final selected =
+              category == selectedCategory;
 
           return GestureDetector(
             onTap: () {
               setState(() {
-                selectedCategory = category;
+                selectedCategory =
+                    category;
               });
             },
             child: Container(
-              padding: const EdgeInsets.symmetric(
+              padding:
+                  const EdgeInsets.symmetric(
                 horizontal: 16,
               ),
               decoration: BoxDecoration(
-                color: selected ? kGreen : Colors.white,
-                borderRadius: BorderRadius.circular(22),
+                color: selected
+                    ? kGreen
+                    : Colors.white,
+                borderRadius:
+                    BorderRadius.circular(22),
                 border: Border.all(
                   color: selected
                       ? kGreen
-                      : const Color(0xFFC8E6C9),
+                      : const Color(
+                          0xFFC8E6C9,
+                        ),
                 ),
               ),
               child: Center(
@@ -501,7 +443,8 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                         ? Colors.white
                         : kPrimaryGreen,
                     fontSize: 13,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                   ),
                 ),
               ),
@@ -512,21 +455,27 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     );
   }
 
-  Widget _buildToolCard(Map<String, dynamic> tool) {
-    final cheapest = _cheapestSeller(tool);
+  Widget _buildToolCard(
+    Map<String, dynamic> tool,
+  ) {
+    final cheapest =
+        _cheapestSeller(tool);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 13),
+      margin:
+          const EdgeInsets.only(bottom: 13),
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius:
+            BorderRadius.circular(18),
         border: Border.all(
           color: kSoftGreen,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.035),
+            color: Colors.black
+                .withOpacity(0.035),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -535,7 +484,8 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
       child: Column(
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               _buildToolImage(tool),
 
@@ -547,12 +497,16 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                       CrossAxisAlignment.start,
                   children: [
                     Text(
-                      tool['name'],
+                      tool['name']?.toString() ??
+                          'Farming Tool',
                       maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
+                      overflow:
+                          TextOverflow.ellipsis,
+                      style:
+                          const TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w700,
+                        fontWeight:
+                            FontWeight.w700,
                         color: kTextDark,
                       ),
                     ),
@@ -560,8 +514,11 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                     const SizedBox(height: 5),
 
                     Text(
-                      tool['category'],
-                      style: const TextStyle(
+                      tool['category']
+                              ?.toString() ??
+                          '',
+                      style:
+                          const TextStyle(
                         fontSize: 12,
                         color: kTextGrey,
                       ),
@@ -569,20 +526,28 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
 
                     if (cheapest != null) ...[
                       const SizedBox(height: 8),
+
                       Row(
                         children: [
                           const Icon(
-                            Icons.location_on_outlined,
+                            Icons
+                                .location_on_outlined,
                             size: 15,
                             color: kGreen,
                           ),
-                          const SizedBox(width: 3),
+
+                          const SizedBox(
+                            width: 3,
+                          ),
+
                           Text(
                             '${cheapest['distance']} km away',
-                            style: const TextStyle(
+                            style:
+                                const TextStyle(
                               fontSize: 12,
                               color: kGreen,
-                              fontWeight: FontWeight.w600,
+                              fontWeight:
+                                  FontWeight.w600,
                             ),
                           ),
                         ],
@@ -597,37 +562,50 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
           const SizedBox(height: 12),
 
           Container(
-            padding: const EdgeInsets.all(10),
+            padding:
+                const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: kPaleGreen,
-              borderRadius: BorderRadius.circular(12),
+              borderRadius:
+                  BorderRadius.circular(12),
             ),
             child: Row(
               children: [
                 const Icon(
-                  Icons.storefront_outlined,
+                  Icons
+                      .storefront_outlined,
                   color: kGreen,
                   size: 19,
                 ),
+
                 const SizedBox(width: 7),
+
                 Expanded(
                   child: Text(
-                    cheapest?['shop'] ?? 'No nearby seller',
+                    cheapest?['shop']
+                            ?.toString() ??
+                        'No nearby seller',
                     maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style:
+                        const TextStyle(
                       fontSize: 12,
                       color: kTextGrey,
                     ),
                   ),
                 ),
+
                 if (cheapest != null)
                   Text(
                     '₹${_formatPrice(cheapest['price'])}',
-                    style: const TextStyle(
+                    style:
+                        const TextStyle(
                       fontSize: 16,
-                      fontWeight: FontWeight.w800,
-                      color: kPrimaryGreen,
+                      fontWeight:
+                          FontWeight.w800,
+                      color:
+                          kPrimaryGreen,
                     ),
                   ),
               ],
@@ -639,28 +617,40 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton.icon(
+                child:
+                    OutlinedButton.icon(
                   onPressed: () {
-                    _showContactDialog(cheapest);
+                    _showContactDialog(
+                      cheapest,
+                    );
                   },
                   icon: const Icon(
                     Icons.phone_outlined,
                     size: 18,
                   ),
-                  label: const Text('Contact'),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: kGreen,
-                    side: const BorderSide(
+                  label:
+                      const Text('Contact'),
+                  style:
+                      OutlinedButton.styleFrom(
+                    foregroundColor:
+                        kGreen,
+                    side:
+                        const BorderSide(
                       color: kGreen,
                     ),
-                    shape: RoundedRectangleBorder(
+                    shape:
+                        RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(11),
+                          BorderRadius.circular(
+                        11,
+                      ),
                     ),
                   ),
                 ),
               ),
+
               const SizedBox(width: 9),
+
               Expanded(
                 child: ElevatedButton(
                   onPressed: () {
@@ -668,20 +658,29 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
                       context,
                       MaterialPageRoute(
                         builder: (_) =>
-                            ToolSellersPage(tool: tool),
+                            ToolSellersPage(
+                          tool: tool,
+                        ),
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: kGreen,
-                    foregroundColor: Colors.white,
+                  style:
+                      ElevatedButton.styleFrom(
+                    backgroundColor:
+                        kGreen,
+                    foregroundColor:
+                        Colors.white,
                     elevation: 0,
-                    shape: RoundedRectangleBorder(
+                    shape:
+                        RoundedRectangleBorder(
                       borderRadius:
-                          BorderRadius.circular(11),
+                          BorderRadius.circular(
+                        11,
+                      ),
                     ),
                   ),
-                  child: const Text(
+                  child:
+                      const Text(
                     'View Sellers',
                   ),
                 ),
@@ -693,19 +692,26 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     );
   }
 
-  Widget _buildToolImage(Map<String, dynamic> tool) {
-    final image = tool['image']?.toString() ?? '';
+  Widget _buildToolImage(
+    Map<String, dynamic> tool,
+  ) {
+    final image =
+        tool['image']?.toString() ?? '';
 
     if (image.isNotEmpty) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
         child: Image.network(
           image,
           width: 72,
           height: 72,
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) {
-            return _fallbackToolIcon(tool);
+          errorBuilder:
+              (_, __, ___) {
+            return _fallbackToolIcon(
+              tool,
+            );
           },
         ),
       );
@@ -714,16 +720,20 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     return _fallbackToolIcon(tool);
   }
 
-  Widget _fallbackToolIcon(Map<String, dynamic> tool) {
+  Widget _fallbackToolIcon(
+    Map<String, dynamic> tool,
+  ) {
     return Container(
       width: 72,
       height: 72,
       decoration: BoxDecoration(
         color: kSoftGreen,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius:
+            BorderRadius.circular(15),
       ),
       child: Icon(
-        tool['icon'] ?? Icons.agriculture,
+        tool['icon'] ??
+            Icons.agriculture,
         color: kGreen,
         size: 32,
       ),
@@ -731,9 +741,15 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
   }
 
   String _formatPrice(dynamic value) {
-    final price = (value as num).toDouble();
+    if (value == null) {
+      return '--';
+    }
 
-    if (price == price.roundToDouble()) {
+    final price =
+        (value as num).toDouble();
+
+    if (price ==
+        price.roundToDouble()) {
       return price.toInt().toString();
     }
 
@@ -748,28 +764,43 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Contact Seller'),
+        title:
+            const Text('Contact Seller'),
         content: Column(
-          mainAxisSize: MainAxisSize.min,
+          mainAxisSize:
+              MainAxisSize.min,
           crossAxisAlignment:
               CrossAxisAlignment.start,
           children: [
             Text(
-              seller['shop'],
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
+              seller['shop']
+                      ?.toString() ??
+                  'Seller',
+              style:
+                  const TextStyle(
+                fontWeight:
+                    FontWeight.w700,
               ),
             ),
+
             const SizedBox(height: 8),
-            Text(seller['phone']),
+
+            Text(
+              seller['phone']
+                      ?.toString() ??
+                  'Contact information unavailable',
+            ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () =>
+                Navigator.pop(context),
             child: const Text(
               'Close',
-              style: TextStyle(color: kGreen),
+              style: TextStyle(
+                color: kGreen,
+              ),
             ),
           ),
         ],
@@ -790,20 +821,36 @@ class ToolSellersPage extends StatelessWidget {
     required this.tool,
   });
 
-  static const Color kGreen = Color(0xFF2E7D32);
-  static const Color kPrimaryGreen = Color(0xFF1B5E20);
-  static const Color kSoftGreen = Color(0xFFE8F5E9);
-  static const Color kPaleGreen = Color(0xFFF4FAF4);
-  static const Color kTextDark = Color(0xFF263238);
-  static const Color kTextGrey = Color(0xFF607D8B);
+  static const Color kGreen =
+      Color(0xFF2E7D32);
 
-  List<Map<String, dynamic>> get sortedSellers {
+  static const Color kPrimaryGreen =
+      Color(0xFF1B5E20);
+
+  static const Color kSoftGreen =
+      Color(0xFFE8F5E9);
+
+  static const Color kPaleGreen =
+      Color(0xFFF4FAF4);
+
+  static const Color kTextDark =
+      Color(0xFF263238);
+
+  static const Color kTextGrey =
+      Color(0xFF607D8B);
+
+  List<Map<String, dynamic>>
+      get sortedSellers {
     final sellers =
-        List<Map<String, dynamic>>.from(tool['sellers'] ?? []);
+        List<Map<String, dynamic>>.from(
+      tool['sellers'] ?? [],
+    );
 
     sellers.sort(
       (a, b) => (a['price'] as num)
-          .compareTo(b['price'] as num),
+          .compareTo(
+        b['price'] as num,
+      ),
     );
 
     return sellers;
@@ -816,71 +863,106 @@ class ToolSellersPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: const IconThemeData(
+        iconTheme:
+            const IconThemeData(
           color: kTextDark,
         ),
         title: Text(
-          tool['name'],
-          style: const TextStyle(
+          tool['name']?.toString() ??
+              'Farming Tool',
+          style:
+              const TextStyle(
             color: kPrimaryGreen,
-            fontWeight: FontWeight.w700,
+            fontWeight:
+                FontWeight.w700,
           ),
         ),
       ),
       body: CustomScrollView(
         slivers: [
           SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverToBoxAdapter(
+            padding:
+                const EdgeInsets.all(16),
+            sliver:
+                SliverToBoxAdapter(
               child: Column(
                 crossAxisAlignment:
                     CrossAxisAlignment.start,
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
+                    padding:
+                        const EdgeInsets.all(
+                      15,
+                    ),
+                    decoration:
+                        BoxDecoration(
                       color: Colors.white,
                       borderRadius:
-                          BorderRadius.circular(18),
+                          BorderRadius.circular(
+                        18,
+                      ),
                     ),
                     child: Row(
                       children: [
                         Container(
                           width: 70,
                           height: 70,
-                          decoration: BoxDecoration(
-                            color: kSoftGreen,
+                          decoration:
+                              BoxDecoration(
+                            color:
+                                kSoftGreen,
                             borderRadius:
-                                BorderRadius.circular(15),
+                                BorderRadius
+                                    .circular(
+                              15,
+                            ),
                           ),
                           child: Icon(
                             tool['icon'] ??
-                                Icons.agriculture,
+                                Icons
+                                    .agriculture,
                             color: kGreen,
                             size: 32,
                           ),
                         ),
-                        const SizedBox(width: 13),
+
+                        const SizedBox(
+                            width: 13),
+
                         Expanded(
                           child: Column(
                             crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                CrossAxisAlignment
+                                    .start,
                             children: [
                               Text(
-                                tool['name'],
-                                style: const TextStyle(
+                                tool['name']
+                                        ?.toString() ??
+                                    'Farming Tool',
+                                style:
+                                    const TextStyle(
                                   fontSize: 18,
                                   fontWeight:
-                                      FontWeight.w700,
-                                  color: kTextDark,
+                                      FontWeight
+                                          .w700,
+                                  color:
+                                      kTextDark,
                                 ),
                               ),
-                              const SizedBox(height: 5),
+
+                              const SizedBox(
+                                  height: 5),
+
                               Text(
-                                tool['category'],
-                                style: const TextStyle(
-                                  color: kTextGrey,
-                                  fontSize: 13,
+                                tool['category']
+                                        ?.toString() ??
+                                    '',
+                                style:
+                                    const TextStyle(
+                                  color:
+                                      kTextGrey,
+                                  fontSize:
+                                      13,
                                 ),
                               ),
                             ],
@@ -890,39 +972,47 @@ class ToolSellersPage extends StatelessWidget {
                     ),
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(
+                      height: 20),
 
                   Text(
                     '${sortedSellers.length} Nearby Sellers',
-                    style: const TextStyle(
+                    style:
+                        const TextStyle(
                       fontSize: 19,
-                      fontWeight: FontWeight.w700,
+                      fontWeight:
+                          FontWeight.w700,
                       color: kTextDark,
                     ),
                   ),
 
-                  const SizedBox(height: 5),
+                  const SizedBox(
+                      height: 5),
 
                   const Text(
                     'Sorted from lowest to highest price',
-                    style: TextStyle(
+                    style:
+                        TextStyle(
                       fontSize: 12,
                       color: kTextGrey,
                     ),
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(
+                      height: 12),
                 ],
               ),
             ),
           ),
 
           SliverPadding(
-            padding: const EdgeInsets.symmetric(
+            padding:
+                const EdgeInsets.symmetric(
               horizontal: 16,
             ),
             sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
+              delegate:
+                  SliverChildBuilderDelegate(
                 (context, index) {
                   return _buildSellerCard(
                     context,
@@ -930,7 +1020,8 @@ class ToolSellersPage extends StatelessWidget {
                     index == 0,
                   );
                 },
-                childCount: sortedSellers.length,
+                childCount:
+                    sortedSellers.length,
               ),
             ),
           ),
@@ -945,16 +1036,25 @@ class ToolSellersPage extends StatelessWidget {
     bool cheapest,
   ) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(15),
+      margin:
+          const EdgeInsets.only(
+        bottom: 12,
+      ),
+      padding:
+          const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(17),
+        borderRadius:
+            BorderRadius.circular(17),
         border: Border.all(
           color: cheapest
-              ? const Color(0xFFA5D6A7)
+              ? const Color(
+                  0xFFA5D6A7,
+                )
               : kSoftGreen,
-          width: cheapest ? 1.5 : 1,
+          width: cheapest
+              ? 1.5
+              : 1,
         ),
       ),
       child: Column(
@@ -964,76 +1064,110 @@ class ToolSellersPage extends StatelessWidget {
               Container(
                 width: 48,
                 height: 48,
-                decoration: BoxDecoration(
+                decoration:
+                    BoxDecoration(
                   color: kSoftGreen,
                   borderRadius:
-                      BorderRadius.circular(13),
+                      BorderRadius.circular(
+                    13,
+                  ),
                 ),
                 child: const Icon(
-                  Icons.storefront_outlined,
+                  Icons
+                      .storefront_outlined,
                   color: kGreen,
                 ),
               ),
-              const SizedBox(width: 11),
+
+              const SizedBox(
+                  width: 11),
+
               Expanded(
                 child: Column(
                   crossAxisAlignment:
-                      CrossAxisAlignment.start,
+                      CrossAxisAlignment
+                          .start,
                   children: [
                     Row(
                       children: [
                         Expanded(
                           child: Text(
-                            seller['shop'],
+                            seller['shop']
+                                    ?.toString() ??
+                                'Seller',
                             maxLines: 2,
                             overflow:
-                                TextOverflow.ellipsis,
-                            style: const TextStyle(
+                                TextOverflow
+                                    .ellipsis,
+                            style:
+                                const TextStyle(
                               fontSize: 15,
                               fontWeight:
-                                  FontWeight.w700,
-                              color: kTextDark,
+                                  FontWeight
+                                      .w700,
+                              color:
+                                  kTextDark,
                             ),
                           ),
                         ),
+
                         if (cheapest)
                           Container(
                             padding:
-                                const EdgeInsets.symmetric(
+                                const EdgeInsets
+                                    .symmetric(
                               horizontal: 7,
                               vertical: 4,
                             ),
-                            decoration: BoxDecoration(
-                              color: kSoftGreen,
+                            decoration:
+                                BoxDecoration(
+                              color:
+                                  kSoftGreen,
                               borderRadius:
-                                  BorderRadius.circular(8),
+                                  BorderRadius
+                                      .circular(
+                                8,
+                              ),
                             ),
-                            child: const Text(
+                            child:
+                                const Text(
                               'LOWEST',
-                              style: TextStyle(
+                              style:
+                                  TextStyle(
                                 fontSize: 9,
                                 fontWeight:
-                                    FontWeight.w800,
-                                color: kGreen,
+                                    FontWeight
+                                        .w800,
+                                color:
+                                    kGreen,
                               ),
                             ),
                           ),
                       ],
                     ),
-                    const SizedBox(height: 6),
+
+                    const SizedBox(
+                        height: 6),
+
                     Row(
                       children: [
                         const Icon(
-                          Icons.location_on_outlined,
+                          Icons
+                              .location_on_outlined,
                           size: 15,
                           color: kGreen,
                         ),
-                        const SizedBox(width: 3),
+
+                        const SizedBox(
+                            width: 3),
+
                         Text(
-                          '${seller['distance']} km away',
-                          style: const TextStyle(
+                          '${seller['distance'] ?? '--'} km away',
+                          style:
+                              const TextStyle(
                             fontSize: 12,
-                            color: kTextGrey,
+                            color:
+                                kTextGrey,
                           ),
                         ),
                       ],
@@ -1044,37 +1178,54 @@ class ToolSellersPage extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(
+              height: 12),
 
           Row(
             children: [
               Expanded(
                 child: Text(
                   '₹${_formatPrice(seller['price'])}',
-                  style: const TextStyle(
+                  style:
+                      const TextStyle(
                     fontSize: 19,
-                    fontWeight: FontWeight.w800,
-                    color: kPrimaryGreen,
+                    fontWeight:
+                        FontWeight.w800,
+                    color:
+                        kPrimaryGreen,
                   ),
                 ),
               ),
+
               OutlinedButton.icon(
                 onPressed: () {
                   showDialog(
                     context: context,
-                    builder: (_) => AlertDialog(
-                      title: const Text('Contact Seller'),
+                    builder: (_) =>
+                        AlertDialog(
+                      title:
+                          const Text(
+                        'Contact Seller',
+                      ),
                       content: Text(
-                        seller['phone'],
+                        seller['phone']
+                                ?.toString() ??
+                            'Contact information unavailable',
                       ),
                       actions: [
                         TextButton(
                           onPressed: () =>
-                              Navigator.pop(context),
-                          child: const Text(
+                              Navigator
+                                  .pop(
+                            context,
+                          ),
+                          child:
+                              const Text(
                             'Close',
-                            style: TextStyle(
-                              color: kGreen,
+                            style:
+                                TextStyle(
+                              color:
+                                  kGreen,
                             ),
                           ),
                         ),
@@ -1086,10 +1237,14 @@ class ToolSellersPage extends StatelessWidget {
                   Icons.phone_outlined,
                   size: 17,
                 ),
-                label: const Text('Contact'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: kGreen,
-                  side: const BorderSide(
+                label:
+                    const Text('Contact'),
+                style:
+                    OutlinedButton.styleFrom(
+                  foregroundColor:
+                      kGreen,
+                  side:
+                      const BorderSide(
                     color: kGreen,
                   ),
                 ),
@@ -1101,10 +1256,18 @@ class ToolSellersPage extends StatelessWidget {
     );
   }
 
-  String _formatPrice(dynamic value) {
-    final price = (value as num).toDouble();
+  String _formatPrice(
+    dynamic value,
+  ) {
+    if (value == null) {
+      return '--';
+    }
 
-    if (price == price.roundToDouble()) {
+    final price =
+        (value as num).toDouble();
+
+    if (price ==
+        price.roundToDouble()) {
       return price.toInt().toString();
     }
 

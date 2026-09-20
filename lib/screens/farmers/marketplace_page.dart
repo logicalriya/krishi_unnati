@@ -14,8 +14,7 @@ class MarketplacePage extends StatefulWidget {
   /// When true, this page is being shown as a tab inside the persistent
   /// bottom-nav shell (see farmer_dashboard.dart). In that case the shell
   /// already provides the bottom nav bar, so this page's own (duplicated)
-  /// bottom nav row is not rendered, avoiding a double nav bar. The rest
-  /// of the Marketplace UI is completely unchanged either way.
+  /// bottom nav row is not rendered, avoiding a double nav bar.
   final bool embedded;
 
   @override
@@ -204,7 +203,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kPaleGreen,
-
       body: SafeArea(
         child: Column(
           children: [
@@ -222,10 +220,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildLocationCard(),
-
-                    const SizedBox(height: 12),
-
                     _buildSearchBar(),
 
                     const SizedBox(height: 18),
@@ -350,107 +344,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 
   // ============================================================
-  // LOCATION CARD
-  // ============================================================
-
-  Widget _buildLocationCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 11,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: kSoftGreen,
-        ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: kSoftGreen,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(
-              Icons.location_on_outlined,
-              color: kGreen,
-              size: 21,
-            ),
-          ),
-
-          const SizedBox(width: 10),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Your location',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: kTextGrey,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                Row(
-                  children: [
-                    if (_locationLoading)
-                      const SizedBox(
-                        width: 13,
-                        height: 13,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: kGreen,
-                        ),
-                      ),
-
-                    if (_locationLoading)
-                      const SizedBox(width: 6),
-
-                    Flexible(
-                      child: Text(
-                        _locationText,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: kTextDark,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-
-          IconButton(
-            tooltip: 'Refresh location',
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 34,
-              minHeight: 34,
-            ),
-            onPressed: _getCurrentLocation,
-            icon: const Icon(
-              Icons.my_location,
-              color: kGreen,
-              size: 20,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ============================================================
   // SEARCH
   // ============================================================
 
@@ -516,70 +409,385 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 
   // ============================================================
-  // ADMIN RECOMMENDATION
+  // PRODUCT RECOMMENDATION
   // ============================================================
 
   Widget _buildRecommendationCard() {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [
-            Color(0xFFE8F5E9),
-            Color(0xFFF4FAF4),
-          ],
-        ),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(17),
         border: Border.all(
           color: const Color(0xFFC8E6C9),
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 46,
-            height: 46,
-            decoration: const BoxDecoration(
-              color: kGreen,
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(
-              Icons.admin_panel_settings_outlined,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Admin Recommendations',
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
-                    color: kPrimaryGreen,
-                  ),
-                ),
-
-                SizedBox(height: 3),
-
-                Text(
-                  'Recommended products and services are selected by Krishi Unnati admins.',
-                  style: TextStyle(
-                    fontSize: 11.5,
-                    height: 1.3,
-                    color: kTextGrey,
-                  ),
-                ),
-              ],
-            ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.035),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
         ],
       ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 46,
+                height: 46,
+                decoration: BoxDecoration(
+                  color: kSoftGreen,
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: const Icon(
+                  Icons.shopping_bag_outlined,
+                  color: kGreen,
+                  size: 25,
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Recommended Product',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                        color: kPrimaryGreen,
+                      ),
+                    ),
+
+                    SizedBox(height: 3),
+
+                    Text(
+                      'Recommended by Krishi Unnati',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        color: kTextGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          // ======================================================
+          // DYNAMIC PRODUCT NAME
+          // Backend can replace this value dynamically.
+          // ======================================================
+
+          const Text(
+            'Product Name',
+            style: TextStyle(
+              fontSize: 17,
+              fontWeight: FontWeight.w700,
+              color: kTextDark,
+            ),
+          ),
+
+          const SizedBox(height: 9),
+
+          Row(
+            children: [
+              // PRICE
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: kSoftGreen,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.currency_rupee,
+                      color: kGreen,
+                      size: 15,
+                    ),
+                    Text(
+                      '--',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: kGreen,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 9),
+
+              // DISTANCE
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 9,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF5F7F5),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.location_on_outlined,
+                      color: kTextGrey,
+                      size: 15,
+                    ),
+                    SizedBox(width: 3),
+                    Text(
+                      '-- km',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: kTextGrey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 14),
+
+          Row(
+            children: [
+              // CONTACT
+              Expanded(
+                child: SizedBox(
+                  height: 37,
+                  child: ElevatedButton.icon(
+                    onPressed: () {},
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: kGreen,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    icon: const Icon(
+                      Icons.phone_outlined,
+                      size: 16,
+                    ),
+                    label: const Text(
+                      'Contact',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(width: 9),
+
+              // MORE DETAILS
+              Expanded(
+                child: SizedBox(
+                  height: 37,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      _showProductDetails();
+                    },
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: kGreen,
+                      side: const BorderSide(
+                        color: kGreen,
+                        width: 1.2,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'More Details',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        SizedBox(width: 5),
+                        Icon(
+                          Icons.arrow_forward,
+                          size: 15,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // MORE DETAILS
+  // ============================================================
+
+  void _showProductDetails() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(22),
+        ),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(
+            18,
+            18,
+            18,
+            25,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              const Row(
+                children: [
+                  Icon(
+                    Icons.shopping_bag_outlined,
+                    color: kGreen,
+                    size: 25,
+                  ),
+
+                  SizedBox(width: 10),
+
+                  Text(
+                    'Product Details',
+                    style: TextStyle(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w700,
+                      color: kTextDark,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 18),
+
+              const Text(
+                'Product Name',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: kTextDark,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                'Price',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: kTextGrey,
+                ),
+              ),
+
+              const SizedBox(height: 2),
+
+              const Text(
+                '₹ --',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: kGreen,
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              const Text(
+                'Distance',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: kTextGrey,
+                ),
+              ),
+
+              const SizedBox(height: 2),
+
+              const Text(
+                '-- km',
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: kTextDark,
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              SizedBox(
+                width: double.infinity,
+                height: 42,
+                child: ElevatedButton.icon(
+                  onPressed: () {},
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: kGreen,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(11),
+                    ),
+                  ),
+                  icon: const Icon(
+                    Icons.phone_outlined,
+                    size: 18,
+                  ),
+                  label: const Text(
+                    'Contact Seller',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -845,9 +1053,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
           vertical: 4,
         ),
         decoration: BoxDecoration(
-          color: selected
-              ? kSoftGreen
-              : Colors.transparent,
+          color: selected ? kSoftGreen : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

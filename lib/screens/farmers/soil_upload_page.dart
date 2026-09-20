@@ -20,6 +20,15 @@ class SoilUploadPage extends StatefulWidget {
 }
 
 class _SoilUploadPageState extends State<SoilUploadPage> {
+  // ── Agriculture theme ────────────────────────────────────────
+  static const _green = Color(0xFF2E7D32);
+  static const _greenDark = Color(0xFF1B5E20);
+  static const _greenLight = Color(0xFFE8F3E8);
+  static const _greenSurface = Color(0xFFF4F8F3);
+  static const _greenBorder = Color(0xFFCFE3CF);
+  static const _text = Color(0xFF17321C);
+  static const _muted = Color(0xFF607064);
+
   bool accessibilityMode = false;
   String? selectedFileName;
 
@@ -39,7 +48,10 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
   void _submit() {
     if (selectedFileName == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a file first')),
+        const SnackBar(
+          backgroundColor: _greenDark,
+          content: Text('Please select a file first'),
+        ),
       );
       return;
     }
@@ -47,14 +59,17 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
     // Hook this up to the actual soil-analysis backend/API when one
     // exists.
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Soil analysis submitted successfully')),
+      const SnackBar(
+        backgroundColor: _greenDark,
+        content: Text('Soil analysis submitted successfully'),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F8),
+      backgroundColor: _greenSurface,
       appBar: const FarmerPageHeader(title: 'Krishi Unnati'),
       body: SafeArea(
         child: Column(
@@ -73,12 +88,15 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: _greenBorder,
+                        ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                            color: _greenDark.withOpacity(0.06),
+                            blurRadius: 9,
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -87,8 +105,11 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                         children: [
                           Row(
                             children: const [
-                              Icon(Icons.description_outlined,
-                                  size: 18, color: Color(0xFF00A94F)),
+                              Icon(
+                                Icons.description_outlined,
+                                size: 18,
+                                color: _greenDark,
+                              ),
                               SizedBox(width: 6),
                               Expanded(
                                 child: Text(
@@ -96,7 +117,7 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w700,
-                                    color: Color(0xFF30343B),
+                                    color: _text,
                                   ),
                                 ),
                               ),
@@ -111,7 +132,7 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                             style: TextStyle(
                               fontSize: 12,
                               height: 1.4,
-                              color: Color(0xFF707780),
+                              color: _muted,
                             ),
                           ),
 
@@ -123,8 +144,8 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                               width: double.infinity,
                               height: 150,
                               decoration: BoxDecoration(
-                                color: const Color(0xFFFAFBFC),
-                                borderRadius: BorderRadius.circular(10),
+                                color: _greenSurface,
+                                borderRadius: BorderRadius.circular(12),
                               ),
                               child: CustomPaint(
                                 painter: DashedBorderPainter(),
@@ -137,13 +158,13 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                         width: 44,
                                         height: 44,
                                         decoration: const BoxDecoration(
-                                          color: Color(0xFFEFF1F3),
+                                          color: _greenLight,
                                           shape: BoxShape.circle,
                                         ),
                                         child: const Icon(
                                           Icons.cloud_upload_outlined,
                                           size: 22,
-                                          color: Color(0xFF7C858E),
+                                          color: _greenDark,
                                         ),
                                       ),
                                       const SizedBox(height: 12),
@@ -155,7 +176,7 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                           fontWeight: selectedFileName != null
                                               ? FontWeight.w600
                                               : FontWeight.normal,
-                                          color: const Color(0xFF606870),
+                                          color: _text,
                                         ),
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.ellipsis,
@@ -165,7 +186,7 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                         'Supported: JPG, PNG, PDF (Max 5MB)',
                                         style: TextStyle(
                                           fontSize: 10,
-                                          color: Color(0xFF90979E),
+                                          color: _muted,
                                         ),
                                       ),
                                     ],
@@ -186,11 +207,11 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF00A94F),
+                          backgroundColor: _green,
                           foregroundColor: Colors.white,
                           elevation: 0,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(12),
                           ),
                         ),
                         child: const Text(

@@ -17,6 +17,35 @@ class _CropHealthPageState extends State<CropHealthPage> {
   XFile? selectedImage;
 
   // ============================================================
+  // DYNAMIC ML PREDICTION RESULTS
+  // ============================================================
+  //
+  // The ML model/backend will provide these values dynamically.
+  //
+  // Expected format:
+  //
+  // [
+  //   {
+  //     'diseaseName': 'Cotton Curl Virus',
+  //     'probability': '96.91%',
+  //     'description': 'Tap to see details',
+  //     'highRisk': true,
+  //   },
+  //   {
+  //     'diseaseName': 'Cotton Fusarium Wilt',
+  //     'probability': '0.53%',
+  //     'description': 'Tap to see details',
+  //     'highRisk': false,
+  //   },
+  // ]
+  //
+  // ============================================================
+
+  List<Map<String, dynamic>> predictionResults = [];
+
+  bool isPredicting = false;
+
+  // ============================================================
   // PICK IMAGE
   // ============================================================
 
@@ -30,10 +59,29 @@ class _CropHealthPageState extends State<CropHealthPage> {
       if (image != null) {
         setState(() {
           selectedImage = image;
+          predictionResults = [];
+          isPredicting = true;
         });
 
-        // Later:
-        // Send selectedImage to the AI disease detection model.
+        // ========================================================
+        // SEND SELECTED IMAGE TO ML MODEL
+        // ========================================================
+        //
+        // Backend / ML developer will connect the model here.
+        //
+        // After the model returns its prediction:
+        //
+        // setState(() {
+        //   predictionResults = modelResults;
+        //   isPredicting = false;
+        // });
+        //
+        // The model can return any number of predictions.
+        // Nothing is hardcoded in the UI.
+        //
+        // ========================================================
+
+        // ML MODEL CONNECTION WILL BE ADDED HERE
       }
     } catch (e) {
       if (!mounted) return;
@@ -236,6 +284,8 @@ class _CropHealthPageState extends State<CropHealthPage> {
                               onTap: () {
                                 setState(() {
                                   selectedImage = null;
+                                  predictionResults = [];
+                                  isPredicting = false;
                                 });
                               },
 
@@ -422,34 +472,45 @@ class _CropHealthPageState extends State<CropHealthPage> {
               const SizedBox(height: 7),
 
               // ==================================================
-              // DISEASE RESULT 1
+              // DYNAMIC ML PREDICTION RESULTS
               // ==================================================
 
-              DiseaseResultCard(
-                diseaseName:
-                    'Cotton Curl Virus',
-                probability:
-                    '96.91%',
-                description:
-                    'Tap to see details',
-                highRisk: true,
-              ),
+              if (isPredicting)
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 15,
+                  ),
+                  child: CircularProgressIndicator(
+                    color: Color(0xFF16A34A),
+                  ),
+                ),
 
-              const SizedBox(height: 7),
+              if (!isPredicting &&
+                  predictionResults.isNotEmpty)
+                ...predictionResults.map(
+                  (result) => Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 7,
+                    ),
+                    child: DiseaseResultCard(
+                      diseaseName:
+                          result['diseaseName'] ??
+                              'Unknown Disease',
 
-              // ==================================================
-              // DISEASE RESULT 2
-              // ==================================================
+                      probability:
+                          result['probability'] ??
+                              '--',
 
-              DiseaseResultCard(
-                diseaseName:
-                    'Cotton Fusarium Wilt',
-                probability:
-                    '0.53%',
-                description:
-                    'Tap to see details',
-                highRisk: false,
-              ),
+                      description:
+                          result['description'] ??
+                              'Tap to see details',
+
+                      highRisk:
+                          result['highRisk'] ??
+                              false,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

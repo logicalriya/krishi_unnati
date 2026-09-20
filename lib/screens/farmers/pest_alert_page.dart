@@ -3,10 +3,10 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
 import '../farmer_extras/pest_map_screen.dart';
+import 'marketplace_page.dart';
 
 class PestAlertPage extends StatefulWidget {
   const PestAlertPage({super.key, this.embedded = false});
-
 
   final bool embedded;
 
@@ -31,7 +31,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
   // ------------------------------------------------------------
   // SAMPLE PEST ALERT DATA
   // ------------------------------------------------------------
-
 
   final List<PestAlert> _allAlerts = [
     PestAlert(
@@ -413,6 +412,23 @@ class _PestAlertPageState extends State<PestAlertPage> {
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
+
+        leading: IconButton(
+          tooltip: 'Back',
+          icon: const Icon(
+            Icons.arrow_back_ios_new,
+            color: Color(0xFF202020),
+            size: 20,
+          ),
+          onPressed: () {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (_) => const MarketplacePage(),
+              ),
+            );
+          },
+        ),
 
         title: const Text(
           'Pest Alerts',

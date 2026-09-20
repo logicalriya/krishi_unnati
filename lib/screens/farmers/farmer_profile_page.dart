@@ -20,8 +20,11 @@ class FarmerProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final t = AppLocale.of(context).t;
     final user = AppSession.of(context).user;
-    final name = (user?['fullName'] ?? 'Farmer').toString();
+
+    // Name and phone number saved during registration
+    final name = (user?['fullName'] ?? '').toString();
     final phone = (user?['phone'] ?? '').toString();
+
     final village = (user?['village'] ?? '').toString();
     final district = (user?['district'] ?? '').toString();
     final location = [village, district]
@@ -29,10 +32,10 @@ class FarmerProfilePage extends StatelessWidget {
         .join(', ');
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FAF6),
+      backgroundColor: const Color(0xFFF3F8F4),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF172033),
+        foregroundColor: const Color(0xFF18352A),
         elevation: 0,
         title: Text(
           t('myProfile'),
@@ -45,7 +48,7 @@ class FarmerProfilePage extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(18),
             decoration: BoxDecoration(
-              color: const Color(0xFF0B8F4D),
+              color: const Color(0xFF2E7D4F),
               borderRadius: BorderRadius.circular(18),
             ),
             child: Row(
@@ -54,7 +57,9 @@ class FarmerProfilePage extends StatelessWidget {
                   radius: 29,
                   backgroundColor: Colors.white.withOpacity(0.2),
                   child: Text(
-                    name.trim().isEmpty ? 'F' : name.trim()[0].toUpperCase(),
+                    name.trim().isEmpty
+                        ? 'F'
+                        : name.trim()[0].toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,
@@ -68,7 +73,7 @@ class FarmerProfilePage extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name,
+                        name.isEmpty ? 'Farmer' : name,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -93,10 +98,23 @@ class FarmerProfilePage extends StatelessWidget {
           _sectionCard(
             title: t('profile'),
             children: [
-              _infoRow(Icons.person_outline, t('fullName'), name),
-              if (phone.isNotEmpty) _infoRow(Icons.phone_outlined, t('phoneNumber'), phone),
+              _infoRow(
+                Icons.person_outline,
+                t('fullName'),
+                name.isEmpty ? 'Farmer' : name,
+              ),
+              if (phone.isNotEmpty)
+                _infoRow(
+                  Icons.phone_outlined,
+                  t('phoneNumber'),
+                  phone,
+                ),
               if (location.isNotEmpty)
-                _infoRow(Icons.location_on_outlined, t('locationCol'), location),
+                _infoRow(
+                  Icons.location_on_outlined,
+                  t('locationCol'),
+                  location,
+                ),
             ],
           ),
           const SizedBox(height: 14),
@@ -105,9 +123,14 @@ class FarmerProfilePage extends StatelessWidget {
             children: [
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.language_outlined, color: Color(0xFF0B8F4D)),
+                leading: const Icon(
+                  Icons.language_outlined,
+                  color: Color(0xFF2E7D4F),
+                ),
                 title: Text(t('selectLanguage')),
-                subtitle: Text(AppLocale.of(context).language.displayName),
+                subtitle: Text(
+                  AppLocale.of(context).language.displayName,
+                ),
                 trailing: DropdownButtonHideUnderline(
                   child: DropdownButton<AppLanguage>(
                     value: AppLocale.of(context).language,
@@ -130,7 +153,10 @@ class FarmerProfilePage extends StatelessWidget {
               const Divider(height: 1),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.logout, color: Color(0xFFB42318)),
+                leading: const Icon(
+                  Icons.logout,
+                  color: Color(0xFFB42318),
+                ),
                 title: Text(
                   t('logout'),
                   style: const TextStyle(
@@ -147,13 +173,18 @@ class FarmerProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _sectionCard({required String title, required List<Widget> children}) {
+  Widget _sectionCard({
+    required String title,
+    required List<Widget> children,
+  }) {
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFDCE8DF)),
+        border: Border.all(
+          color: const Color(0xFFD5E4D9),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -161,7 +192,7 @@ class FarmerProfilePage extends StatelessWidget {
           Text(
             title,
             style: const TextStyle(
-              color: Color(0xFF195B37),
+              color: Color(0xFF24613E),
               fontSize: 14,
               fontWeight: FontWeight.w800,
             ),
@@ -173,19 +204,30 @@ class FarmerProfilePage extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(IconData icon, String label, String value) {
+  Widget _infoRow(
+    IconData icon,
+    String label,
+    String value,
+  ) {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: Icon(icon, color: const Color(0xFF607064), size: 20),
+      leading: Icon(
+        icon,
+        color: const Color(0xFF607568),
+        size: 20,
+      ),
       title: Text(
         label,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF6A727D)),
+        style: const TextStyle(
+          fontSize: 11,
+          color: Color(0xFF68756D),
+        ),
       ),
       subtitle: Text(
         value,
         style: const TextStyle(
           fontSize: 14,
-          color: Color(0xFF1E2B38),
+          color: Color(0xFF20352A),
           fontWeight: FontWeight.w700,
         ),
       ),

@@ -54,10 +54,10 @@ class _FarmerHistoryPageState extends State<FarmerHistoryPage> {
     final t = AppLocale.of(context).t;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FAF6),
+      backgroundColor: const Color(0xFFF3F8F4),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        foregroundColor: const Color(0xFF172033),
+        foregroundColor: const Color(0xFF18352A),
         elevation: 0,
         title: Text(
           t('scanHistory'),
@@ -75,7 +75,11 @@ class _FarmerHistoryPageState extends State<FarmerHistoryPage> {
         future: _historyFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(
+                color: Color(0xFF2E7D4F),
+              ),
+            );
           }
 
           final entries = snapshot.data ?? const <Map<String, dynamic>>[];
@@ -116,7 +120,9 @@ class _HistoryCard extends StatelessWidget {
     final title = (entry['disease'] ?? entry['title'] ?? translate('scanResult')).toString();
     final confidence = entry['confidence'];
     final timestamp = DateTime.tryParse((entry['timestamp'] ?? '').toString());
-    final icon = type == 'pest_report' ? Icons.bug_report_outlined : Icons.eco_outlined;
+    final icon = type == 'pest_report'
+        ? Icons.bug_report_outlined
+        : Icons.eco_outlined;
     final date = timestamp == null ? '' : _formatDate(timestamp);
 
     return Container(
@@ -124,7 +130,7 @@ class _HistoryCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFDCE8DF)),
+        border: Border.all(color: const Color(0xFFD5E4D9)),
       ),
       child: Row(
         children: [
@@ -132,10 +138,13 @@ class _HistoryCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: const Color(0xFFE4F5EA),
+              color: const Color(0xFFE3F1E8),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: const Color(0xFF0B8F4D)),
+            child: Icon(
+              icon,
+              color: const Color(0xFF2E7D4F),
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -148,7 +157,7 @@ class _HistoryCard extends StatelessWidget {
                       : translate('cropScan'),
                   style: const TextStyle(
                     fontSize: 11,
-                    color: Color(0xFF0B8F4D),
+                    color: Color(0xFF2E7D4F),
                     fontWeight: FontWeight.w700,
                   ),
                 ),
@@ -160,13 +169,16 @@ class _HistoryCard extends StatelessWidget {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF172033),
+                    color: Color(0xFF18352A),
                   ),
                 ),
                 if (confidence != null)
                   Text(
                     '${translate('confidence')}: $confidence',
-                    style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Color(0xFF68756D),
+                    ),
                   ),
               ],
             ),
@@ -174,7 +186,10 @@ class _HistoryCard extends StatelessWidget {
           if (date.isNotEmpty)
             Text(
               date,
-              style: const TextStyle(fontSize: 10, color: Colors.grey),
+              style: const TextStyle(
+                fontSize: 10,
+                color: Color(0xFF68756D),
+              ),
             ),
         ],
       ),
@@ -201,14 +216,18 @@ class _EmptyHistory extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.history, size: 64, color: Color(0xFF9AA7A0)),
+            const Icon(
+              Icons.history,
+              size: 64,
+              color: Color(0xFF8EA095),
+            ),
             const SizedBox(height: 14),
             Text(
               t('noScansYet'),
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 15,
-                color: Color(0xFF52605A),
+                color: Color(0xFF52665A),
                 height: 1.4,
               ),
             ),

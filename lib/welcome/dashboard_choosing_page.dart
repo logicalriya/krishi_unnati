@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../screens/farmers/farmer_create_account_page.dart';
+import '../screens/farmers/farmer_login_page.dart';
+import '../screens/farmers/farmer_dashboard.dart';
 import '../screens/admins/admin_dashboard.dart';
 import '../screens/officers/create_account_screen.dart';
 import 'registration_help_page.dart';
 import '../state/app_locale.dart';
+import '../state/app_session.dart';
 
 class DashboardChoosingPage extends StatefulWidget {
   const DashboardChoosingPage({super.key});
@@ -57,12 +59,28 @@ class _DashboardChoosingPageState extends State<DashboardChoosingPage> {
     SystemNavigator.pop();
   }
 
-  // OPEN FARMER DASHBOARD
+  // OPEN FARMER PORTAL
+  // Logged in  -> dashboard directly
+  // Logged out -> login page (which links to registration)
 
   void _openFarmerDashboard() {
+    final user = AppSession.of(context).user;
+    final bool loggedInFarmer =
+        user != null && (user['role'] ?? 'farmer') == 'farmer';
+
+    // Already logged in -> straight to dashboard
+    if (loggedInFarmer) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+      return;
+    }
+
+    // Not logged in -> login page
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => const FarmerCreateAccountPage(),
+        settings: const RouteSettings(name: '/farmer-login'),
+        builder: (context) => const FarmerLoginPage(),
       ),
     );
   }
