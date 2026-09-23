@@ -43,6 +43,59 @@ class _MarketplacePageState extends State<MarketplacePage> {
   String _locationText = 'Getting your location...';
   bool _locationLoading = true;
 
+  // ============================================================
+  // DEMO RECOMMENDATIONS
+  // Backend/admin can replace this data dynamically later.
+  // ============================================================
+
+  final List<Map<String, String>> _recommendations = [
+    {
+      'name': 'NPK 10:26:26 Fertilizer',
+      'category': 'Fertilizer',
+      'price': '₹1,250',
+      'distance': '3.2 km',
+      'seller': 'Green Farm Supplies',
+      'image':
+          'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=600&q=80',
+    },
+    {
+      'name': 'Battery Powered Sprayer',
+      'category': 'Farming Tool',
+      'price': '₹3,499',
+      'distance': '5.8 km',
+      'seller': 'Kisan Equipment Store',
+      'image':
+          'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80',
+    },
+    {
+      'name': 'Organic Neem Fertilizer',
+      'category': 'Crop Protection',
+      'price': '₹699',
+      'distance': '7.1 km',
+      'seller': 'Agro Green Mart',
+      'image':
+          'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80',
+    },
+    {
+      'name': 'Hand Cultivator Tool Set',
+      'category': 'Farming Tool',
+      'price': '₹899',
+      'distance': '8.4 km',
+      'seller': 'Farm Tools Hub',
+      'image':
+          'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
+    },
+    {
+      'name': 'Micronutrient Soil Mix',
+      'category': 'Soil Nutrient',
+      'price': '₹549',
+      'distance': '10.2 km',
+      'seller': 'Krishi Seva Store',
+      'image':
+          'https://images.unsplash.com/photo-1598514982901-ae627a7e0a7f?auto=format&fit=crop&w=600&q=80',
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -455,7 +508,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Recommended Product',
+                      'Recommended Products',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
@@ -475,171 +528,442 @@ class _MarketplacePageState extends State<MarketplacePage> {
                   ],
                 ),
               ),
-            ],
-          ),
 
-          const SizedBox(height: 14),
-
-          // ======================================================
-          // DYNAMIC PRODUCT NAME
-          // Backend can replace this value dynamically.
-          // ======================================================
-
-          const Text(
-            'Product Name',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w700,
-              color: kTextDark,
-            ),
-          ),
-
-          const SizedBox(height: 9),
-
-          Row(
-            children: [
-              // PRICE
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 9,
-                  vertical: 6,
+              TextButton(
+                onPressed: _showAllRecommendations,
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 5,
+                    vertical: 4,
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                 ),
-                decoration: BoxDecoration(
-                  color: kSoftGreen,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.currency_rupee,
-                      color: kGreen,
-                      size: 15,
-                    ),
-                    Text(
-                      '--',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: kGreen,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              const SizedBox(width: 9),
-
-              // DISTANCE
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 9,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFF5F7F5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.location_on_outlined,
-                      color: kTextGrey,
-                      size: 15,
-                    ),
-                    SizedBox(width: 3),
-                    Text(
-                      '-- km',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: kTextGrey,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          Row(
-            children: [
-              // CONTACT
-              Expanded(
-                child: SizedBox(
-                  height: 37,
-                  child: ElevatedButton.icon(
-                    onPressed: () {},
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kGreen,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    icon: const Icon(
-                      Icons.phone_outlined,
-                      size: 16,
-                    ),
-                    label: const Text(
-                      'Contact',
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                child: const Text(
+                  'View All',
+                  style: TextStyle(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w600,
+                    color: kGreen,
                   ),
                 ),
               ),
+            ],
+          ),
 
-              const SizedBox(width: 9),
+          const SizedBox(height: 14),
 
-              // MORE DETAILS
-              Expanded(
-                child: SizedBox(
-                  height: 37,
-                  child: OutlinedButton(
-                    onPressed: () {
-                      _showProductDetails();
-                    },
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: kGreen,
-                      side: const BorderSide(
-                        color: kGreen,
-                        width: 1.2,
+          // ======================================================
+          // DYNAMIC RECOMMENDATION LIST
+          // Backend/admin can replace this list dynamically.
+          // ======================================================
+
+          SizedBox(
+            height: 205,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              physics: const BouncingScrollPhysics(),
+              itemCount: _recommendations.length,
+              itemBuilder: (context, index) {
+                return _buildRecommendationItem(
+                  _recommendations[index],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // RECOMMENDATION ITEM
+  // ============================================================
+
+  Widget _buildRecommendationItem(
+    Map<String, String> item,
+  ) {
+    return Container(
+      width: 245,
+      margin: const EdgeInsets.only(right: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FCF9),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: const Color(0xFFDDEBDD),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // IMAGE
+          SizedBox(
+            height: 92,
+            width: double.infinity,
+            child: Image.network(
+              item['image'] ?? '',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: kSoftGreen,
+                  child: const Center(
+                    child: Icon(
+                      Icons.shopping_bag_outlined,
+                      color: kGreen,
+                      size: 35,
+                    ),
+                  ),
+                );
+              },
+              loadingBuilder: (
+                context,
+                child,
+                loadingProgress,
+              ) {
+                if (loadingProgress == null) {
+                  return child;
+                }
+
+                return Container(
+                  color: kSoftGreen,
+                  child: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: kGreen,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(
+                10,
+                8,
+                10,
+                7,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['category'] ?? '',
+                    style: const TextStyle(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w600,
+                      color: kGreen,
+                    ),
+                  ),
+
+                  const SizedBox(height: 2),
+
+                  Text(
+                    item['name'] ?? 'Product Name',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: kTextDark,
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Row(
+                    children: [
+                      Text(
+                        item['price'] ?? '₹ --',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: kGreen,
+                        ),
                       ),
-                      shape: RoundedRectangleBorder(
+
+                      const SizedBox(width: 8),
+
+                      Icon(
+                        Icons.location_on_outlined,
+                        size: 12,
+                        color: Colors.grey.shade600,
+                      ),
+
+                      const SizedBox(width: 2),
+
+                      Text(
+                        item['distance'] ?? '-- km',
+                        style: TextStyle(
+                          fontSize: 9.5,
+                          color: Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item['seller'] ?? '',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 9.5,
+                            color: kTextGrey,
+                          ),
+                        ),
+                      ),
+
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 11,
+                        color: kGreen,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // VIEW ALL RECOMMENDATIONS
+  // ============================================================
+
+  void _showAllRecommendations() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(22),
+        ),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.72,
+          minChildSize: 0.45,
+          maxChildSize: 0.92,
+          builder: (context, scrollController) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 8,
+                      bottom: 3,
+                    ),
+                    child: Container(
+                      width: 38,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD0D0D0),
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      14,
+                      6,
+                      8,
+                      6,
+                    ),
+                    child: Row(
                       children: [
-                        Text(
-                          'More Details',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
+                        const Expanded(
+                          child: Text(
+                            'Recommended Products',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: kTextDark,
+                            ),
                           ),
                         ),
-                        SizedBox(width: 5),
-                        Icon(
-                          Icons.arrow_forward,
-                          size: 15,
+
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: const Icon(
+                            Icons.close,
+                            size: 20,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                ),
+
+                  const Divider(
+                    height: 1,
+                    color: Color(0xFFE8E8E8),
+                  ),
+
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding: const EdgeInsets.fromLTRB(
+                        14,
+                        12,
+                        14,
+                        20,
+                      ),
+                      itemCount: _recommendations.length,
+                      itemBuilder: (context, index) {
+                        final item = _recommendations[index];
+
+                        return Container(
+                          margin: const EdgeInsets.only(
+                            bottom: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF9FCF9),
+                            borderRadius: BorderRadius.circular(15),
+                            border: Border.all(
+                              color: const Color(0xFFDDEBDD),
+                            ),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 105,
+                                height: 105,
+                                child: Image.network(
+                                  item['image'] ?? '',
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (
+                                    context,
+                                    error,
+                                    stackTrace,
+                                  ) {
+                                    return Container(
+                                      color: kSoftGreen,
+                                      child: const Icon(
+                                        Icons.shopping_bag_outlined,
+                                        color: kGreen,
+                                        size: 35,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(11),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        item['category'] ?? '',
+                                        style: const TextStyle(
+                                          fontSize: 9.5,
+                                          fontWeight:
+                                              FontWeight.w600,
+                                          color: kGreen,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 3),
+
+                                      Text(
+                                        item['name'] ??
+                                            'Product Name',
+                                        maxLines: 2,
+                                        overflow:
+                                            TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight:
+                                              FontWeight.w700,
+                                          color: kTextDark,
+                                        ),
+                                      ),
+
+                                      const SizedBox(height: 6),
+
+                                      Row(
+                                        children: [
+                                          Text(
+                                            item['price'] ??
+                                                '₹ --',
+                                            style:
+                                                const TextStyle(
+                                              fontSize: 12,
+                                              fontWeight:
+                                                  FontWeight.w700,
+                                              color: kGreen,
+                                            ),
+                                          ),
+
+                                          const SizedBox(width: 8),
+
+                                          Icon(
+                                            Icons
+                                                .location_on_outlined,
+                                            size: 12,
+                                            color: Colors
+                                                .grey.shade600,
+                                          ),
+
+                                          const SizedBox(width: 2),
+
+                                          Text(
+                                            item['distance'] ??
+                                                '-- km',
+                                            style: TextStyle(
+                                              fontSize: 9.5,
+                                              color: Colors
+                                                  .grey.shade600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                      const SizedBox(height: 6),
+
+                                      Text(
+                                        item['seller'] ?? '',
+                                        maxLines: 1,
+                                        overflow:
+                                            TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 10,
+                                          color: kTextGrey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
-            ],
-          ),
-        ],
-      ),
+            );
+          },
+        );
+      },
     );
   }
 

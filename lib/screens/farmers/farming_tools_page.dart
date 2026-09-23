@@ -68,7 +68,7 @@ class _FarmingToolsPageState extends State<FarmingToolsPage> {
     final result = widget.tools.where((tool) {
       final categoryMatch =
           selectedCategory == 'All' ||
-              tool['category'] == selectedCategory;
+          tool['category'] == selectedCategory;
 
       final query = searchQuery.toLowerCase();
 
@@ -904,27 +904,7 @@ class ToolSellersPage extends StatelessWidget {
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 70,
-                          height: 70,
-                          decoration:
-                              BoxDecoration(
-                            color:
-                                kSoftGreen,
-                            borderRadius:
-                                BorderRadius
-                                    .circular(
-                              15,
-                            ),
-                          ),
-                          child: Icon(
-                            tool['icon'] ??
-                                Icons
-                                    .agriculture,
-                            color: kGreen,
-                            size: 32,
-                          ),
-                        ),
+                        _buildToolImage(),
 
                         const SizedBox(
                             width: 13),
@@ -1026,6 +1006,52 @@ class ToolSellersPage extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------
+  // DYNAMIC TOOL IMAGE FOR SELLERS PAGE
+  // ---------------------------------------------------------
+
+  Widget _buildToolImage() {
+    final image =
+        tool['image']?.toString() ?? '';
+
+    if (image.isNotEmpty) {
+      return ClipRRect(
+        borderRadius:
+            BorderRadius.circular(15),
+        child: Image.network(
+          image,
+          width: 70,
+          height: 70,
+          fit: BoxFit.cover,
+          errorBuilder:
+              (_, __, ___) {
+            return _fallbackToolIcon();
+          },
+        ),
+      );
+    }
+
+    return _fallbackToolIcon();
+  }
+
+  Widget _fallbackToolIcon() {
+    return Container(
+      width: 70,
+      height: 70,
+      decoration: BoxDecoration(
+        color: kSoftGreen,
+        borderRadius:
+            BorderRadius.circular(15),
+      ),
+      child: Icon(
+        tool['icon'] ??
+            Icons.agriculture,
+        color: kGreen,
+        size: 32,
       ),
     );
   }

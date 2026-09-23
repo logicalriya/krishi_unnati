@@ -40,7 +40,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 77.0082,
       severity: 'High',
     ),
-
     PestAlert(
       pest: 'Pink Bollworm',
       location: 'Amravati',
@@ -48,7 +47,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 77.7796,
       severity: 'Medium',
     ),
-
     PestAlert(
       pest: 'Onion Thrips',
       location: 'Nashik',
@@ -56,7 +54,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 73.7898,
       severity: 'High',
     ),
-
     PestAlert(
       pest: 'Fall Armyworm',
       location: 'Pune',
@@ -64,7 +61,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 73.8567,
       severity: 'Medium',
     ),
-
     PestAlert(
       pest: 'Sugarcane Borer',
       location: 'Kolhapur',
@@ -72,7 +68,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 74.2433,
       severity: 'Low',
     ),
-
     PestAlert(
       pest: 'Stem Borer',
       location: 'Nagpur',
@@ -80,7 +75,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 79.0882,
       severity: 'Medium',
     ),
-
     PestAlert(
       pest: 'Fruit Fly',
       location: 'Aurangabad',
@@ -88,7 +82,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 75.3433,
       severity: 'Low',
     ),
-
     PestAlert(
       pest: 'Whitefly',
       location: 'Jalgaon',
@@ -96,6 +89,50 @@ class _PestAlertPageState extends State<PestAlertPage> {
       longitude: 75.5626,
       severity: 'High',
     ),
+  ];
+
+  // ------------------------------------------------------------
+  // CURRENT ALERT DATA
+  //
+  // DEMO DATA IS SHOWN FOR NOW.
+  //
+  // Later this list can be populated from the backend / ML /
+  // pest-alert API without changing the UI structure.
+  // ------------------------------------------------------------
+
+  final List<Map<String, String>> _demoPestDiseases = [
+    {
+      'name': 'Aphid Infestation',
+      'crop': 'Wheat',
+      'location': 'Ludhiana West',
+      'distance': '2.4 km away',
+      'severity': 'High',
+      'time': '2 hours ago',
+    },
+    {
+      'name': 'Brown Plant Hopper',
+      'crop': 'Rice',
+      'location': 'Amritsar',
+      'distance': '5.8 km away',
+      'severity': 'Medium',
+      'time': '4 hours ago',
+    },
+    {
+      'name': 'Leaf Blast Disease',
+      'crop': 'Rice',
+      'location': 'Patiala',
+      'distance': '8.1 km away',
+      'severity': 'High',
+      'time': '6 hours ago',
+    },
+    {
+      'name': 'Cotton Bollworm',
+      'crop': 'Cotton',
+      'location': 'Bathinda',
+      'distance': '11.6 km away',
+      'severity': 'Medium',
+      'time': '1 day ago',
+    },
   ];
 
   @override
@@ -166,7 +203,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
         _loadingLocation = false;
       });
 
-      // Move map to farmer's location
       _mapController.move(
         LatLng(
           position.latitude,
@@ -215,14 +251,12 @@ class _PestAlertPageState extends State<PestAlertPage> {
         alert.longitude,
       );
 
-      // 150 km radius
       if (distance <= 150000) {
         alert.distanceKm = distance / 1000;
         nearby.add(alert);
       }
     }
 
-    // Nearest alerts first
     nearby.sort(
       (a, b) =>
           (a.distanceKm ?? 999)
@@ -239,7 +273,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
   List<Marker> _buildMarkers() {
     final List<Marker> markers = [];
 
-    // Farmer marker
     if (_farmerPosition != null) {
       markers.add(
         Marker(
@@ -251,12 +284,12 @@ class _PestAlertPageState extends State<PestAlertPage> {
           height: 45,
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.blue.withOpacity(0.15),
+              color: const Color(0xFF2563EB).withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.location_on,
-              color: Colors.blue,
+              color: Color(0xFF2563EB),
               size: 32,
             ),
           ),
@@ -264,7 +297,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
       );
     }
 
-    // Pest markers
     final nearbyAlerts = _getNearbyAlerts();
 
     for (final alert in nearbyAlerts) {
@@ -295,13 +327,13 @@ class _PestAlertPageState extends State<PestAlertPage> {
   Color _severityColor(String severity) {
     switch (severity) {
       case 'High':
-        return const Color(0xFFE53935);
+        return const Color(0xFFD83A3A);
 
       case 'Medium':
-        return const Color(0xFFE0A800);
+        return const Color(0xFFD99A18);
 
       case 'Low':
-        return const Color(0xFF36A269);
+        return const Color(0xFF2E8B57);
 
       default:
         return Colors.grey;
@@ -318,11 +350,11 @@ class _PestAlertPageState extends State<PestAlertPage> {
     Color backgroundColor;
 
     if (alert.severity == 'High') {
-      backgroundColor = const Color(0xFFFFF1F1);
+      backgroundColor = const Color(0xFFFFF4F4);
     } else if (alert.severity == 'Medium') {
-      backgroundColor = const Color(0xFFFFFAE8);
+      backgroundColor = const Color(0xFFFFFBEE);
     } else {
-      backgroundColor = const Color(0xFFEEFBF4);
+      backgroundColor = const Color(0xFFF0FAF4);
     }
 
     return Container(
@@ -334,6 +366,10 @@ class _PestAlertPageState extends State<PestAlertPage> {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(7),
+        border: Border.all(
+          color: color.withOpacity(0.22),
+          width: 1,
+        ),
       ),
       child: Row(
         children: [
@@ -342,9 +378,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
             color: color,
             size: 17,
           ),
-
           const SizedBox(width: 8),
-
           Expanded(
             child: Column(
               crossAxisAlignment:
@@ -358,9 +392,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
                     color: Color(0xFF333333),
                   ),
                 ),
-
                 const SizedBox(height: 2),
-
                 Text(
                   '${alert.location} • '
                   '${alert.distanceKm?.toStringAsFixed(1)} km away',
@@ -372,7 +404,6 @@ class _PestAlertPageState extends State<PestAlertPage> {
               ],
             ),
           ),
-
           Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 8,
@@ -381,6 +412,10 @@ class _PestAlertPageState extends State<PestAlertPage> {
             decoration: BoxDecoration(
               color: color.withOpacity(0.12),
               borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: color.withOpacity(0.25),
+                width: 0.7,
+              ),
             ),
             child: Text(
               alert.severity,
@@ -397,15 +432,340 @@ class _PestAlertPageState extends State<PestAlertPage> {
   }
 
   // ============================================================
+  // CURRENT ALERT CARD
+  //
+  // NO IMAGES ARE ADDED.
+  // IMAGE AREA IS KEPT AS A PLACEHOLDER FOR FUTURE DYNAMIC DATA.
+  // ============================================================
+
+  Widget _demoPestDiseaseCard(
+      Map<String, String> item) {
+    final String severity =
+        item['severity'] ?? 'Medium';
+
+    final bool isHigh = severity == 'High';
+    final bool isMedium = severity == 'Medium';
+
+    final Color severityColor = isHigh
+        ? const Color(0xFFD83A3A)
+        : isMedium
+            ? const Color(0xFFD99A18)
+            : const Color(0xFF2E8B57);
+
+    final Color severityBackground = isHigh
+        ? const Color(0xFFFFF4F4)
+        : isMedium
+            ? const Color(0xFFFFFBEE)
+            : const Color(0xFFF0FAF4);
+
+    final Color severityBorder =
+        severityColor.withOpacity(0.42);
+
+    return Container(
+      width: 315,
+      height: 145,
+      margin: const EdgeInsets.only(right: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: severityBorder,
+          width: isHigh ? 1.6 : 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: severityColor.withOpacity(
+              isHigh
+                  ? 0.12
+                  : isMedium
+                      ? 0.09
+                      : 0.06,
+            ),
+            blurRadius: isHigh ? 8 : 6,
+            spreadRadius: isHigh ? 0.5 : 0,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Row(
+        children: [
+          // IMAGE PLACEHOLDER
+          SizedBox(
+            width: 108,
+            height: double.infinity,
+            child: Container(
+              color: const Color(0xFFEAF5EE),
+              child: const Icon(
+                Icons.bug_report,
+                color: Color(0xFF2E8B57),
+                size: 40,
+              ),
+            ),
+          ),
+
+          // CONTENT
+          Expanded(
+            child: Padding(
+              padding:
+                  const EdgeInsets.fromLTRB(
+                12,
+                12,
+                9,
+                10,
+              ),
+              child: Column(
+                crossAxisAlignment:
+                    CrossAxisAlignment.start,
+                children: [
+                  // SEVERITY + TIME
+                  Row(
+                    mainAxisAlignment:
+                        MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding:
+                            const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: severityBackground,
+                          border: Border.all(
+                            color: severityBorder,
+                            width: 0.9,
+                          ),
+                          borderRadius:
+                              BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          severity.toUpperCase(),
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight:
+                                FontWeight.bold,
+                            color: severityColor,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        item['time']!,
+                        style: const TextStyle(
+                          fontSize: 9,
+                          color: Color(0xFF666666),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 6),
+
+                  // TITLE
+                  Text(
+                    item['name']!,
+                    maxLines: 1,
+                    overflow:
+                        TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight:
+                          FontWeight.bold,
+                      color: Color(0xFF202020),
+                    ),
+                  ),
+
+                  const SizedBox(height: 5),
+
+                  // LOCATION
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        size: 14,
+                        color: Color(0xFF666666),
+                      ),
+                      const SizedBox(width: 3),
+                      Expanded(
+                        child: Text(
+                          '${item['distance']} • '
+                          '${item['location']}',
+                          maxLines: 1,
+                          overflow:
+                              TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 9,
+                            color:
+                                Color(0xFF666666),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  // CROP
+                  Row(
+                    children: [
+                      const Icon(
+                        Icons.eco_outlined,
+                        size: 14,
+                        color: Color(0xFF2E8B57),
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        item['crop']!,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight:
+                              FontWeight.w600,
+                          color:
+                              Color(0xFF2E8B57),
+                        ),
+                      ),
+                      const Spacer(),
+                      const Icon(
+                        Icons.chevron_right,
+                        size: 19,
+                        color: Color(0xFF555555),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // VIEW ALL CURRENT ALERTS
+  // ============================================================
+
+  void _showAllDemoPestDiseases() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.72,
+          minChildSize: 0.45,
+          maxChildSize: 0.92,
+          builder: (context, scrollController) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  // TOP HANDLE
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(
+                      top: 8,
+                      bottom: 3,
+                    ),
+                    child: Container(
+                      width: 38,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD0D0D0),
+                        borderRadius:
+                            BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+
+                  // HEADER
+                  Padding(
+                    padding:
+                        const EdgeInsets.fromLTRB(
+                      12,
+                      6,
+                      8,
+                      6,
+                    ),
+                    child: Row(
+                      mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Current Alerts',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: Color(0xFF202020),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () =>
+                              Navigator.pop(context),
+                          icon: const Icon(
+                            Icons.close,
+                            size: 20,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(
+                    height: 1,
+                    color: Color(0xFFE8E8E8),
+                  ),
+
+                  // SCROLLABLE ALERT LIST
+                  Expanded(
+                    child: ListView.builder(
+                      controller: scrollController,
+                      padding:
+                          const EdgeInsets.fromLTRB(
+                        12,
+                        12,
+                        12,
+                        20,
+                      ),
+                      itemCount:
+                          _demoPestDiseases.length,
+                      itemBuilder:
+                          (context, index) {
+                        return Padding(
+                          padding:
+                              const EdgeInsets.only(
+                            bottom: 8,
+                          ),
+                          child:
+                              _demoPestDiseaseCard(
+                            _demoPestDiseases[index],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // ============================================================
   // BUILD
   // ============================================================
 
   @override
   Widget build(BuildContext context) {
-    final nearbyAlerts = _getNearbyAlerts();
-
     return Scaffold(
-      backgroundColor: const Color(0xFFF7FBF9),
+      backgroundColor:
+          const Color(0xFFF5FAF7),
 
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -424,7 +784,8 @@ class _PestAlertPageState extends State<PestAlertPage> {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (_) => const MarketplacePage(),
+                builder: (_) =>
+                    const MarketplacePage(),
               ),
             );
           },
@@ -433,27 +794,25 @@ class _PestAlertPageState extends State<PestAlertPage> {
         title: const Text(
           'Pest Alerts',
           style: TextStyle(
-            color: Color(0xFF287B50),
+            color: Color(0xFF2E8B57),
             fontSize: 14,
             fontWeight: FontWeight.bold,
           ),
         ),
 
-        // Extra feature brought over from the reference project: a live,
-        // interactive hotspot map alongside the existing alert list.
-        // Purely additive — nothing about this page's own layout changes.
         actions: [
           IconButton(
             tooltip: 'Live Pest Map',
             icon: const Icon(
               Icons.map_outlined,
-              color: Color(0xFF278052),
+              color: Color(0xFF2E8B57),
             ),
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const PestMapScreen(),
+                  builder: (_) =>
+                      const PestMapScreen(),
                 ),
               );
             },
@@ -465,11 +824,14 @@ class _PestAlertPageState extends State<PestAlertPage> {
         onRefresh: _getFarmerLocation,
 
         child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
+          physics:
+              const AlwaysScrollableScrollPhysics(),
 
           child: Padding(
             padding:
-                const EdgeInsets.symmetric(horizontal: 8),
+                const EdgeInsets.symmetric(
+              horizontal: 8,
+            ),
 
             child: Column(
               crossAxisAlignment:
@@ -502,8 +864,10 @@ class _PestAlertPageState extends State<PestAlertPage> {
                         'Pest Hotspots Near You',
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF202020),
+                          fontWeight:
+                              FontWeight.bold,
+                          color:
+                              Color(0xFF202020),
                         ),
                       ),
                     ],
@@ -524,6 +888,9 @@ class _PestAlertPageState extends State<PestAlertPage> {
                       color: Colors.white,
                       borderRadius:
                           BorderRadius.circular(7),
+                      border: Border.all(
+                        color: const Color(0xFFDDEBE2),
+                      ),
                     ),
 
                     child: const Row(
@@ -534,6 +901,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
                           child:
                               CircularProgressIndicator(
                             strokeWidth: 2,
+                            color: Color(0xFF2E8B57),
                           ),
                         ),
 
@@ -557,16 +925,20 @@ class _PestAlertPageState extends State<PestAlertPage> {
                         const EdgeInsets.all(10),
 
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFF1F1),
+                      color:
+                          const Color(0xFFFFF4F4),
                       borderRadius:
                           BorderRadius.circular(7),
+                      border: Border.all(
+                        color: const Color(0xFFE9A4A4),
+                      ),
                     ),
 
                     child: Row(
                       children: [
                         const Icon(
                           Icons.location_off,
-                          color: Colors.red,
+                          color: Color(0xFFD83A3A),
                           size: 17,
                         ),
 
@@ -578,7 +950,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
                             style:
                                 const TextStyle(
                               fontSize: 9,
-                              color: Colors.red,
+                              color: Color(0xFFD83A3A),
                             ),
                           ),
                         ),
@@ -590,6 +962,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
                             'Retry',
                             style: TextStyle(
                               fontSize: 9,
+                              color: Color(0xFF2E8B57),
                             ),
                           ),
                         ),
@@ -608,22 +981,27 @@ class _PestAlertPageState extends State<PestAlertPage> {
                     width: double.infinity,
                     margin:
                         const EdgeInsets.only(
-                            bottom: 8),
+                      bottom: 8,
+                    ),
 
                     padding:
                         const EdgeInsets.all(10),
 
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFFFAE8),
+                      color:
+                          const Color(0xFFFFFBEE),
                       borderRadius:
                           BorderRadius.circular(7),
+                      border: Border.all(
+                        color: const Color(0xFFE3BE62),
+                      ),
                     ),
 
                     child: const Row(
                       children: [
                         Icon(
                           Icons.info_outline,
-                          color: Colors.orange,
+                          color: Color(0xFFD99A18),
                           size: 16,
                         ),
 
@@ -635,7 +1013,8 @@ class _PestAlertPageState extends State<PestAlertPage> {
                             'Maharashtra pest alerts are shown on the map.',
                             style: TextStyle(
                               fontSize: 9,
-                              color: Color(0xFF806000),
+                              color:
+                                  Color(0xFF806000),
                             ),
                           ),
                         ),
@@ -656,7 +1035,8 @@ class _PestAlertPageState extends State<PestAlertPage> {
                         BorderRadius.circular(5),
                   ),
 
-                  clipBehavior: Clip.hardEdge,
+                  clipBehavior:
+                      Clip.hardEdge,
 
                   child: FlutterMap(
                     mapController:
@@ -703,6 +1083,9 @@ class _PestAlertPageState extends State<PestAlertPage> {
                     color: Colors.white,
                     borderRadius:
                         BorderRadius.circular(6),
+                    border: Border.all(
+                      color: const Color(0xFFDDEBE2),
+                    ),
                   ),
 
                   child: Row(
@@ -711,58 +1094,87 @@ class _PestAlertPageState extends State<PestAlertPage> {
 
                     children: [
                       _legendItem(
-                        Colors.blue,
+                        const Color(0xFF2563EB),
                         'You',
                       ),
 
                       const SizedBox(width: 15),
 
                       _legendItem(
-                        Colors.red,
+                        const Color(0xFFD83A3A),
                         'High',
                       ),
 
                       const SizedBox(width: 15),
 
                       _legendItem(
-                        Colors.orange,
+                        const Color(0xFFD99A18),
                         'Medium',
                       ),
 
                       const SizedBox(width: 15),
 
                       _legendItem(
-                        Colors.green,
+                        const Color(0xFF2E8B57),
                         'Low',
                       ),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 9),
-
-                // ------------------------------------------------
+                // ==================================================
                 // CURRENT ALERTS
-                // ------------------------------------------------
+                // ==================================================
 
-                const Row(
+                const SizedBox(height: 12),
+
+                Row(
+                  mainAxisAlignment:
+                      MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      '⚠️',
-                      style:
-                          TextStyle(fontSize: 11),
+                    const Row(
+                      children: [
+                        Text(
+                          '⚠️',
+                          style:
+                              TextStyle(fontSize: 12),
+                        ),
+
+                        SizedBox(width: 4),
+
+                        Text(
+                          'Current Alerts',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight:
+                                FontWeight.bold,
+                            color:
+                                Color(0xFF202020),
+                          ),
+                        ),
+                      ],
                     ),
 
-                    SizedBox(width: 3),
-
-                    Text(
-                      'Current Pest Alerts',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight:
-                            FontWeight.bold,
-                        color:
-                            Color(0xFF202020),
+                    TextButton(
+                      onPressed:
+                          _showAllDemoPestDiseases,
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize:
+                            const Size(55, 30),
+                        tapTargetSize:
+                            MaterialTapTargetSize
+                                .shrinkWrap,
+                      ),
+                      child: const Text(
+                        'View All',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight:
+                              FontWeight.w600,
+                          color:
+                              Color(0xFF2E8B57),
+                        ),
                       ),
                     ),
                   ],
@@ -770,64 +1182,23 @@ class _PestAlertPageState extends State<PestAlertPage> {
 
                 const SizedBox(height: 7),
 
-                // ------------------------------------------------
-                // NO ALERTS
-                // ------------------------------------------------
-
-                if (!_loadingLocation &&
-                    nearbyAlerts.isEmpty)
-                  Container(
-                    width: double.infinity,
-                    padding:
-                        const EdgeInsets.all(15),
-
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(7),
-                    ),
-
-                    child: const Column(
-                      children: [
-                        Icon(
-                          Icons.check_circle_outline,
-                          color: Color(0xFF36A269),
-                          size: 25,
-                        ),
-
-                        SizedBox(height: 5),
-
-                        Text(
-                          'No nearby pest alerts',
-                          style: TextStyle(
-                            fontSize: 10,
-                            fontWeight:
-                                FontWeight.w600,
-                          ),
-                        ),
-
-                        SizedBox(height: 2),
-
-                        Text(
-                          'No reported alerts within 150 km.',
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
+                SizedBox(
+                  height: 145,
+                  child: ListView.builder(
+                    scrollDirection:
+                        Axis.horizontal,
+                    physics:
+                        const BouncingScrollPhysics(),
+                    itemCount:
+                        _demoPestDiseases.length,
+                    itemBuilder:
+                        (context, index) {
+                      return _demoPestDiseaseCard(
+                        _demoPestDiseases[index],
+                      );
+                    },
                   ),
-
-                // ------------------------------------------------
-                // ALERT LIST
-                // ------------------------------------------------
-
-                for (final alert in nearbyAlerts) ...[
-                  _pestAlertCard(alert),
-
-                  const SizedBox(height: 7),
-                ],
+                ),
 
                 const SizedBox(height: 15),
               ],
@@ -845,7 +1216,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
               ? null
               : FloatingActionButton.small(
                   backgroundColor:
-                      const Color(0xFF20A963),
+                      const Color(0xFF2563EB),
 
                   onPressed: () {
                     _mapController.move(
