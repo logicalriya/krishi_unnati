@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/farmer_page_header.dart';
 import '../../state/app_locale.dart';
+import 'farmer_dashboard.dart';
 import 'soil_upload_page.dart';
 import 'soil_manual_input_page.dart';
 
@@ -13,11 +14,17 @@ import 'soil_manual_input_page.dart';
 /// mockup: entry cards into Upload / Manual Input, an expandable
 /// expert-advice FAQ, and an "Ask Experts" query box.
 ///
-/// This is the new entry point for farmer_dashboard.dart's "Soil
-/// Health" home-screen card (previously that opened
-/// soil_health_page.dart directly). soil_health_page.dart itself is
-/// left in place, just no longer linked from that one spot — see
-/// INTEGRATION_NOTES.md for why.
+/// This is the main entry point for the Soil Health feature.
+///
+/// Navigation:
+///
+/// Farmer Dashboard
+///       ↓
+/// SoilHealthHubPage
+///       ├── SoilUploadPage
+///       └── SoilManualInputPage
+///
+/// Back arrow → Farmer Dashboard
 class SoilHealthHubPage extends StatefulWidget {
   const SoilHealthHubPage({super.key});
 
@@ -28,6 +35,7 @@ class SoilHealthHubPage extends StatefulWidget {
 class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
   bool accessibilityMode = false;
   bool _faqExpanded = false;
+
   final _askController = TextEditingController();
 
   @override
@@ -44,9 +52,12 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
     // flow) once one is available.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(AppLocale.of(context).t('questionSubmitted')),
+        content: Text(
+          AppLocale.of(context).t('questionSubmitted'),
+        ),
       ),
     );
+
     _askController.clear();
     FocusScope.of(context).unfocus();
   }
@@ -57,21 +68,68 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F8),
-      appBar: const FarmerPageHeader(title: 'Krishi Unnati'),
+
+      // ==========================================================
+      // HEADER
+      // ==========================================================
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+
+        // Back arrow → Farmer Dashboard
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const HomePage(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Color(0xFF1B5E20),
+          ),
+        ),
+
+        title: const Text(
+          'Krishi Unnati',
+          style: TextStyle(
+            color: Color(0xFF1B5E20),
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+
+        iconTheme: const IconThemeData(
+          color: Color(0xFF1B5E20),
+        ),
+      ),
+
+      // ==========================================================
+      // BODY
+      // ==========================================================
       body: SafeArea(
         child: Column(
           children: [
             AccessibilityModeBar(
               value: accessibilityMode,
-              onChanged: (v) => setState(() => accessibilityMode = v),
+              onChanged: (v) {
+                setState(() {
+                  accessibilityMode = v;
+                });
+              },
             ),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // ---- Overview panel ----
+                    // ==================================================
+                    // OVERVIEW PANEL
+                    // ==================================================
                     Container(
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
@@ -100,10 +158,13 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
                               color: Colors.white,
                             ),
                           ),
+
                           const SizedBox(width: 13),
+
                           Expanded(
                             child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment:
+                                  CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   t('checkSoilHealthCard'),
@@ -113,7 +174,9 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
                                     color: Colors.white,
                                   ),
                                 ),
+
                                 const SizedBox(height: 4),
+
                                 Text(
                                   t('soilHealthOverview'),
                                   style: TextStyle(
@@ -131,6 +194,9 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
 
                     const SizedBox(height: 14),
 
+                    // ==================================================
+                    // CHOOSE SOIL METHOD
+                    // ==================================================
                     Text(
                       t('chooseSoilMethod'),
                       style: const TextStyle(
@@ -139,34 +205,45 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
                         color: Color(0xFF20252B),
                       ),
                     ),
+
                     const SizedBox(height: 9),
 
-                    // ---- Upload / Manual Input cards ----
+                    // ==================================================
+                    // UPLOAD / MANUAL INPUT CARDS
+                    // ==================================================
                     Row(
                       children: [
                         Expanded(
                           child: _actionCard(
                             icon: Icons.camera_alt_outlined,
                             label: t('uploadSoilCard'),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const SoilUploadPage(),
-                              ),
-                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const SoilUploadPage(),
+                                ),
+                              );
+                            },
                           ),
                         ),
+
                         const SizedBox(width: 10),
+
                         Expanded(
                           child: _actionCard(
                             icon: Icons.edit_outlined,
                             label: t('manualInputDetails'),
-                            onTap: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const SoilManualInputPage(),
-                              ),
-                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      const SoilManualInputPage(),
+                                ),
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -174,15 +251,22 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
 
                     const SizedBox(height: 18),
 
-                    // ---- Expert Solution ----
+                    // ==================================================
+                    // EXPERT SOLUTION
+                    // ==================================================
                     Row(
                       children: [
-                        const Icon(Icons.menu_book_outlined,
-                            size: 16, color: Color(0xFF20252B)),
+                        const Icon(
+                          Icons.menu_book_outlined,
+                          size: 16,
+                          color: Color(0xFF20252B),
+                        ),
+
                         const SizedBox(width: 6),
+
                         Text(
                           t('expertSolution'),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF20252B),
@@ -197,15 +281,22 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
 
                     const SizedBox(height: 18),
 
-                    // ---- Further Query ----
+                    // ==================================================
+                    // FURTHER QUERY
+                    // ==================================================
                     Row(
                       children: [
-                        const Icon(Icons.forum_outlined,
-                            size: 16, color: Color(0xFF20252B)),
+                        const Icon(
+                          Icons.forum_outlined,
+                          size: 16,
+                          color: Color(0xFF20252B),
+                        ),
+
                         const SizedBox(width: 6),
+
                         Text(
                           t('furtherQuery'),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w700,
                             color: Color(0xFF20252B),
@@ -227,6 +318,10 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
     );
   }
 
+  // ============================================================
+  // ACTION CARD
+  // ============================================================
+
   Widget _actionCard({
     required IconData icon,
     required String label,
@@ -240,13 +335,21 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE1E5EA)),
+          border: Border.all(
+            color: const Color(0xFFE1E5EA),
+          ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 22, color: const Color(0xFF00A94F)),
+            Icon(
+              icon,
+              size: 22,
+              color: const Color(0xFF00A94F),
+            ),
+
             const SizedBox(height: 8),
+
             Text(
               label,
               textAlign: TextAlign.center,
@@ -262,37 +365,59 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
     );
   }
 
+  // ============================================================
+  // FAQ CARD
+  // ============================================================
+
   Widget _buildFaqCard() {
     final t = AppLocale.of(context).t;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 14,
+        vertical: 4,
+      ),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE1E5EA)),
+        border: Border.all(
+          color: const Color(0xFFE1E5EA),
+        ),
       ),
       child: Theme(
-        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+        data: Theme.of(context).copyWith(
+          dividerColor: Colors.transparent,
+        ),
         child: ExpansionTile(
           initiallyExpanded: _faqExpanded,
-          onExpansionChanged: (v) => setState(() => _faqExpanded = v),
+
+          onExpansionChanged: (v) {
+            setState(() {
+              _faqExpanded = v;
+            });
+          },
+
           tilePadding: EdgeInsets.zero,
-          childrenPadding: const EdgeInsets.only(bottom: 12),
+
+          childrenPadding: const EdgeInsets.only(
+            bottom: 12,
+          ),
+
           title: Text(
             t('wheatRustQuestion'),
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 12.5,
               fontWeight: FontWeight.w700,
               color: Color(0xFF20252B),
             ),
           ),
+
           children: [
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
                 t('wheatRustAnswer'),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11.5,
                   height: 1.4,
                   color: Color(0xFF5B6570),
@@ -305,6 +430,10 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
     );
   }
 
+  // ============================================================
+  // ASK EXPERTS BOX
+  // ============================================================
+
   Widget _buildAskExpertsBox() {
     final t = AppLocale.of(context).t;
 
@@ -313,19 +442,26 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
       decoration: BoxDecoration(
         color: const Color(0xFFFEF9E7),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFF3E7B8)),
+        border: Border.all(
+          color: const Color(0xFFF3E7B8),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.chat_bubble_outline,
-                  size: 15, color: Color(0xFF17375E)),
+              const Icon(
+                Icons.chat_bubble_outline,
+                size: 15,
+                color: Color(0xFF17375E),
+              ),
+
               const SizedBox(width: 6),
+
               Text(
                 t('askExperts'),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
                   fontWeight: FontWeight.bold,
                   letterSpacing: .3,
@@ -334,34 +470,48 @@ class _SoilHealthHubPageState extends State<SoilHealthHubPage> {
               ),
             ],
           ),
+
           const SizedBox(height: 10),
+
           Container(
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(24),
-              border: Border.all(color: const Color(0xFFF0DE9E)),
+              border: Border.all(
+                color: const Color(0xFFF0DE9E),
+              ),
             ),
             child: Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _askController,
+
                     onSubmitted: (_) => _askExpert(),
-                    style: const TextStyle(fontSize: 13),
+
+                    style: const TextStyle(
+                      fontSize: 13,
+                    ),
+
                     decoration: InputDecoration(
                       border: InputBorder.none,
+
                       hintText: t('askExpertsPlaceholder'),
+
                       hintStyle: const TextStyle(
                         fontSize: 12.5,
                         color: Color(0xFFB0B6BC),
                       ),
-                      contentPadding: EdgeInsets.symmetric(
+
+                      contentPadding:
+                          const EdgeInsets.symmetric(
                         horizontal: 16,
                         vertical: 12,
                       ),
                     ),
                   ),
                 ),
+
                 IconButton(
                   onPressed: _askExpert,
                   icon: const Icon(

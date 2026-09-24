@@ -59,7 +59,8 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _loadLiveLocation() async {
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      bool serviceEnabled =
+          await Geolocator.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
         if (!mounted) return;
@@ -72,10 +73,12 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      LocationPermission permission = await Geolocator.checkPermission();
+      LocationPermission permission =
+          await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+        permission =
+            await Geolocator.requestPermission();
       }
 
       if (permission == LocationPermission.denied ||
@@ -90,13 +93,15 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
-      final position = await Geolocator.getCurrentPosition(
+      final position =
+          await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
       );
 
-      final List<Placemark> placemarks = await placemarkFromCoordinates(
+      final List<Placemark> placemarks =
+          await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
@@ -104,7 +109,9 @@ class _HomePageState extends State<HomePage> {
       if (!mounted) return;
 
       final Placemark? place =
-          placemarks.isNotEmpty ? placemarks.first : null;
+          placemarks.isNotEmpty
+              ? placemarks.first
+              : null;
 
       final area = [
         place?.subLocality,
@@ -117,14 +124,17 @@ class _HomePageState extends State<HomePage> {
 
       setState(() {
         _liveLocationText =
-            area.isNotEmpty ? area : 'Live location detected';
+            area.isNotEmpty
+                ? area
+                : 'Live location detected';
         _liveLocationLoading = false;
       });
     } catch (_) {
       if (!mounted) return;
 
       setState(() {
-        _liveLocationText = 'Unable to get live location';
+        _liveLocationText =
+            'Unable to get live location';
         _liveLocationLoading = false;
       });
     }
@@ -138,7 +148,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CropHealthPage(),
+        builder: (context) =>
+            const CropHealthPage(),
       ),
     );
   }
@@ -147,7 +158,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const PestAlertPage(),
+        builder: (context) =>
+            const PestAlertPage(),
       ),
     );
   }
@@ -156,7 +168,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const SoilHealthHubPage(),
+        builder: (context) =>
+            const SoilHealthHubPage(),
       ),
     );
   }
@@ -165,7 +178,8 @@ class _HomePageState extends State<HomePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const HelpAssistancePage(),
+        builder: (context) =>
+            const HelpAssistancePage(),
       ),
     );
   }
@@ -173,7 +187,8 @@ class _HomePageState extends State<HomePage> {
   void showComingSoon(String feature) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('$feature will be available soon.'),
+        content:
+            Text('$feature will be available soon.'),
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -213,7 +228,8 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding: const EdgeInsets.only(bottom: 20),
+        padding:
+            const EdgeInsets.only(bottom: 20),
         child: Column(
           children: [
             _buildHeader(),
@@ -229,17 +245,25 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1FBF6),
+      backgroundColor:
+          const Color(0xFFF1FBF6),
+
       body: IndexedStack(
         index: selectedBottomIndex,
         children: [
           _buildHomeTab(),
-          const PestAlertPage(embedded: true),
-          const MarketplacePage(embedded: true),
+          const PestAlertPage(
+            embedded: true,
+          ),
+          const MarketplacePage(
+            embedded: true,
+          ),
           const HelpAssistancePage(),
         ],
       ),
-      bottomNavigationBar: _buildBottomNavigation(),
+
+      bottomNavigationBar:
+          _buildBottomNavigation(),
     );
   }
 
@@ -258,7 +282,8 @@ class _HomePageState extends State<HomePage> {
 
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) => const StartupPage(),
+        builder: (context) =>
+            const StartupPage(),
       ),
       (route) => false,
     );
@@ -267,7 +292,8 @@ class _HomePageState extends State<HomePage> {
   void _openProfile() {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => const FarmerProfilePage(),
+        builder: (_) =>
+            const FarmerProfilePage(),
       ),
     );
   }
@@ -301,6 +327,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+
           IconButton(
             onPressed: _openProfile,
             icon: const Icon(
@@ -322,7 +349,10 @@ class _HomePageState extends State<HomePage> {
   Widget _buildAccessibilityBar() {
     return Container(
       height: 45,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      padding:
+          const EdgeInsets.symmetric(
+        horizontal: 12,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFFF0F1F3),
         border: Border(
@@ -338,7 +368,8 @@ class _HomePageState extends State<HomePage> {
             height: 30,
             decoration: BoxDecoration(
               color: const Color(0xFFE1E5EA),
-              borderRadius: BorderRadius.circular(7),
+              borderRadius:
+                  BorderRadius.circular(7),
             ),
             child: const Icon(
               Icons.hearing,
@@ -346,10 +377,14 @@ class _HomePageState extends State<HomePage> {
               color: Color(0xFF17375E),
             ),
           ),
+
           const SizedBox(width: 8),
+
           const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment:
+                MainAxisAlignment.center,
+            crossAxisAlignment:
+                CrossAxisAlignment.start,
             children: [
               Text(
                 'Accessibility Mode',
@@ -370,13 +405,17 @@ class _HomePageState extends State<HomePage> {
               ),
             ],
           ),
+
           const Spacer(),
+
           const Icon(
             Icons.volume_up_outlined,
             size: 16,
             color: Color(0xFF596069),
           ),
+
           const SizedBox(width: 5),
+
           Switch(
             value: accessibilityMode,
             onChanged: (value) {
@@ -386,7 +425,8 @@ class _HomePageState extends State<HomePage> {
             },
             materialTapTargetSize:
                 MaterialTapTargetSize.shrinkWrap,
-            activeColor: const Color(0xFF0BA951),
+            activeColor:
+                const Color(0xFF0BA951),
           ),
         ],
       ),
@@ -400,14 +440,21 @@ class _HomePageState extends State<HomePage> {
   Widget _buildFarmerHome() {
     final user = AppSession.of(context).user;
 
+    // Use the exact name saved during registration.
     final fullName =
-        (user?['fullName'] ?? 'Farmer').toString();
+        (user?['fullName'] ?? '')
+            .toString()
+            .trim();
 
     final village =
-        (user?['village'] ?? '').toString().trim();
+        (user?['village'] ?? '')
+            .toString()
+            .trim();
 
     final district =
-        (user?['district'] ?? '').toString().trim();
+        (user?['district'] ?? '')
+            .toString()
+            .trim();
 
     final registeredLocation = [
       village,
@@ -416,27 +463,29 @@ class _HomePageState extends State<HomePage> {
         .where((value) => value.isNotEmpty)
         .join(', ');
 
-    final displayLocation = _liveLocationLoading
-        ? (registeredLocation.isNotEmpty
-            ? registeredLocation
-            : 'Maharashtra, India')
-        : (_liveLocationText ==
-                    'Location permission denied' ||
-                _liveLocationText ==
-                    'Location services are off' ||
-                _liveLocationText ==
-                    'Unable to get live location'
+    final displayLocation =
+        _liveLocationLoading
             ? (registeredLocation.isNotEmpty
                 ? registeredLocation
                 : 'Maharashtra, India')
-            : _liveLocationText);
+            : (_liveLocationText ==
+                        'Location permission denied' ||
+                    _liveLocationText ==
+                        'Location services are off' ||
+                    _liveLocationText ==
+                        'Unable to get live location'
+                ? (registeredLocation.isNotEmpty
+                    ? registeredLocation
+                    : 'Maharashtra, India')
+                : _liveLocationText);
 
-    final greetingName = fullName.isEmpty
-        ? 'Farmer'
-        : fullName
-            .split(RegExp(r'\s+'))
-            .take(2)
-            .join(' ');
+    final greetingName =
+        fullName.isEmpty
+            ? 'Farmer'
+            : fullName
+                .split(RegExp(r'\s+'))
+                .take(2)
+                .join(' ');
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -448,7 +497,8 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         children: [
           _buildWeatherInformationCard(
-            displayLocation: displayLocation,
+            displayLocation:
+                displayLocation,
             greetingName: greetingName,
           ),
 
@@ -463,17 +513,21 @@ class _HomePageState extends State<HomePage> {
                   icon: Icons.eco_outlined,
                   iconBackground:
                       const Color(0xFFE0F7E9),
-                  title: 'Find Pest\nor Diseases',
+                  title:
+                      'Find Pest\nor Diseases',
                   onTap: openCropHealth,
                 ),
               ),
+
               const SizedBox(width: 10),
+
               Expanded(
                 child: _dashboardButton(
                   icon: Icons.biotech_outlined,
                   iconBackground:
                       const Color(0xFFE0F7E9),
-                  title: 'Check Your\nSoil Health',
+                  title:
+                      'Check Your\nSoil Health',
                   onTap: openSoilHealth,
                 ),
               ),
@@ -482,22 +536,12 @@ class _HomePageState extends State<HomePage> {
 
           const SizedBox(height: 10),
 
+          // HISTORY CARD ONLY
+          //
+          // "Check Today's Weather" card removed.
+
           Row(
             children: [
-              Expanded(
-                child: _dashboardButton(
-                  icon: Icons.wb_sunny_outlined,
-                  iconBackground:
-                      const Color(0xFFFFF4D8),
-                  title: "Check Today's\nWeather",
-                  onTap: () {
-                    showComingSoon(
-                      "Today's Weather",
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(width: 10),
               Expanded(
                 child: _dashboardButton(
                   icon: Icons.history,
@@ -520,11 +564,7 @@ class _HomePageState extends State<HomePage> {
 
           const SizedBox(height: 16),
 
-          // TODAY'S ALERTS
-
-          _buildTodaysAlerts(),
-
-          const SizedBox(height: 14),
+          // TODAY'S ALERTS SECTION REMOVED
 
           // ASK A QUESTION
 
@@ -554,7 +594,8 @@ class _HomePageState extends State<HomePage> {
       ),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius:
+            BorderRadius.circular(14),
         border: Border.all(
           color: const Color(0xFFDDE9E1),
           width: 1,
@@ -578,13 +619,16 @@ class _HomePageState extends State<HomePage> {
                 size: 16,
                 color: Color(0xFF2E9E5B),
               ),
+
               const SizedBox(width: 3),
+
               Expanded(
                 child: Text(
                   displayLocation,
                   style: const TextStyle(
                     fontSize: 11,
-                    fontWeight: FontWeight.w600,
+                    fontWeight:
+                        FontWeight.w600,
                     color: Color(0xFF2E9E5B),
                   ),
                 ),
@@ -617,17 +661,20 @@ class _HomePageState extends State<HomePage> {
 
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.all(11),
+            padding:
+                const EdgeInsets.all(11),
             decoration: BoxDecoration(
               color: const Color(0xFFF1FBF5),
-              borderRadius: BorderRadius.circular(11),
+              borderRadius:
+                  BorderRadius.circular(11),
             ),
             child: Row(
               children: [
                 Container(
                   width: 42,
                   height: 42,
-                  decoration: const BoxDecoration(
+                  decoration:
+                      const BoxDecoration(
                     color: Color(0xFFDDF5E6),
                     shape: BoxShape.circle,
                   ),
@@ -645,8 +692,10 @@ class _HomePageState extends State<HomePage> {
                     "Today's Weather",
                     style: TextStyle(
                       fontSize: 12,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF2E9E5B),
+                      fontWeight:
+                          FontWeight.w800,
+                      color:
+                          Color(0xFF2E9E5B),
                     ),
                   ),
                 ),
@@ -659,254 +708,24 @@ class _HomePageState extends State<HomePage> {
                       temperature,
                       style: const TextStyle(
                         fontSize: 20,
-                        fontWeight: FontWeight.w800,
-                        color: Color(0xFF172033),
+                        fontWeight:
+                            FontWeight.w800,
+                        color:
+                            Color(0xFF172033),
                       ),
                     ),
+
                     Text(
                       weatherCondition,
                       style: const TextStyle(
                         fontSize: 9,
-                        color: Color(0xFF555D63),
+                        color:
+                            Color(0xFF555D63),
                       ),
                     ),
                   ],
                 ),
               ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ============================================================
-  // TODAY'S ALERTS
-  // ============================================================
-
-  Widget _buildTodaysAlerts() {
-    return Column(
-      crossAxisAlignment:
-          CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            const Text(
-              "Today's Alerts",
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w800,
-                color: Color(0xFF172033),
-              ),
-            ),
-            const Spacer(),
-            GestureDetector(
-              onTap: openAllAlerts,
-              child: const Text(
-                'View All',
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w800,
-                  color: Color(0xFF2E9E5B),
-                ),
-              ),
-            ),
-          ],
-        ),
-
-        const SizedBox(height: 8),
-
-        SizedBox(
-          height: 92,
-          child: ListView(
-            scrollDirection: Axis.horizontal,
-            physics:
-                const BouncingScrollPhysics(),
-            children: [
-              ...pestAlerts.map(
-                (alert) => Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    right: 9,
-                  ),
-                  child: _alertCard(
-                    icon:
-                        Icons.bug_report_outlined,
-                    iconColor:
-                        const Color(0xFFE68A00),
-                    backgroundColor:
-                        const Color(0xFFFFF8E7),
-                    title:
-                        alert['title'] ??
-                            'Pest Alert',
-                    subtitle:
-                        alert['message'] ?? '',
-                    type: 'Pest Alert',
-                  ),
-                ),
-              ),
-
-              ...weatherAlerts.map(
-                (alert) => Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    right: 9,
-                  ),
-                  child: _alertCard(
-                    icon:
-                        Icons.cloud_outlined,
-                    iconColor:
-                        const Color(0xFF2E7D9E),
-                    backgroundColor:
-                        const Color(0xFFEAF7FB),
-                    title:
-                        alert['title'] ??
-                            'Weather Alert',
-                    subtitle:
-                        alert['message'] ?? '',
-                    type: 'Weather Alert',
-                  ),
-                ),
-              ),
-
-              if (pestAlerts.isEmpty &&
-                  weatherAlerts.isEmpty)
-                _emptyAlertCard(),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _alertCard({
-    required IconData icon,
-    required Color iconColor,
-    required Color backgroundColor,
-    required String title,
-    required String subtitle,
-    required String type,
-  }) {
-    return Container(
-      width: 210,
-      height: 88,
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE1E8E3),
-          width: 1,
-        ),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius:
-                  BorderRadius.circular(8),
-            ),
-            child: Icon(
-              icon,
-              size: 18,
-              color: iconColor,
-            ),
-          ),
-
-          const SizedBox(width: 8),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
-              children: [
-                Text(
-                  type,
-                  style: TextStyle(
-                    fontSize: 8,
-                    fontWeight: FontWeight.w700,
-                    color: iconColor,
-                  ),
-                ),
-
-                const SizedBox(height: 2),
-
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow:
-                      TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: Color(0xFF172033),
-                  ),
-                ),
-
-                const SizedBox(height: 3),
-
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow:
-                      TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 8.5,
-                    color: Color(0xFF6C7471),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _emptyAlertCard() {
-    return Container(
-      width: 210,
-      height: 88,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFE1E8E3),
-        ),
-      ),
-      child: const Row(
-        children: [
-          Icon(
-            Icons.notifications_none,
-            color: Color(0xFF2E9E5B),
-            size: 25,
-          ),
-
-          SizedBox(width: 8),
-
-          Expanded(
-            child: Text(
-              'No alerts for today',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: Color(0xFF555D63),
-              ),
             ),
           ),
         ],
@@ -950,7 +769,8 @@ class _HomePageState extends State<HomePage> {
               Container(
                 height: 34,
                 width: 34,
-                decoration: const BoxDecoration(
+                decoration:
+                    const BoxDecoration(
                   color: Color(0xFFE0F7E9),
                   shape: BoxShape.circle,
                 ),
@@ -1000,7 +820,8 @@ class _HomePageState extends State<HomePage> {
                     'ASK EXPERTS',
                     style: TextStyle(
                       fontSize: 11,
-                      fontWeight: FontWeight.w800,
+                      fontWeight:
+                          FontWeight.w800,
                       color: Color(0xFF814B18),
                     ),
                   ),
@@ -1106,7 +927,8 @@ class _HomePageState extends State<HomePage> {
               child: Icon(
                 icon,
                 size: 20,
-                color: const Color(0xFF2E9E5B),
+                color:
+                    const Color(0xFF2E9E5B),
               ),
             ),
 
@@ -1135,7 +957,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBottomNavigation() {
     return KrishiBottomNav(
       selectedIndex: selectedBottomIndex,
-      onDestinationSelected: onBottomNavigation,
+      onDestinationSelected:
+          onBottomNavigation,
     );
   }
 }
@@ -1174,10 +997,12 @@ class AlertsPage extends StatelessWidget {
     return Scaffold(
       backgroundColor:
           const Color(0xFFF1FBF6),
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
+
         title: const Text(
           "Today's Alerts",
           style: TextStyle(
@@ -1186,18 +1011,22 @@ class AlertsPage extends StatelessWidget {
             color: Color(0xFF172033),
           ),
         ),
+
         iconTheme: const IconThemeData(
           color: Color(0xFF172033),
         ),
       ),
+
       body: allAlerts.isEmpty
           ? const Center(
               child: Text(
                 'No alerts available',
                 style: TextStyle(
                   fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF6C7471),
+                  fontWeight:
+                      FontWeight.w600,
+                  color:
+                      Color(0xFF6C7471),
                 ),
               ),
             )
@@ -1238,13 +1067,15 @@ class AlertsPage extends StatelessWidget {
                         color:
                             Color(0x0A000000),
                         blurRadius: 5,
-                        offset: Offset(0, 2),
+                        offset:
+                            Offset(0, 2),
                       ),
                     ],
                   ),
                   child: Row(
                     crossAxisAlignment:
-                        CrossAxisAlignment.start,
+                        CrossAxisAlignment
+                            .start,
                     children: [
                       Container(
                         width: 40,
@@ -1259,7 +1090,8 @@ class AlertsPage extends StatelessWidget {
                                   0xFFEAF7FB,
                                 ),
                           borderRadius:
-                              BorderRadius.circular(
+                              BorderRadius
+                                  .circular(
                             10,
                           ),
                         ),
@@ -1280,7 +1112,9 @@ class AlertsPage extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(width: 11),
+                      const SizedBox(
+                        width: 11,
+                      ),
 
                       Expanded(
                         child: Column(
@@ -1291,7 +1125,8 @@ class AlertsPage extends StatelessWidget {
                             Text(
                               alert['type'] ??
                                   'Alert',
-                              style: TextStyle(
+                              style:
+                                  TextStyle(
                                 fontSize: 9,
                                 fontWeight:
                                     FontWeight
@@ -1307,7 +1142,8 @@ class AlertsPage extends StatelessWidget {
                             ),
 
                             const SizedBox(
-                                height: 3),
+                              height: 3,
+                            ),
 
                             Text(
                               alert['title'] ??
@@ -1325,7 +1161,8 @@ class AlertsPage extends StatelessWidget {
                             ),
 
                             const SizedBox(
-                                height: 4),
+                              height: 4,
+                            ),
 
                             Text(
                               alert['message'] ??
@@ -1342,7 +1179,8 @@ class AlertsPage extends StatelessWidget {
                             if (alert['time'] !=
                                 null) ...[
                               const SizedBox(
-                                  height: 6),
+                                height: 6,
+                              ),
                               Text(
                                 alert['time']!,
                                 style:

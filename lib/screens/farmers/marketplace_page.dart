@@ -273,10 +273,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSearchBar(),
-
-                    const SizedBox(height: 18),
-
                     const Text(
                       'Marketplace',
                       style: TextStyle(
@@ -313,15 +309,21 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
                     const SizedBox(height: 10),
 
-                    _buildToolsCard(),
+                    // TOOLS + FERTILIZERS SIDE BY SIDE
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _buildToolsCard(),
+                        ),
 
-                    const SizedBox(height: 10),
+                        const SizedBox(width: 10),
 
-                    _buildFertilizersCard(),
-
-                    const SizedBox(height: 16),
-
-                    _buildNearbyCard(),
+                        Expanded(
+                          child: _buildFertilizersCard(),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -389,71 +391,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 color: kGreen,
                 size: 22,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ============================================================
-  // SEARCH
-  // ============================================================
-
-  Widget _buildSearchBar() {
-    return Container(
-      height: 50,
-      padding: const EdgeInsets.symmetric(horizontal: 13),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: kSoftGreen,
-          width: 1.2,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.035),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          const Icon(
-            Icons.search,
-            color: kGreen,
-            size: 21,
-          ),
-
-          const SizedBox(width: 8),
-
-          const Expanded(
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search tools, fertilizers...',
-                hintStyle: TextStyle(
-                  fontSize: 13,
-                  color: kTextGrey,
-                ),
-                border: InputBorder.none,
-                isDense: true,
-              ),
-            ),
-          ),
-
-          IconButton(
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(
-              minWidth: 35,
-              minHeight: 35,
-            ),
-            onPressed: () {},
-            icon: const Icon(
-              Icons.mic_none,
-              color: kGreen,
-              size: 21,
             ),
           ),
         ],
@@ -553,11 +490,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
           const SizedBox(height: 14),
 
-          // ======================================================
-          // DYNAMIC RECOMMENDATION LIST
-          // Backend/admin can replace this list dynamically.
-          // ======================================================
-
           SizedBox(
             height: 205,
             child: ListView.builder(
@@ -597,7 +529,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // IMAGE
           SizedBox(
             height: 92,
             width: double.infinity,
@@ -1170,7 +1101,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
           ),
         ],
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: 48,
@@ -1186,73 +1118,73 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ),
           ),
 
-          const SizedBox(width: 12),
+          const SizedBox(height: 10),
 
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: kTextDark,
-                  ),
+          Text(
+            title,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: kTextDark,
+            ),
+          ),
+
+          const SizedBox(height: 4),
+
+          Text(
+            subtitle,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              fontSize: 10.5,
+              height: 1.25,
+              color: kTextGrey,
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          SizedBox(
+            width: double.infinity,
+            height: 35,
+            child: ElevatedButton(
+              onPressed: onTap,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: kGreen,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 6,
                 ),
-
-                const SizedBox(height: 3),
-
-                Text(
-                  subtitle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 11.5,
-                    height: 1.25,
-                    color: kTextGrey,
-                  ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
                 ),
-
-                const SizedBox(height: 9),
-
-                SizedBox(
-                  height: 35,
-                  child: ElevatedButton(
-                    onPressed: onTap,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: kGreen,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
+                    child: Text(
+                      buttonText,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          buttonText,
-                          style: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-
-                        const SizedBox(width: 5),
-
-                        const Icon(
-                          Icons.arrow_forward,
-                          size: 15,
-                        ),
-                      ],
-                    ),
                   ),
-                ),
-              ],
+
+                  const SizedBox(width: 4),
+
+                  const Icon(
+                    Icons.arrow_forward,
+                    size: 14,
+                  ),
+                ],
+              ),
             ),
           ),
         ],

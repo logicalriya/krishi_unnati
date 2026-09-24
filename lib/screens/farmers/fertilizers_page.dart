@@ -1073,25 +1073,7 @@ class FertilizerSellersPage
       ),
       child: Row(
         children: [
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: warning
-                  ? kSoftAmber
-                  : kSoftGreen,
-              borderRadius:
-                  BorderRadius.circular(15),
-            ),
-            child: Icon(
-              product['icon'] ??
-                  Icons.eco_outlined,
-              color: warning
-                  ? kAmber
-                  : kGreen,
-              size: 32,
-            ),
-          ),
+          _buildProductImage(product),
 
           const SizedBox(width: 13),
 
@@ -1144,6 +1126,61 @@ class FertilizerSellersPage
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildProductImage(
+    Map<String, dynamic> product,
+  ) {
+    final image =
+        product['image']?.toString() ?? '';
+
+    if (image.isNotEmpty) {
+      return ClipRRect(
+        borderRadius:
+            BorderRadius.circular(15),
+        child: Image.network(
+          image,
+          width: 70,
+          height: 70,
+          fit: BoxFit.cover,
+          errorBuilder:
+              (_, __, ___) {
+            return _fallbackProductIcon(
+              product,
+            );
+          },
+        ),
+      );
+    }
+
+    return _fallbackProductIcon(product);
+  }
+
+  Widget _fallbackProductIcon(
+    Map<String, dynamic> product,
+  ) {
+    final warning =
+        product['warning'] == true;
+
+    return Container(
+      width: 70,
+      height: 70,
+      decoration: BoxDecoration(
+        color: warning
+            ? kSoftAmber
+            : kSoftGreen,
+        borderRadius:
+            BorderRadius.circular(15),
+      ),
+      child: Icon(
+        product['icon'] ??
+            Icons.eco_outlined,
+        color: warning
+            ? kAmber
+            : kGreen,
+        size: 32,
       ),
     );
   }

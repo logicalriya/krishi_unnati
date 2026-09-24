@@ -21,9 +21,9 @@ class FarmerProfilePage extends StatelessWidget {
     final t = AppLocale.of(context).t;
     final user = AppSession.of(context).user;
 
-    // Name and phone number saved during registration
-    final name = (user?['fullName'] ?? '').toString();
-    final phone = (user?['phone'] ?? '').toString();
+    // Name and phone number saved during registration.
+    final name = (user?['fullName'] ?? '').toString().trim();
+    final phone = (user?['phone'] ?? '').toString().trim();
 
     final village = (user?['village'] ?? '').toString();
     final district = (user?['district'] ?? '').toString();
@@ -57,9 +57,9 @@ class FarmerProfilePage extends StatelessWidget {
                   radius: 29,
                   backgroundColor: Colors.white.withOpacity(0.2),
                   child: Text(
-                    name.trim().isEmpty
+                    name.isEmpty
                         ? 'F'
-                        : name.trim()[0].toUpperCase(),
+                        : name[0].toUpperCase(),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 22,

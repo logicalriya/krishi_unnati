@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
 import '../../widgets/farmer_page_header.dart';
-import 'soil_health_page.dart' show DashedBorderPainter;
+
+import 'soil_health_hub_page.dart';
 
 /// ============================================================
 /// SOIL HEALTH — UPLOAD CARD
@@ -10,8 +11,9 @@ import 'soil_health_page.dart' show DashedBorderPainter;
 ///
 /// Matches the "Upload Your Soil Health Card" screen from the Visily
 /// mockup. Reuses the same file-picking approach and dashed-border
-/// upload box already built in soil_health_page.dart, rather than
-/// re-implementing file picking from scratch.
+/// upload box already built in soil_health_page.dart.
+///
+/// Back button returns to SoilHealthHubPage.
 class SoilUploadPage extends StatefulWidget {
   const SoilUploadPage({super.key});
 
@@ -70,7 +72,37 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _greenSurface,
-      appBar: const FarmerPageHeader(title: 'Krishi Unnati'),
+
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+
+        // Back arrow → Soil Health Hub
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const SoilHealthHubPage(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: _greenDark,
+          ),
+        ),
+
+        title: const Text(
+          'Krishi Unnati',
+          style: TextStyle(
+            color: _greenDark,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -78,6 +110,7 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
               value: accessibilityMode,
               onChanged: (v) => setState(() => accessibilityMode = v),
             ),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(14),
@@ -148,7 +181,7 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: CustomPaint(
-                                painter: DashedBorderPainter(),
+                                
                                 child: Center(
                                   child: Column(
                                     mainAxisAlignment:
@@ -167,7 +200,9 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                           color: _greenDark,
                                         ),
                                       ),
+
                                       const SizedBox(height: 12),
+
                                       Text(
                                         selectedFileName ??
                                             'Drag & drop or select file',
@@ -181,7 +216,9 @@ class _SoilUploadPageState extends State<SoilUploadPage> {
                                         textAlign: TextAlign.center,
                                         overflow: TextOverflow.ellipsis,
                                       ),
+
                                       const SizedBox(height: 4),
+
                                       const Text(
                                         'Supported: JPG, PNG, PDF (Max 5MB)',
                                         style: TextStyle(

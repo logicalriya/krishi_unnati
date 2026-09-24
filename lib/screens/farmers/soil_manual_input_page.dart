@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../widgets/farmer_page_header.dart';
+import 'soil_health_hub_page.dart';
 
 /// ============================================================
 /// SOIL HEALTH — MANUAL INPUT
@@ -9,6 +10,8 @@ import '../../widgets/farmer_page_header.dart';
 /// Matches the "Manual Input Soil Health Details" screen from the
 /// Visily mockup: a plain form of the eight soil parameters, each
 /// with its unit shown as a suffix, and a Submit Analysis button.
+///
+/// Back button returns to SoilHealthHubPage.
 class SoilManualInputPage extends StatefulWidget {
   const SoilManualInputPage({super.key});
 
@@ -66,7 +69,37 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: _greenSurface,
-      appBar: const FarmerPageHeader(title: 'Krishi Unnati'),
+
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+
+        // Back arrow → Soil Health Hub
+        leading: IconButton(
+          onPressed: () {
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (_) => const SoilHealthHubPage(),
+              ),
+            );
+          },
+          icon: const Icon(
+            Icons.arrow_back,
+            color: _greenDark,
+          ),
+        ),
+
+        title: const Text(
+          'Krishi Unnati',
+          style: TextStyle(
+            color: _greenDark,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+
       body: SafeArea(
         child: Column(
           children: [
@@ -74,6 +107,7 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
               value: accessibilityMode,
               onChanged: (v) => setState(() => accessibilityMode = v),
             ),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(14),
@@ -142,42 +176,49 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
                       unit: 'kg/ha',
                       controller: _nitrogenController,
                     ),
+
                     _field(
                       label: 'Phosphorus (P)',
                       hint: 'Enter phosphorus content',
                       unit: 'kg/ha',
                       controller: _phosphorusController,
                     ),
+
                     _field(
                       label: 'Potassium (K)',
                       hint: 'Enter potassium content',
                       unit: 'kg/ha',
                       controller: _potassiumController,
                     ),
+
                     _field(
                       label: 'Organic Carbon',
                       hint: 'Enter organic carbon percentage',
                       unit: '%',
                       controller: _organicCarbonController,
                     ),
+
                     _field(
                       label: 'Soil Moisture',
                       hint: 'Enter moisture percentage',
                       unit: '%',
                       controller: _soilMoistureController,
                     ),
+
                     _field(
                       label: 'pH Level',
                       hint: 'Enter pH value',
                       unit: 'pH',
                       controller: _phLevelController,
                     ),
+
                     _field(
                       label: 'Electrical Conductivity',
                       hint: 'Enter EC value',
                       unit: 'dS/m',
                       controller: _electricalConductivityController,
                     ),
+
                     _field(
                       label: 'Temperature',
                       hint: 'Enter soil temperature',
@@ -226,7 +267,9 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
     bool isLast = false,
   }) {
     return Padding(
-      padding: EdgeInsets.only(bottom: isLast ? 18 : 14),
+      padding: EdgeInsets.only(
+        bottom: isLast ? 18 : 14,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -238,7 +281,9 @@ class _SoilManualInputPageState extends State<SoilManualInputPage> {
               color: _text,
             ),
           ),
+
           const SizedBox(height: 6),
+
           TextField(
             controller: controller,
             keyboardType: const TextInputType.numberWithOptions(
