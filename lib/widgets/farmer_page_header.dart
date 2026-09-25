@@ -57,8 +57,8 @@ class AccessibilityModeBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 45,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: const BoxDecoration(
         color: Color(0xFFF0F1F3),
         border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
@@ -66,38 +66,38 @@ class AccessibilityModeBar extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
               color: const Color(0xFFE1E5EA),
-              borderRadius: BorderRadius.circular(7),
+              borderRadius: BorderRadius.circular(9),
             ),
             child: const Icon(
               Icons.hearing,
-              size: 18,
+              size: 22,
               color: Color(0xFF17375E),
             ),
           ),
 
-          const SizedBox(width: 8),
+          const SizedBox(width: 10),
 
           const Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Accessibility Mode',
+                'READ SCREEN',
                 style: TextStyle(
-                  fontSize: 9.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF26303A),
                 ),
               ),
-              SizedBox(height: 1),
+              SizedBox(height: 2),
               Text(
                 'ASSISTANCE TOOLS',
                 style: TextStyle(
-                  fontSize: 6.5,
+                  fontSize: 10,
                   letterSpacing: .4,
                   color: Color(0xFF6C7075),
                 ),
@@ -109,11 +109,11 @@ class AccessibilityModeBar extends StatelessWidget {
 
           const Icon(
             Icons.volume_up_outlined,
-            size: 16,
+            size: 20,
             color: Color(0xFF596069),
           ),
 
-          const SizedBox(width: 5),
+          const SizedBox(width: 6),
 
           Switch(
             value: value,

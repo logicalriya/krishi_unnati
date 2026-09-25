@@ -132,9 +132,21 @@ class _PestAlertPageState extends State<PestAlertPage> {
         return;
       }
 
+      // Try a cached fix first so the map can center immediately if one
+      // exists, while the fresh fix below is still being acquired.
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null && mounted) {
+        setState(() {
+          _currentCenter = LatLng(lastKnown.latitude, lastKnown.longitude);
+        });
+      }
+
+      // LocationAccuracy.medium resolves noticeably faster than .high with
+      // little practical difference for this use case — this screen only
+      // needs to place you on a regional map, not lane-level precision.
       final Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
-      ).timeout(const Duration(seconds: 6));
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
+      ).timeout(const Duration(seconds: 8));
 
       if (mounted) {
         setState(() {
@@ -225,6 +237,19 @@ class _PestAlertPageState extends State<PestAlertPage> {
     _mapController.move(camera.center, (camera.zoom + delta).clamp(3.0, 18.0));
   }
 
+  // ============================================================
+  // GO TO CURRENT LOCATION
+  // ============================================================
+  void _goToCurrentLocation() {
+    if (_farmerPosition != null) {
+      _mapController.move(_currentCenter, 12.0);
+    } else {
+      // No fix yet (denied/failed/still loading) — try fetching again,
+      // which will also refresh the status bar with a new error if needed.
+      _getFarmerLocation();
+    }
+  }
+
   Widget _mapZoomButton(IconData icon, VoidCallback onPressed) {
     return Container(
       decoration: BoxDecoration(
@@ -236,6 +261,25 @@ class _PestAlertPageState extends State<PestAlertPage> {
         icon: Icon(icon, color: const Color(0xFF2E8B57), size: 20),
         onPressed: onPressed,
         constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+        padding: EdgeInsets.zero,
+      ),
+    );
+  }
+
+  Widget _mapCurrentLocationButton() {
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: const Color(0xFF2563EB),
+        shape: BoxShape.circle,
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.18), blurRadius: 6, offset: const Offset(0, 2))],
+      ),
+      child: IconButton(
+        icon: const Icon(Icons.my_location, color: Colors.white, size: 20),
+        onPressed: _goToCurrentLocation,
+        tooltip: 'Go to current location',
+        constraints: const BoxConstraints(minWidth: 40, minHeight: 40),
         padding: EdgeInsets.zero,
       ),
     );
@@ -725,7 +769,7 @@ class _PestAlertPageState extends State<PestAlertPage> {
                         ),
                       ),
 
-                    // MAP WITH ZOOM CONTROLS
+                    // MAP WITH ZOOM + CURRENT-LOCATION CONTROLS
                     Container(
                       height: 260,
                       width: double.infinity,
@@ -757,6 +801,11 @@ class _PestAlertPageState extends State<PestAlertPage> {
                                 _mapZoomButton(Icons.remove, () => _zoomBy(-1)),
                               ],
                             ),
+                          ),
+                          Positioned(
+                            bottom: 10,
+                            right: 10,
+                            child: _mapCurrentLocationButton(),
                           ),
                         ],
                       ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -83,10 +84,30 @@ class _HomePageState extends State<HomePage> {
         return;
       }
 
+      // Try a cached fix first — this returns instantly if the device has
+      // one, so the UI can show something immediately instead of a blank
+      // spinner while the fresh GPS fix below is still being acquired.
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown != null && mounted) {
+        _loadWeather(lastKnown.latitude, lastKnown.longitude);
+      }
+
+      // LocationAccuracy.high can hang for minutes (or indefinitely) with
+      // poor GPS signal — indoors, emulators, USB-tethered dev devices —
+      // because it holds out for a precise fix. .medium resolves much
+      // faster and is plenty accurate for a farming app. The explicit
+      // .timeout() is the real fix: without it, a stuck native location
+      // call never throws, so the try/catch below never fires and
+      // _loadingLocation stays true forever.
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.high,
+          accuracy: LocationAccuracy.medium,
         ),
+      ).timeout(
+        const Duration(seconds: 15),
+        onTimeout: () {
+          throw TimeoutException('Location request timed out');
+        },
       );
 
       // Fire the weather fetch in parallel — it doesn't need the placemark lookup.
@@ -95,7 +116,7 @@ class _HomePageState extends State<HomePage> {
       final List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
-      );
+      ).timeout(const Duration(seconds: 10));
 
       if (!mounted) return;
 

@@ -133,6 +133,8 @@ class DiseaseResultCard extends StatelessWidget {
             const Divider(height: 1, color: Color(0xFFEFEFEF)),
             const SizedBox(height: 14),
 
+            // Short summary — same as before. Detailed step-by-step
+            // guidance lives in the full report sheet, not here.
             const Text(
               'Preventive Measures:',
               style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
@@ -171,29 +173,173 @@ class DiseaseResultCard extends StatelessWidget {
     );
   }
 
+  // ============================================================
+  // FULL DIAGNOSIS REPORT — detailed, step-by-step version of the
+  // card's summary, shown as a scrollable bottom sheet.
+  // ============================================================
+
   void _showFullReport(BuildContext context, DiseaseInfo info) {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(diseaseName, style: const TextStyle(fontSize: 18)),
-        content: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('AI detection confidence: $probability\n', style: const TextStyle(fontSize: 14)),
-              const Text('Preventive Measures:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              Text(info.preventiveMeasures, style: const TextStyle(fontSize: 14)),
-              const SizedBox(height: 10),
-              const Text('Chemical Treatments:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              Text(info.chemicalTreatments, style: const TextStyle(fontSize: 14)),
-            ],
-          ),
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.75,
+          minChildSize: 0.45,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return SafeArea(
+              child: Column(
+                children: [
+                  // Drag handle
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10, bottom: 4),
+                    child: Container(
+                      width: 40,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD0D0D0),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+
+                  // Header
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 10, 12, 12),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFEFF7EF),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.eco_outlined, size: 24, color: Color(0xFF20A963)),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                diseaseName,
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'AI confidence: $probability',
+                                style: const TextStyle(fontSize: 12.5, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.close, size: 24),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(height: 1, color: Color(0xFFE8E8E8)),
+
+                  // Scrollable detailed content
+                  Expanded(
+                    child: ListView(
+                      controller: scrollController,
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
+                      children: [
+                        _sectionTitle('Preventive Measures', Icons.shield_outlined, const Color(0xFF20A963)),
+                        const SizedBox(height: 10),
+                        ...info.detailedPreventiveMeasures.asMap().entries.map(
+                              (entry) => _numberedStep(entry.key + 1, entry.value, const Color(0xFF20A963)),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        _sectionTitle('Chemical Treatments', Icons.science_outlined, const Color(0xFF2563EB)),
+                        const SizedBox(height: 10),
+                        ...info.detailedChemicalTreatments.asMap().entries.map(
+                              (entry) => _numberedStep(entry.key + 1, entry.value, const Color(0xFF2563EB)),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFFBEE),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: const Color(0xFFE3BE62)),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.info_outline, size: 16, color: Color(0xFF806000)),
+                              SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'This guidance is general — always confirm chemical dosage and safety instructions on the product label or with a local agricultural expert before applying.',
+                                  style: TextStyle(fontSize: 11.5, color: Color(0xFF806000), height: 1.4),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  Widget _sectionTitle(String title, IconData icon, Color color) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: color),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close', style: TextStyle(fontSize: 14)),
+      ],
+    );
+  }
+
+  Widget _numberedStep(int number, String text, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 20,
+            height: 20,
+            margin: const EdgeInsets.only(top: 1),
+            decoration: BoxDecoration(color: color.withOpacity(0.12), shape: BoxShape.circle),
+            alignment: Alignment.center,
+            child: Text(
+              '$number',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: color),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: const TextStyle(fontSize: 13.5, color: Color(0xFF333333), height: 1.4),
+            ),
           ),
         ],
       ),
