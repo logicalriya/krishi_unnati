@@ -32,6 +32,17 @@ class _HomePageState extends State<HomePage> {
   String _liveLocationText = 'Getting your location...';
   bool _liveLocationLoading = true;
 
+
+  bool _weatherInitStarted = false;
+
+
+  bool _locationResolved = false;
+  bool _weatherResolved = false;
+
+
+  int _retryCount = 0;
+  static const int _maxRetries = 1;
+
   // ============================================================
   // LIVE WEATHER DATA (Open-Meteo — no API key required)
   // ============================================================
@@ -40,105 +51,198 @@ class _HomePageState extends State<HomePage> {
   String weatherCondition = 'Loading...';
 
   // ============================================================
-  // INITIALIZATION
+  // LOCATION & WEATHER PIPELINE (NO HARDCODED DEFAULTS)
   // ============================================================
 
   @override
-  void initState() {
-    super.initState();
-    _loadLiveLocation();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+
+    final session = AppSession.of(context);
+    if (!_weatherInitStarted && session.loaded) {
+      _weatherInitStarted = true;
+      _initLocationAndWeather();
+    }
   }
 
-  // ============================================================
-  // LIVE LOCATION + WEATHER
-  // ============================================================
+  Future<void> _initLocationAndWeather() async {
+    final session = AppSession.of(context);
+    final user = session.user;
 
-  Future<void> _loadLiveLocation() async {
+    final village = (user?['village'] ?? '').toString().trim();
+    final district = (user?['district'] ?? '').toString().trim();
+    final registeredLocation =
+    [village, district].where((s) => s.isNotEmpty).join(', ');
+
+    // STEP 1: IMMEDIATELY FETCH WEATHER FOR REGISTERED DISTRICT/VILLAGE
+    if (registeredLocation.isNotEmpty) {
+      await _loadWeatherFromRegisteredAddress(village, district);
+    }
+
+    // STEP 2: TRY CACHED GPS FIX (FAST)
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      final lastKnown = await Geolocator.getLastKnownPosition()
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
+      if (lastKnown != null && mounted) {
+        _loadWeather(lastKnown.latitude, lastKnown.longitude);
+        _fetchPlacemark(lastKnown.latitude, lastKnown.longitude, registeredLocation);
+      }
+    } catch (_) {}
+
+    // STEP 3: LIVE GPS LOOKUP
+    await _requestBackgroundGps(registeredLocation);
+
+    // STEP 4: if, after everything above, we still have nothing resolved
+    // (common on a brand-new install: no cached GPS fix yet, cold GPS
+    // lock takes too long, and the address geocode may have raced with
+    // a slow network on first launch), retry once after a short delay
+    // instead of leaving the user stuck on "Location Unavailable".
+    if (mounted && !_locationResolved && _retryCount < _maxRetries) {
+      _retryCount++;
+      await Future.delayed(const Duration(seconds: 4));
+      if (mounted && !_locationResolved) {
+        await _initLocationAndWeather();
+      }
+    }
+  }
+
+
+  Future<void> _loadWeatherFromRegisteredAddress(String village, String district) async {
+    final locationName = [village, district].where((s) => s.isNotEmpty).join(', ');
+    if (locationName.isEmpty) return;
+
+    if (mounted && !_locationResolved) {
+      setState(() {
+        _liveLocationText = locationName;
+      });
+    }
+
+    // Attempt 1: Native geocoding lookups for the user's registered location
+    final searchQueries = [
+      if (village.isNotEmpty && district.isNotEmpty) '$village, $district, India',
+      if (district.isNotEmpty) '$district, India',
+      if (village.isNotEmpty) '$village, India',
+    ];
+
+    for (final query in searchQueries) {
+      try {
+        final locations = await locationFromAddress(query)
+            .timeout(const Duration(seconds: 4), onTimeout: () => []);
+        if (locations.isNotEmpty) {
+          final loc = locations.first;
+          await _loadWeather(loc.latitude, loc.longitude);
+          return;
+        }
+      } catch (_) {}
+    }
+
+    // Attempt 2: Geocoding API lookup for the registered city/district name
+    final searchName = district.isNotEmpty ? district : village;
+    if (searchName.isNotEmpty) {
+      try {
+        final uri = Uri.parse(
+          'https://geocoding-api.open-meteo.com/v1/search?name=${Uri.encodeComponent(searchName)}&count=1&language=en&format=json',
+        );
+        final res = await http.get(uri).timeout(const Duration(seconds: 4));
+        if (res.statusCode == 200) {
+          final data = jsonDecode(res.body) as Map<String, dynamic>;
+          final results = data['results'] as List?;
+          if (results != null && results.isNotEmpty) {
+            final lat = (results[0]['latitude'] as num).toDouble();
+            final lon = (results[0]['longitude'] as num).toDouble();
+            await _loadWeather(lat, lon);
+          }
+        }
+      } catch (_) {}
+    }
+  }
+
+  Future<void> _requestBackgroundGps(String registeredLocation) async {
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled()
+          .timeout(const Duration(seconds: 3), onTimeout: () => false);
 
       if (!serviceEnabled) {
-        if (!mounted) return;
-        setState(() {
-          _liveLocationText = 'Location services are off';
-          _liveLocationLoading = false;
-          weatherCondition = 'Unavailable';
-        });
+        _resolveLocationFallback(registeredLocation);
         return;
       }
 
-      LocationPermission permission = await Geolocator.checkPermission();
+      LocationPermission permission = await Geolocator.checkPermission()
+          .timeout(const Duration(seconds: 3), onTimeout: () => LocationPermission.denied);
 
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
       }
 
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        if (!mounted) return;
-        setState(() {
-          _liveLocationText = 'Location permission denied';
-          _liveLocationLoading = false;
-          weatherCondition = 'Unavailable';
-        });
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        _resolveLocationFallback(registeredLocation);
         return;
       }
 
-      // Try a cached fix first — this returns instantly if the device has
-      // one, so the UI can show something immediately instead of a blank
-      // spinner while the fresh GPS fix below is still being acquired.
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null && mounted) {
-        _loadWeather(lastKnown.latitude, lastKnown.longitude);
-      }
-
-      // LocationAccuracy.high can hang for minutes (or indefinitely) with
-      // poor GPS signal — indoors, emulators, USB-tethered dev devices —
-      // because it holds out for a precise fix. .medium resolves much
-      // faster and is plenty accurate for a farming app. The explicit
-      // .timeout() is the real fix: without it, a stuck native location
-      // call never throws, so the try/catch below never fires and
-      // _loadingLocation stays true forever.
       final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
-          accuracy: LocationAccuracy.medium,
+          accuracy: LocationAccuracy.low,
         ),
-      ).timeout(
-        const Duration(seconds: 15),
-        onTimeout: () {
-          throw TimeoutException('Location request timed out');
-        },
-      );
+      ).timeout(const Duration(seconds: 20));
 
-      // Fire the weather fetch in parallel — it doesn't need the placemark lookup.
-      _loadWeather(position.latitude, position.longitude);
+      if (mounted) {
+        _loadWeather(position.latitude, position.longitude);
+        await _fetchPlacemark(position.latitude, position.longitude, registeredLocation);
+      }
+    } catch (_) {
+      _resolveLocationFallback(registeredLocation);
+    } finally {
+      if (mounted && _liveLocationLoading) {
+        setState(() {
+          _liveLocationLoading = false;
+        });
+      }
+    }
+  }
 
-      final List<Placemark> placemarks = await placemarkFromCoordinates(
-        position.latitude,
-        position.longitude,
-      ).timeout(const Duration(seconds: 10));
+  void _resolveLocationFallback(String registeredLocation) {
+    if (!mounted) return;
+
+    // If something has already resolved the location (e.g. the registered
+    // address lookup succeeded, or a cached GPS fix came back), a later
+    // GPS timeout/denial should NOT wipe that out. Only fall back to
+    // "Location Unavailable" style text if nothing has loaded yet.
+    if (_locationResolved) return;
+
+    setState(() {
+      _liveLocationText = registeredLocation.isNotEmpty
+          ? registeredLocation
+          : 'Location Unavailable';
+      _liveLocationLoading = false;
+    });
+  }
+
+  Future<void> _fetchPlacemark(double lat, double lon, String registeredLocation) async {
+    try {
+      final placemarks = await placemarkFromCoordinates(lat, lon)
+          .timeout(const Duration(seconds: 4), onTimeout: () => []);
 
       if (!mounted) return;
 
-      final Placemark? place = placemarks.isNotEmpty ? placemarks.first : null;
-
+      final place = placemarks.isNotEmpty ? placemarks.first : null;
       final area = [
         place?.subLocality,
         place?.locality,
         place?.administrativeArea,
-      ].whereType<String>().where((value) => value.isNotEmpty).join(', ');
+      ].whereType<String>().where((v) => v.isNotEmpty).join(', ');
 
       setState(() {
-        _liveLocationText = area.isNotEmpty ? area : 'Live location detected';
+        _liveLocationText = area.isNotEmpty
+            ? area
+            : (registeredLocation.isNotEmpty ? registeredLocation : 'GPS Location');
         _liveLocationLoading = false;
+        _locationResolved = true;
       });
     } catch (_) {
       if (!mounted) return;
-      setState(() {
-        _liveLocationText = 'Unable to get live location';
-        _liveLocationLoading = false;
-        weatherCondition = 'Unavailable';
-      });
+      _resolveLocationFallback(registeredLocation);
     }
   }
 
@@ -149,7 +253,7 @@ class _HomePageState extends State<HomePage> {
             '?latitude=$lat&longitude=$lon&current_weather=true',
       );
 
-      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+      final response = await http.get(uri).timeout(const Duration(seconds: 6));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body) as Map<String, dynamic>;
@@ -162,24 +266,13 @@ class _HomePageState extends State<HomePage> {
           setState(() {
             temperature = '$temp°C';
             weatherCondition = _weatherCodeToText(code);
+            _weatherResolved = true;
+            _locationResolved = true;
+            _liveLocationLoading = false;
           });
-          return;
         }
       }
-
-      if (mounted) {
-        setState(() {
-          temperature = '--°C';
-          weatherCondition = 'Unavailable';
-        });
-      }
-    } catch (_) {
-      if (!mounted) return;
-      setState(() {
-        temperature = '--°C';
-        weatherCondition = 'Unavailable';
-      });
-    }
+    } catch (_) {}
   }
 
   /// Maps Open-Meteo's WMO weather codes to short display text.
@@ -402,9 +495,17 @@ class _HomePageState extends State<HomePage> {
   // ============================================================
 
   Widget _buildFarmerHome() {
-    final user = AppSession.of(context).user;
+    final session = AppSession.of(context);
+    if (!session.loaded) {
+      return const Padding(
+        padding: EdgeInsets.all(32.0),
+        child: Center(child: CircularProgressIndicator()),
+      );
+    }
+    final user = session.user;
 
-    final fullName = (user?['fullName'] ?? '').toString().trim();
+    final rawName = user?['fullName'] ?? user?['name'] ?? user?['phone'] ?? '';
+    final fullName = rawName.toString().trim();
     final village = (user?['village'] ?? '').toString().trim();
     final district = (user?['district'] ?? '').toString().trim();
 
@@ -412,11 +513,9 @@ class _HomePageState extends State<HomePage> {
     [village, district].where((value) => value.isNotEmpty).join(', ');
 
     final displayLocation = _liveLocationLoading
-        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Maharashtra, India')
-        : (_liveLocationText == 'Location permission denied' ||
-        _liveLocationText == 'Location services are off' ||
-        _liveLocationText == 'Unable to get live location'
-        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Maharashtra, India')
+        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Getting your location...')
+        : (_liveLocationText == 'Getting your location...'
+        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Location Unavailable')
         : _liveLocationText);
 
     final greetingName = fullName.isEmpty

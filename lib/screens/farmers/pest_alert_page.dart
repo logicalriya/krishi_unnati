@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -72,7 +73,9 @@ class _PestAlertPageState extends State<PestAlertPage> {
   void initState() {
     super.initState();
     _hotspots = _generateHotspots();
-    _getFarmerLocation();
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) _getFarmerLocation();
+    });
   }
 
   // ============================================================
@@ -101,69 +104,129 @@ class _PestAlertPageState extends State<PestAlertPage> {
   }
 
   // ============================================================
-  // GET FARMER LOCATION
+  // GET FARMER LOCATION (NON-BLOCKING & GUARANTEED TIMEOUT)
   // ============================================================
   Future<void> _getFarmerLocation() async {
+    if (!mounted) return;
     setState(() {
       _loadingLocation = true;
       _locationError = null;
     });
 
     try {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() {
-          _loadingLocation = false;
-          _locationError = 'Location services are turned off.';
-        });
-        return;
+      await _fetchLocationWithGuards().timeout(const Duration(seconds: 26));
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _loadingLocation = false;
+        _locationError = 'GPS response timed out. Displaying regional map.';
+      });
+    }
+  }
+
+  Future<LocationPermission> _waitForPermissionResolution() async {
+    LocationPermission permission = await Geolocator.checkPermission();
+
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always ||
+        permission == LocationPermission.deniedForever) {
+      return permission;
+    }
+
+    for (int i = 0; i < 10; i++) {
+      await Future.delayed(const Duration(milliseconds: 800));
+      if (!mounted) return permission;
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.whileInUse ||
+          permission == LocationPermission.always ||
+          permission == LocationPermission.deniedForever) {
+        return permission;
       }
+    }
 
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
+    // Still "denied" after ~8s of polling: nobody else appears to be
+    // asking (e.g. this page was opened standalone, not via the
+    // dashboard). Fall back to requesting it ourselves so the page still
+    // works on its own.
+    return Geolocator.requestPermission()
+        .timeout(const Duration(seconds: 5), onTimeout: () => LocationPermission.denied);
+  }
+
+  Future<void> _fetchLocationWithGuards() async {
+    // Check service with 2s timeout
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled()
+        .timeout(const Duration(seconds: 2), onTimeout: () => false);
+
+    if (!serviceEnabled) {
+      if (!mounted) return;
+      setState(() {
+        _loadingLocation = false;
+        _locationError = 'Location services are turned off.';
+      });
+      return;
+    }
+
+    LocationPermission permission = await _waitForPermissionResolution();
+
+    if (permission == LocationPermission.denied ||
+        permission == LocationPermission.deniedForever) {
+      if (!mounted) return;
+      setState(() {
+        _loadingLocation = false;
+        _locationError = 'Location permission is denied.';
+      });
+      return;
+    }
+
+    Position? position;
+
+    // Step 1: Try cached position with a strict 2-second Dart timeout
+    try {
+      position = await Geolocator.getLastKnownPosition()
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
+    } catch (_) {
+      position = null;
+    }
+
+    // Step 2: Fall back to live location. Raised from 3s -> 12s: 3s is
+    // frequently too short for a genuine cold GPS fix, which was causing
+    // this to fail and fall through to the "GPS signal weak" message even
+    // once permission was actually granted.
+    if (position == null) {
+      try {
+        position = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.low,
+          ),
+        ).timeout(const Duration(seconds: 12));
+      } catch (_) {
+        position = null;
       }
+    }
 
-      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-        setState(() {
-          _loadingLocation = false;
-          _locationError = 'Location permission is denied.';
-        });
-        return;
-      }
+    if (!mounted) return;
 
-      // Try a cached fix first so the map can center immediately if one
-      // exists, while the fresh fix below is still being acquired.
-      final lastKnown = await Geolocator.getLastKnownPosition();
-      if (lastKnown != null && mounted) {
-        setState(() {
-          _currentCenter = LatLng(lastKnown.latitude, lastKnown.longitude);
-        });
-      }
+    if (position != null) {
+      final double lat = position.latitude;
+      final double lng = position.longitude;
 
-      // LocationAccuracy.medium resolves noticeably faster than .high with
-      // little practical difference for this use case — this screen only
-      // needs to place you on a regional map, not lane-level precision.
-      final Position position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.medium),
-      ).timeout(const Duration(seconds: 8));
+      setState(() {
+        _farmerPosition = position;
+        _currentCenter = LatLng(lat, lng);
+        _hotspots = _generateHotspots();
+        _loadingLocation = false;
+      });
 
-      if (mounted) {
-        setState(() {
-          _farmerPosition = position;
-          _currentCenter = LatLng(position.latitude, position.longitude);
-          _hotspots = _generateHotspots(); // Regenerate accurate to exact location
-          _loadingLocation = false;
-        });
+      // Safely move map if controller is attached
+      try {
         _mapController.move(_currentCenter, 9.0);
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          _loadingLocation = false;
-          _locationError = 'Unable to get your location.';
-        });
-      }
+      } catch (_) {}
+    } else {
+      setState(() {
+        _loadingLocation = false;
+        _locationError = 'GPS signal weak. Displaying regional map.';
+      });
     }
   }
 

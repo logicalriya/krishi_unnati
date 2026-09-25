@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'farmer_create_account_page.dart';
 import 'farmer_dashboard.dart';
 import 'forgot_pin_page.dart';
-import '../../services/local_db.dart';
+import '../../state/app_session.dart';
 import '../../state/app_locale.dart';
 
 /// ============================================================
@@ -83,7 +83,11 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
     });
 
 
-    final String? error = await LocalDb.login(
+    // 1. Get AppSession instance
+    final session = AppSession.of(context);
+
+    // 2. Login through session so AppSession updates memory state & notifies listeners
+    final String? error = await session.login(
       phone: mobile,
       password: pin,
       role: 'farmer',
@@ -100,12 +104,12 @@ class _FarmerLoginPageState extends State<FarmerLoginPage> {
       return;
     }
 
-    Navigator.pushReplacement(
-      context,
+    // 3. Clear auth stack and navigate to HomePage
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
-        builder: (context) =>
-            const HomePage(),
+        builder: (context) => const HomePage(),
       ),
+          (route) => false,
     );
   }
 

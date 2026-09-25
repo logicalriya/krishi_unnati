@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'farmer_login_page.dart';
 import 'farmer_dashboard.dart';
-import '../../services/local_db.dart';
 import '../../state/app_locale.dart';
+import '../../state/app_session.dart';
 
 // ============================================================
 // APP COLORS
@@ -252,41 +251,40 @@ class _FarmerCreateAccountPageState
       return;
     }
 
-    // Actually persist the account (previously this only validated the
-    // form and then showed a success dialog without saving anything, so
-    // the login screen couldn't recognize any account afterwards).
-    final String error = await LocalDb.register(
-          fullName: _nameController.text.trim(),
-          phone: _mobileController.text.trim(),
-          password: pin,
-          role: 'farmer',
-        ) ??
-        '';
+    final session = AppSession.of(context);
+
+    final String? error = await session.register(
+    fullName: _nameController.text.trim(),
+    phone: _mobileController.text.trim(),
+    password: pin,
+    role: 'farmer',
+    );
 
     if (!mounted) return;
 
-    if (error.isNotEmpty) {
-      _showMessage(error);
-      return;
+    if (error != null) {
+    _showMessage(error);
+    return;
     }
 
-    // Auto-login the newly registered farmer and go to the dashboard
-    final String? loginError = await LocalDb.login(
-      phone: _mobileController.text.trim(),
-      password: pin,
-      role: 'farmer',
+    // 2. Login through AppSession to notify listeners & populate session.user
+    final String? loginError = await session.login(
+    phone: _mobileController.text.trim(),
+    password: pin,
+    role: 'farmer',
     );
 
     if (!mounted) return;
 
     if (loginError != null) {
-      _showMessage(loginError);
-      return;
+    _showMessage(loginError);
+    return;
     }
 
+    // 3. Navigate to HomePage with an updated session in memory
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const HomePage()),
-      (route) => false,
+    MaterialPageRoute(builder: (_) => const HomePage()),
+    (route) => false,
     );
   }
 

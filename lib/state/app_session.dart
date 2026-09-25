@@ -13,9 +13,19 @@ class AppSession extends ChangeNotifier {
   bool get loaded => _loaded;
 
   Future<void> load() async {
-    _user = await LocalDb.currentUser();
+    final storedUser = await LocalDb.currentUser();
+    _user = _sanitizeUserData(storedUser);
     _loaded = true;
     notifyListeners();
+  }
+
+  Map<String, dynamic>? _sanitizeUserData(Map<String, dynamic>? rawUser) {
+    if (rawUser == null) return null;
+    final name = (rawUser['fullName'] ?? '').toString().trim();
+    return {
+      ...rawUser,
+      'fullName': name.isNotEmpty ? name : (rawUser['phone'] ?? 'Farmer'),
+    };
   }
 
   Future<String?> register({
