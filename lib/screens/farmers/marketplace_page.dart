@@ -11,10 +11,6 @@ import 'fertilizers_page.dart';
 class MarketplacePage extends StatefulWidget {
   const MarketplacePage({super.key, this.embedded = false});
 
-  /// When true, this page is being shown as a tab inside the persistent
-  /// bottom-nav shell (see farmer_dashboard.dart). In that case the shell
-  /// already provides the bottom nav bar, so this page's own (duplicated)
-  /// bottom nav row is not rendered, avoiding a double nav bar.
   final bool embedded;
 
   @override
@@ -37,6 +33,12 @@ class _MarketplacePageState extends State<MarketplacePage> {
   static const Color kTextGrey = Color(0xFF607D8B);
 
   // ============================================================
+  // READ SCREEN / ACCESSIBILITY TOGGLE
+  // ============================================================
+
+  bool _readScreenEnabled = false;
+
+  // ============================================================
   // LOCATION
   // ============================================================
 
@@ -45,7 +47,6 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
   // ============================================================
   // DEMO RECOMMENDATIONS
-  // Backend/admin can replace this data dynamically later.
   // ============================================================
 
   final List<Map<String, String>> _recommendations = [
@@ -56,7 +57,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
       'distance': '3.2 km',
       'seller': 'Green Farm Supplies',
       'image':
-          'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1589923188900-85dae523342b?auto=format&fit=crop&w=600&q=80',
     },
     {
       'name': 'Battery Powered Sprayer',
@@ -65,7 +66,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
       'distance': '5.8 km',
       'seller': 'Kisan Equipment Store',
       'image':
-          'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1592982537447-7440770cbfc9?auto=format&fit=crop&w=600&q=80',
     },
     {
       'name': 'Organic Neem Fertilizer',
@@ -74,7 +75,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
       'distance': '7.1 km',
       'seller': 'Agro Green Mart',
       'image':
-          'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80',
     },
     {
       'name': 'Hand Cultivator Tool Set',
@@ -83,7 +84,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
       'distance': '8.4 km',
       'seller': 'Farm Tools Hub',
       'image':
-          'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=600&q=80',
     },
     {
       'name': 'Micronutrient Soil Mix',
@@ -92,7 +93,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
       'distance': '10.2 km',
       'seller': 'Krishi Seva Store',
       'image':
-          'https://images.unsplash.com/photo-1598514982901-ae627a7e0a7f?auto=format&fit=crop&w=600&q=80',
+      'https://images.unsplash.com/photo-1598514982901-ae627a7e0a7f?auto=format&fit=crop&w=600&q=80',
     },
   ];
 
@@ -177,7 +178,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
           setState(() {
             _locationText =
-                location.isNotEmpty ? location : 'Location detected';
+            location.isNotEmpty ? location : 'Location detected';
             _locationLoading = false;
           });
         }
@@ -261,14 +262,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
           children: [
             _buildAppBar(),
 
+            _buildReadScreenBar(),
+
             Expanded(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 padding: const EdgeInsets.fromLTRB(
-                  16,
-                  10,
-                  16,
                   18,
+                  14,
+                  18,
+                  22,
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,53 +279,55 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     const Text(
                       'Marketplace',
                       style: TextStyle(
-                        fontSize: 23,
+                        fontSize: 26,
                         fontWeight: FontWeight.w800,
                         color: kTextDark,
                       ),
                     ),
 
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 4),
 
                     Text(
                       'Find farming products and services',
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         color: Colors.grey.shade600,
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 18),
 
                     _buildRecommendationCard(),
 
-                    const SizedBox(height: 18),
+                    const SizedBox(height: 20),
 
                     const Text(
                       'What are you looking for?',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 20,
                         fontWeight: FontWeight.w700,
                         color: kTextDark,
                       ),
                     ),
 
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
 
-                    // TOOLS + FERTILIZERS SIDE BY SIDE
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _buildToolsCard(),
-                        ),
 
-                        const SizedBox(width: 10),
+                    IntrinsicHeight(
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Expanded(
+                            child: _buildToolsCard(),
+                          ),
 
-                        Expanded(
-                          child: _buildFertilizersCard(),
-                        ),
-                      ],
+                          const SizedBox(width: 12),
+
+                          Expanded(
+                            child: _buildFertilizersCard(),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -337,12 +342,68 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 
   // ============================================================
+  // READ SCREEN BAR
+  // ============================================================
+
+  Widget _buildReadScreenBar() {
+    return Container(
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      decoration: const BoxDecoration(
+        color: Color(0xFFF0F1F3),
+        border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: const Color(0xFFE1E5EA),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: const Icon(Icons.hearing, size: 22, color: Color(0xFF17375E)),
+          ),
+          const SizedBox(width: 10),
+          const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'READ SCREEN',
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Color(0xFF26303A)),
+              ),
+              SizedBox(height: 2),
+              Text(
+                'ASSISTANCE TOOLS',
+                style: TextStyle(fontSize: 10, letterSpacing: .4, color: Color(0xFF6C7075)),
+              ),
+            ],
+          ),
+          const Spacer(),
+          const Icon(Icons.volume_up_outlined, size: 20, color: Color(0xFF596069)),
+          const SizedBox(width: 6),
+          Switch(
+            value: _readScreenEnabled,
+            onChanged: (value) {
+              setState(() => _readScreenEnabled = value);
+              // TODO: hook up actual screen-reading (e.g. flutter_tts) here.
+            },
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            activeColor: const Color(0xFF0BA951),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ============================================================
   // APP BAR
   // ============================================================
 
   Widget _buildAppBar() {
     return Container(
-      padding: const EdgeInsets.fromLTRB(6, 6, 12, 8),
+      padding: const EdgeInsets.fromLTRB(10, 10, 16, 12),
       decoration: const BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(
@@ -353,8 +414,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
       child: Row(
         children: [
           Container(
-            width: 38,
-            height: 38,
+            width: 44,
+            height: 44,
             decoration: const BoxDecoration(
               color: kGreen,
               shape: BoxShape.circle,
@@ -362,17 +423,17 @@ class _MarketplacePageState extends State<MarketplacePage> {
             child: const Icon(
               Icons.eco_outlined,
               color: Colors.white,
-              size: 21,
+              size: 24,
             ),
           ),
 
-          const SizedBox(width: 9),
+          const SizedBox(width: 11),
 
           const Expanded(
             child: Text(
               'Krishi Unnati',
               style: TextStyle(
-                fontSize: 18,
+                fontSize: 21,
                 fontWeight: FontWeight.bold,
                 color: kPrimaryGreen,
               ),
@@ -382,14 +443,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
           Container(
             decoration: BoxDecoration(
               color: kSoftGreen,
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(11),
             ),
             child: IconButton(
               onPressed: () {},
               icon: const Icon(
                 Icons.notifications_none,
                 color: kGreen,
-                size: 22,
+                size: 25,
               ),
             ),
           ),
@@ -404,10 +465,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
   Widget _buildRecommendationCard() {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: const Color(0xFFC8E6C9),
         ),
@@ -425,20 +486,20 @@ class _MarketplacePageState extends State<MarketplacePage> {
           Row(
             children: [
               Container(
-                width: 46,
-                height: 46,
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
                   color: kSoftGreen,
-                  borderRadius: BorderRadius.circular(13),
+                  borderRadius: BorderRadius.circular(14),
                 ),
                 child: const Icon(
                   Icons.shopping_bag_outlined,
                   color: kGreen,
-                  size: 25,
+                  size: 28,
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: 13),
 
               const Expanded(
                 child: Column(
@@ -447,7 +508,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     Text(
                       'Recommended Products',
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 17,
                         fontWeight: FontWeight.w700,
                         color: kPrimaryGreen,
                       ),
@@ -458,7 +519,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     Text(
                       'Recommended by Krishi Unnati',
                       style: TextStyle(
-                        fontSize: 11.5,
+                        fontSize: 13,
                         color: kTextGrey,
                       ),
                     ),
@@ -470,8 +531,8 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 onPressed: _showAllRecommendations,
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 5,
-                    vertical: 4,
+                    horizontal: 6,
+                    vertical: 5,
                   ),
                   minimumSize: Size.zero,
                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
@@ -479,7 +540,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 child: const Text(
                   'View All',
                   style: TextStyle(
-                    fontSize: 10.5,
+                    fontSize: 12.5,
                     fontWeight: FontWeight.w600,
                     color: kGreen,
                   ),
@@ -488,10 +549,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 16),
 
           SizedBox(
-            height: 205,
+            height: 220,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               physics: const BouncingScrollPhysics(),
@@ -513,14 +574,14 @@ class _MarketplacePageState extends State<MarketplacePage> {
   // ============================================================
 
   Widget _buildRecommendationItem(
-    Map<String, String> item,
-  ) {
+      Map<String, String> item,
+      ) {
     return Container(
-      width: 245,
-      margin: const EdgeInsets.only(right: 10),
+      width: 260,
+      margin: const EdgeInsets.only(right: 12),
       decoration: BoxDecoration(
         color: const Color(0xFFF9FCF9),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(15),
         border: Border.all(
           color: const Color(0xFFDDEBDD),
         ),
@@ -530,7 +591,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            height: 92,
+            height: 100,
             width: double.infinity,
             child: Image.network(
               item['image'] ?? '',
@@ -542,16 +603,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     child: Icon(
                       Icons.shopping_bag_outlined,
                       color: kGreen,
-                      size: 35,
+                      size: 38,
                     ),
                   ),
                 );
               },
               loadingBuilder: (
-                context,
-                child,
-                loadingProgress,
-              ) {
+                  context,
+                  child,
+                  loadingProgress,
+                  ) {
                 if (loadingProgress == null) {
                   return child;
                 }
@@ -572,10 +633,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(
+                12,
                 10,
-                8,
-                10,
-                7,
+                12,
+                9,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,52 +644,52 @@ class _MarketplacePageState extends State<MarketplacePage> {
                   Text(
                     item['category'] ?? '',
                     style: const TextStyle(
-                      fontSize: 9.5,
+                      fontSize: 11,
                       fontWeight: FontWeight.w600,
                       color: kGreen,
                     ),
                   ),
 
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 3),
 
                   Text(
                     item['name'] ?? 'Product Name',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.w700,
                       color: kTextDark,
                     ),
                   ),
 
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 5),
 
                   Row(
                     children: [
                       Text(
                         item['price'] ?? '₹ --',
                         style: const TextStyle(
-                          fontSize: 12,
+                          fontSize: 14,
                           fontWeight: FontWeight.w700,
                           color: kGreen,
                         ),
                       ),
 
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 9),
 
                       Icon(
                         Icons.location_on_outlined,
-                        size: 12,
+                        size: 14,
                         color: Colors.grey.shade600,
                       ),
 
-                      const SizedBox(width: 2),
+                      const SizedBox(width: 3),
 
                       Text(
                         item['distance'] ?? '-- km',
                         style: TextStyle(
-                          fontSize: 9.5,
+                          fontSize: 11,
                           color: Colors.grey.shade600,
                         ),
                       ),
@@ -645,7 +706,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 9.5,
+                            fontSize: 11,
                             color: kTextGrey,
                           ),
                         ),
@@ -653,7 +714,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
                       const Icon(
                         Icons.arrow_forward_ios,
-                        size: 11,
+                        size: 13,
                         color: kGreen,
                       ),
                     ],
@@ -693,11 +754,11 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(
-                      top: 8,
-                      bottom: 3,
+                      top: 10,
+                      bottom: 4,
                     ),
                     child: Container(
-                      width: 38,
+                      width: 40,
                       height: 4,
                       decoration: BoxDecoration(
                         color: const Color(0xFFD0D0D0),
@@ -708,10 +769,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
-                      14,
-                      6,
+                      16,
                       8,
-                      6,
+                      10,
+                      8,
                     ),
                     child: Row(
                       children: [
@@ -719,7 +780,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                           child: Text(
                             'Recommended Products',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: kTextDark,
                             ),
@@ -732,7 +793,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                           },
                           icon: const Icon(
                             Icons.close,
-                            size: 20,
+                            size: 24,
                           ),
                         ),
                       ],
@@ -748,10 +809,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     child: ListView.builder(
                       controller: scrollController,
                       padding: const EdgeInsets.fromLTRB(
+                        16,
                         14,
-                        12,
-                        14,
-                        20,
+                        16,
+                        24,
                       ),
                       itemCount: _recommendations.length,
                       itemBuilder: (context, index) {
@@ -759,11 +820,11 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
                         return Container(
                           margin: const EdgeInsets.only(
-                            bottom: 10,
+                            bottom: 12,
                           ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFF9FCF9),
-                            borderRadius: BorderRadius.circular(15),
+                            borderRadius: BorderRadius.circular(16),
                             border: Border.all(
                               color: const Color(0xFFDDEBDD),
                             ),
@@ -772,22 +833,22 @@ class _MarketplacePageState extends State<MarketplacePage> {
                           child: Row(
                             children: [
                               SizedBox(
-                                width: 105,
-                                height: 105,
+                                width: 115,
+                                height: 115,
                                 child: Image.network(
                                   item['image'] ?? '',
                                   fit: BoxFit.cover,
                                   errorBuilder: (
-                                    context,
-                                    error,
-                                    stackTrace,
-                                  ) {
+                                      context,
+                                      error,
+                                      stackTrace,
+                                      ) {
                                     return Container(
                                       color: kSoftGreen,
                                       child: const Icon(
                                         Icons.shopping_bag_outlined,
                                         color: kGreen,
-                                        size: 35,
+                                        size: 38,
                                       ),
                                     );
                                   },
@@ -796,38 +857,38 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
                               Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.all(11),
+                                  padding: const EdgeInsets.all(12),
                                   child: Column(
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item['category'] ?? '',
                                         style: const TextStyle(
-                                          fontSize: 9.5,
+                                          fontSize: 11,
                                           fontWeight:
-                                              FontWeight.w600,
+                                          FontWeight.w600,
                                           color: kGreen,
                                         ),
                                       ),
 
-                                      const SizedBox(height: 3),
+                                      const SizedBox(height: 4),
 
                                       Text(
                                         item['name'] ??
                                             'Product Name',
                                         maxLines: 2,
                                         overflow:
-                                            TextOverflow.ellipsis,
+                                        TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          fontSize: 14,
+                                          fontSize: 16,
                                           fontWeight:
-                                              FontWeight.w700,
+                                          FontWeight.w700,
                                           color: kTextDark,
                                         ),
                                       ),
 
-                                      const SizedBox(height: 6),
+                                      const SizedBox(height: 7),
 
                                       Row(
                                         children: [
@@ -835,31 +896,31 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                             item['price'] ??
                                                 '₹ --',
                                             style:
-                                                const TextStyle(
-                                              fontSize: 12,
+                                            const TextStyle(
+                                              fontSize: 14,
                                               fontWeight:
-                                                  FontWeight.w700,
+                                              FontWeight.w700,
                                               color: kGreen,
                                             ),
                                           ),
 
-                                          const SizedBox(width: 8),
+                                          const SizedBox(width: 9),
 
                                           Icon(
                                             Icons
                                                 .location_on_outlined,
-                                            size: 12,
+                                            size: 14,
                                             color: Colors
                                                 .grey.shade600,
                                           ),
 
-                                          const SizedBox(width: 2),
+                                          const SizedBox(width: 3),
 
                                           Text(
                                             item['distance'] ??
                                                 '-- km',
                                             style: TextStyle(
-                                              fontSize: 9.5,
+                                              fontSize: 11,
                                               color: Colors
                                                   .grey.shade600,
                                             ),
@@ -867,15 +928,15 @@ class _MarketplacePageState extends State<MarketplacePage> {
                                         ],
                                       ),
 
-                                      const SizedBox(height: 6),
+                                      const SizedBox(height: 7),
 
                                       Text(
                                         item['seller'] ?? '',
                                         maxLines: 1,
                                         overflow:
-                                            TextOverflow.ellipsis,
+                                        TextOverflow.ellipsis,
                                         style: const TextStyle(
-                                          fontSize: 10,
+                                          fontSize: 12,
                                           color: kTextGrey,
                                         ),
                                       ),
@@ -915,10 +976,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
       builder: (context) {
         return Padding(
           padding: const EdgeInsets.fromLTRB(
-            18,
-            18,
-            18,
-            25,
+            20,
+            20,
+            20,
+            28,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -926,7 +987,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
             children: [
               Center(
                 child: Container(
-                  width: 40,
+                  width: 42,
                   height: 4,
                   decoration: BoxDecoration(
                     color: Colors.grey.shade300,
@@ -935,22 +996,22 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
 
               const Row(
                 children: [
                   Icon(
                     Icons.shopping_bag_outlined,
                     color: kGreen,
-                    size: 25,
+                    size: 28,
                   ),
 
-                  SizedBox(width: 10),
+                  SizedBox(width: 11),
 
                   Text(
                     'Product Details',
                     style: TextStyle(
-                      fontSize: 19,
+                      fontSize: 21,
                       fontWeight: FontWeight.w700,
                       color: kTextDark,
                     ),
@@ -958,64 +1019,64 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 ],
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
 
               const Text(
                 'Product Name',
                 style: TextStyle(
-                  fontSize: 18,
+                  fontSize: 20,
                   fontWeight: FontWeight.w700,
                   color: kTextDark,
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
               const Text(
                 'Price',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 13,
                   color: kTextGrey,
                 ),
               ),
 
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
 
               const Text(
                 '₹ --',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: kGreen,
                 ),
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
 
               const Text(
                 'Distance',
                 style: TextStyle(
-                  fontSize: 11,
+                  fontSize: 13,
                   color: kTextGrey,
                 ),
               ),
 
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
 
               const Text(
                 '-- km',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: 17,
                   fontWeight: FontWeight.w600,
                   color: kTextDark,
                 ),
               ),
 
-              const SizedBox(height: 18),
+              const SizedBox(height: 20),
 
               SizedBox(
                 width: double.infinity,
-                height: 42,
+                height: 48,
                 child: ElevatedButton.icon(
                   onPressed: () {},
                   style: ElevatedButton.styleFrom(
@@ -1023,17 +1084,17 @@ class _MarketplacePageState extends State<MarketplacePage> {
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(11),
+                      borderRadius: BorderRadius.circular(12),
                     ),
                   ),
                   icon: const Icon(
                     Icons.phone_outlined,
-                    size: 18,
+                    size: 20,
                   ),
                   label: const Text(
                     'Contact Seller',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 15,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -1076,6 +1137,12 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
   // ============================================================
   // CATEGORY CARD
+  //
+  // Used inside an IntrinsicHeight + Expanded pair in build(), so
+  // both cards are forced to the same height regardless of subtitle
+  // length. The Spacer below pushes the button to the bottom of
+  // whichever height that ends up being, so both buttons line up
+  // even when one card's text is shorter than the other's.
   // ============================================================
 
   Widget _buildCategoryCard({
@@ -1086,10 +1153,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
     required VoidCallback onTap,
   }) {
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(17),
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: kSoftGreen,
         ),
@@ -1105,50 +1172,54 @@ class _MarketplacePageState extends State<MarketplacePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 48,
-            height: 48,
+            width: 54,
+            height: 54,
             decoration: BoxDecoration(
               color: kSoftGreen,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(15),
             ),
             child: Icon(
               icon,
               color: kGreen,
-              size: 26,
+              size: 29,
             ),
           ),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
 
           Text(
             title,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w700,
               color: kTextDark,
             ),
           ),
 
-          const SizedBox(height: 4),
+          const SizedBox(height: 5),
 
           Text(
             subtitle,
             maxLines: 3,
             overflow: TextOverflow.ellipsis,
             style: const TextStyle(
-              fontSize: 10.5,
-              height: 1.25,
+              fontSize: 12,
+              height: 1.3,
               color: kTextGrey,
             ),
           ),
 
-          const SizedBox(height: 10),
+          // Pushes the button to the bottom of the card so both cards'
+          // buttons align horizontally regardless of subtitle length.
+          const Spacer(),
+
+          const SizedBox(height: 12),
 
           SizedBox(
             width: double.infinity,
-            height: 35,
+            height: 42,
             child: ElevatedButton(
               onPressed: onTap,
               style: ElevatedButton.styleFrom(
@@ -1156,10 +1227,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 6,
+                  horizontal: 8,
                 ),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(11),
                 ),
               ),
               child: Row(
@@ -1171,17 +1242,17 @@ class _MarketplacePageState extends State<MarketplacePage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
-                        fontSize: 10.5,
+                        fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
 
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 5),
 
                   const Icon(
                     Icons.arrow_forward,
-                    size: 14,
+                    size: 16,
                   ),
                 ],
               ),
@@ -1198,10 +1269,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
 
   Widget _buildNearbyCard() {
     return Container(
-      padding: const EdgeInsets.all(13),
+      padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: kSoftGreen,
         ),
@@ -1211,16 +1282,16 @@ class _MarketplacePageState extends State<MarketplacePage> {
           Icon(
             Icons.near_me_outlined,
             color: kGreen,
-            size: 21,
+            size: 23,
           ),
 
-          SizedBox(width: 9),
+          SizedBox(width: 10),
 
           Expanded(
             child: Text(
               'Nearby shops will be shown based on your detected location.',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 13,
                 height: 1.3,
                 color: kTextGrey,
               ),
@@ -1247,7 +1318,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(vertical: 7),
+      padding: const EdgeInsets.symmetric(vertical: 9),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -1277,10 +1348,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
   }
 
   Widget _buildNavItem(
-    int index,
-    IconData icon,
-    String label,
-  ) {
+      int index,
+      IconData icon,
+      String label,
+      ) {
     final bool selected = _currentIndex == index;
 
     return GestureDetector(
@@ -1305,12 +1376,12 @@ class _MarketplacePageState extends State<MarketplacePage> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 4,
+          horizontal: 12,
+          vertical: 5,
         ),
         decoration: BoxDecoration(
           color: selected ? kSoftGreen : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(13),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -1320,10 +1391,10 @@ class _MarketplacePageState extends State<MarketplacePage> {
               color: selected
                   ? kGreen
                   : Colors.grey.shade500,
-              size: 22,
+              size: 24,
             ),
 
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
 
             Text(
               label,
@@ -1331,7 +1402,7 @@ class _MarketplacePageState extends State<MarketplacePage> {
                 color: selected
                     ? kGreen
                     : Colors.grey.shade500,
-                fontSize: 10.5,
+                fontSize: 12,
                 fontWeight: selected
                     ? FontWeight.w600
                     : FontWeight.normal,

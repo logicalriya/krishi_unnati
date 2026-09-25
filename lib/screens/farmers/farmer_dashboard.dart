@@ -1,6 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 
 import '../../widgets/bottom_nav.dart';
 import '../../state/app_locale.dart';
@@ -29,19 +32,11 @@ class _HomePageState extends State<HomePage> {
   bool _liveLocationLoading = true;
 
   // ============================================================
-  // DYNAMIC WEATHER DATA
+  // LIVE WEATHER DATA (Open-Meteo — no API key required)
   // ============================================================
 
   String temperature = '--°C';
   String weatherCondition = 'Loading...';
-
-  // ============================================================
-  // DYNAMIC ALERT DATA
-  // ============================================================
-
-  List<Map<String, String>> pestAlerts = [];
-
-  List<Map<String, String>> weatherAlerts = [];
 
   // ============================================================
   // INITIALIZATION
@@ -54,90 +49,132 @@ class _HomePageState extends State<HomePage> {
   }
 
   // ============================================================
-  // LIVE LOCATION
+  // LIVE LOCATION + WEATHER
   // ============================================================
 
   Future<void> _loadLiveLocation() async {
     try {
-      bool serviceEnabled =
-          await Geolocator.isLocationServiceEnabled();
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
 
       if (!serviceEnabled) {
         if (!mounted) return;
-
         setState(() {
           _liveLocationText = 'Location services are off';
           _liveLocationLoading = false;
+          weatherCondition = 'Unavailable';
         });
-
         return;
       }
 
-      LocationPermission permission =
-          await Geolocator.checkPermission();
+      LocationPermission permission = await Geolocator.checkPermission();
 
       if (permission == LocationPermission.denied) {
-        permission =
-            await Geolocator.requestPermission();
+        permission = await Geolocator.requestPermission();
       }
 
       if (permission == LocationPermission.denied ||
           permission == LocationPermission.deniedForever) {
         if (!mounted) return;
-
         setState(() {
           _liveLocationText = 'Location permission denied';
           _liveLocationLoading = false;
+          weatherCondition = 'Unavailable';
         });
-
         return;
       }
 
-      final position =
-          await Geolocator.getCurrentPosition(
+      final position = await Geolocator.getCurrentPosition(
         locationSettings: const LocationSettings(
           accuracy: LocationAccuracy.high,
         ),
       );
 
-      final List<Placemark> placemarks =
-          await placemarkFromCoordinates(
+      // Fire the weather fetch in parallel — it doesn't need the placemark lookup.
+      _loadWeather(position.latitude, position.longitude);
+
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
         position.latitude,
         position.longitude,
       );
 
       if (!mounted) return;
 
-      final Placemark? place =
-          placemarks.isNotEmpty
-              ? placemarks.first
-              : null;
+      final Placemark? place = placemarks.isNotEmpty ? placemarks.first : null;
 
       final area = [
         place?.subLocality,
         place?.locality,
         place?.administrativeArea,
-      ]
-          .whereType<String>()
-          .where((value) => value.isNotEmpty)
-          .join(', ');
+      ].whereType<String>().where((value) => value.isNotEmpty).join(', ');
 
       setState(() {
-        _liveLocationText =
-            area.isNotEmpty
-                ? area
-                : 'Live location detected';
+        _liveLocationText = area.isNotEmpty ? area : 'Live location detected';
         _liveLocationLoading = false;
       });
     } catch (_) {
       if (!mounted) return;
-
       setState(() {
-        _liveLocationText =
-            'Unable to get live location';
+        _liveLocationText = 'Unable to get live location';
         _liveLocationLoading = false;
+        weatherCondition = 'Unavailable';
       });
     }
+  }
+
+  Future<void> _loadWeather(double lat, double lon) async {
+    try {
+      final uri = Uri.parse(
+        'https://api.open-meteo.com/v1/forecast'
+            '?latitude=$lat&longitude=$lon&current_weather=true',
+      );
+
+      final response = await http.get(uri).timeout(const Duration(seconds: 10));
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body) as Map<String, dynamic>;
+        final current = data['current_weather'] as Map<String, dynamic>?;
+
+        if (current != null && mounted) {
+          final temp = (current['temperature'] as num).round();
+          final code = current['weathercode'] as int;
+
+          setState(() {
+            temperature = '$temp°C';
+            weatherCondition = _weatherCodeToText(code);
+          });
+          return;
+        }
+      }
+
+      if (mounted) {
+        setState(() {
+          temperature = '--°C';
+          weatherCondition = 'Unavailable';
+        });
+      }
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        temperature = '--°C';
+        weatherCondition = 'Unavailable';
+      });
+    }
+  }
+
+  /// Maps Open-Meteo's WMO weather codes to short display text.
+  /// Reference: https://open-meteo.com/en/docs (WMO Weather interpretation codes)
+  String _weatherCodeToText(int code) {
+    if (code == 0) return 'Clear sky';
+    if (code == 1 || code == 2) return 'Partly cloudy';
+    if (code == 3) return 'Overcast';
+    if (code == 45 || code == 48) return 'Foggy';
+    if (code >= 51 && code <= 57) return 'Drizzle';
+    if (code >= 61 && code <= 67) return 'Rain';
+    if (code >= 71 && code <= 77) return 'Snow';
+    if (code >= 80 && code <= 82) return 'Rain showers';
+    if (code >= 85 && code <= 86) return 'Snow showers';
+    if (code >= 95) return 'Thunderstorm';
+    return 'Unknown';
   }
 
   // ============================================================
@@ -147,66 +184,14 @@ class _HomePageState extends State<HomePage> {
   void openCropHealth() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) =>
-            const CropHealthPage(),
-      ),
-    );
-  }
-
-  void openPestAlert() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            const PestAlertPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const CropHealthPage()),
     );
   }
 
   void openSoilHealth() {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) =>
-            const SoilHealthHubPage(),
-      ),
-    );
-  }
-
-  void openHelpAssistance() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            const HelpAssistancePage(),
-      ),
-    );
-  }
-
-  void showComingSoon(String feature) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content:
-            Text('$feature will be available soon.'),
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-  }
-
-  // ============================================================
-  // OPEN ALL ALERTS
-  // ============================================================
-
-  void openAllAlerts() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => AlertsPage(
-          pestAlerts: pestAlerts,
-          weatherAlerts: weatherAlerts,
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => const SoilHealthHubPage()),
     );
   }
 
@@ -228,14 +213,13 @@ class _HomePageState extends State<HomePage> {
     return SafeArea(
       child: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
-        padding:
-            const EdgeInsets.only(bottom: 20),
+        padding: const EdgeInsets.only(bottom: 24),
         child: Column(
           children: [
             _buildHeader(),
             _buildAccessibilityBar(),
             _buildFarmerHome(),
-            const SizedBox(height: 10),
+            const SizedBox(height: 12),
           ],
         ),
       ),
@@ -245,25 +229,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFF1FBF6),
-
+      backgroundColor: const Color(0xFFF1FBF6),
       body: IndexedStack(
         index: selectedBottomIndex,
         children: [
           _buildHomeTab(),
-          const PestAlertPage(
-            embedded: true,
-          ),
-          const MarketplacePage(
-            embedded: true,
-          ),
+          const PestAlertPage(embedded: true),
+          const MarketplacePage(embedded: true),
           const HelpAssistancePage(),
         ],
       ),
-
-      bottomNavigationBar:
-          _buildBottomNavigation(),
+      bottomNavigationBar: _buildBottomNavigation(),
     );
   }
 
@@ -273,7 +249,6 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _logout() async {
     final session = AppSession.of(context);
-
     await session.logout();
 
     if (!mounted) return;
@@ -281,20 +256,14 @@ class _HomePageState extends State<HomePage> {
     Navigator.of(context).pop();
 
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) =>
-            const StartupPage(),
-      ),
-      (route) => false,
+      MaterialPageRoute(builder: (context) => const StartupPage()),
+          (route) => false,
     );
   }
 
   void _openProfile() {
     Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) =>
-            const FarmerProfilePage(),
-      ),
+      MaterialPageRoute(builder: (_) => const FarmerProfilePage()),
     );
   }
 
@@ -303,17 +272,10 @@ class _HomePageState extends State<HomePage> {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 8,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
         color: Colors.white,
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFFD0D3D7),
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
       ),
       child: Row(
         children: [
@@ -321,18 +283,17 @@ class _HomePageState extends State<HomePage> {
             child: Text(
               t('appName'),
               style: const TextStyle(
-                fontSize: 18,
+                fontSize: 22,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF195B37),
               ),
             ),
           ),
-
           IconButton(
             onPressed: _openProfile,
             icon: const Icon(
               Icons.settings_outlined,
-              size: 22,
+              size: 26,
               color: Color(0xFF20252B),
             ),
             tooltip: t('settings'),
@@ -348,74 +309,58 @@ class _HomePageState extends State<HomePage> {
 
   Widget _buildAccessibilityBar() {
     return Container(
-      height: 45,
-      padding:
-          const EdgeInsets.symmetric(
-        horizontal: 12,
-      ),
+      height: 58,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: const BoxDecoration(
         color: Color(0xFFF0F1F3),
-        border: Border(
-          bottom: BorderSide(
-            color: Color(0xFFD0D3D7),
-          ),
-        ),
+        border: Border(bottom: BorderSide(color: Color(0xFFD0D3D7))),
       ),
       child: Row(
         children: [
           Container(
-            width: 30,
-            height: 30,
+            width: 38,
+            height: 38,
             decoration: BoxDecoration(
               color: const Color(0xFFE1E5EA),
-              borderRadius:
-                  BorderRadius.circular(7),
+              borderRadius: BorderRadius.circular(9),
             ),
             child: const Icon(
               Icons.hearing,
-              size: 18,
+              size: 22,
               color: Color(0xFF17375E),
             ),
           ),
-
-          const SizedBox(width: 8),
-
+          const SizedBox(width: 10),
           const Column(
-            mainAxisAlignment:
-                MainAxisAlignment.center,
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Accessibility Mode',
+                'READ SCREEN',
                 style: TextStyle(
-                  fontSize: 9.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.bold,
                   color: Color(0xFF26303A),
                 ),
               ),
-              SizedBox(height: 1),
+              SizedBox(height: 2),
               Text(
                 'ASSISTANCE TOOLS',
                 style: TextStyle(
-                  fontSize: 6.5,
+                  fontSize: 10,
                   letterSpacing: .4,
                   color: Color(0xFF6C7075),
                 ),
               ),
             ],
           ),
-
           const Spacer(),
-
           const Icon(
             Icons.volume_up_outlined,
-            size: 16,
+            size: 20,
             color: Color(0xFF596069),
           ),
-
-          const SizedBox(width: 5),
-
+          const SizedBox(width: 6),
           Switch(
             value: accessibilityMode,
             onChanged: (value) {
@@ -423,10 +368,8 @@ class _HomePageState extends State<HomePage> {
                 accessibilityMode = value;
               });
             },
-            materialTapTargetSize:
-                MaterialTapTargetSize.shrinkWrap,
-            activeColor:
-                const Color(0xFF0BA951),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            activeColor: const Color(0xFF0BA951),
           ),
         ],
       ),
@@ -440,121 +383,71 @@ class _HomePageState extends State<HomePage> {
   Widget _buildFarmerHome() {
     final user = AppSession.of(context).user;
 
-    // Use the exact name saved during registration.
-    final fullName =
-        (user?['fullName'] ?? '')
-            .toString()
-            .trim();
+    final fullName = (user?['fullName'] ?? '').toString().trim();
+    final village = (user?['village'] ?? '').toString().trim();
+    final district = (user?['district'] ?? '').toString().trim();
 
-    final village =
-        (user?['village'] ?? '')
-            .toString()
-            .trim();
+    final registeredLocation =
+    [village, district].where((value) => value.isNotEmpty).join(', ');
 
-    final district =
-        (user?['district'] ?? '')
-            .toString()
-            .trim();
+    final displayLocation = _liveLocationLoading
+        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Maharashtra, India')
+        : (_liveLocationText == 'Location permission denied' ||
+        _liveLocationText == 'Location services are off' ||
+        _liveLocationText == 'Unable to get live location'
+        ? (registeredLocation.isNotEmpty ? registeredLocation : 'Maharashtra, India')
+        : _liveLocationText);
 
-    final registeredLocation = [
-      village,
-      district,
-    ]
-        .where((value) => value.isNotEmpty)
-        .join(', ');
-
-    final displayLocation =
-        _liveLocationLoading
-            ? (registeredLocation.isNotEmpty
-                ? registeredLocation
-                : 'Maharashtra, India')
-            : (_liveLocationText ==
-                        'Location permission denied' ||
-                    _liveLocationText ==
-                        'Location services are off' ||
-                    _liveLocationText ==
-                        'Unable to get live location'
-                ? (registeredLocation.isNotEmpty
-                    ? registeredLocation
-                    : 'Maharashtra, India')
-                : _liveLocationText);
-
-    final greetingName =
-        fullName.isEmpty
-            ? 'Farmer'
-            : fullName
-                .split(RegExp(r'\s+'))
-                .take(2)
-                .join(' ');
+    final greetingName = fullName.isEmpty
+        ? 'Farmer'
+        : fullName.split(RegExp(r'\s+')).take(2).join(' ');
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        12,
-        14,
-        12,
-        0,
-      ),
+      padding: const EdgeInsets.fromLTRB(16, 18, 16, 0),
       child: Column(
         children: [
           _buildWeatherInformationCard(
-            displayLocation:
-                displayLocation,
+            displayLocation: displayLocation,
             greetingName: greetingName,
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 18),
 
           // QUICK ACTION CARDS
-
           Row(
             children: [
               Expanded(
                 child: _dashboardButton(
                   icon: Icons.eco_outlined,
-                  iconBackground:
-                      const Color(0xFFE0F7E9),
-                  title:
-                      'Find Pest\nor Diseases',
+                  iconBackground: const Color(0xFFE0F7E9),
+                  title: 'Find Pest\nor Diseases',
                   onTap: openCropHealth,
                 ),
               ),
-
-              const SizedBox(width: 10),
-
+              const SizedBox(width: 12),
               Expanded(
                 child: _dashboardButton(
                   icon: Icons.biotech_outlined,
-                  iconBackground:
-                      const Color(0xFFE0F7E9),
-                  title:
-                      'Check Your\nSoil Health',
+                  iconBackground: const Color(0xFFE0F7E9),
+                  title: 'Check Your\nSoil Health',
                   onTap: openSoilHealth,
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 10),
-
-          // HISTORY CARD ONLY
-          //
-          // "Check Today's Weather" card removed.
+          const SizedBox(height: 12),
 
           Row(
             children: [
               Expanded(
                 child: _dashboardButton(
                   icon: Icons.history,
-                  iconBackground:
-                      const Color(0xFFE0F7E9),
-                  title:
-                      'Check Your History\n(last 30 days)',
+                  iconBackground: const Color(0xFFE0F7E9),
+                  title: 'Check Your History\n(last 30 days)',
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            const FarmerHistoryPage(),
-                      ),
+                      MaterialPageRoute(builder: (_) => const FarmerHistoryPage()),
                     );
                   },
                 ),
@@ -562,15 +455,11 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          const SizedBox(height: 16),
-
-          // TODAY'S ALERTS SECTION REMOVED
-
-          // ASK A QUESTION
+          const SizedBox(height: 20),
 
           _buildAskQuestion(),
 
-          const SizedBox(height: 10),
+          const SizedBox(height: 12),
         ],
       ),
     );
@@ -586,49 +475,32 @@ class _HomePageState extends State<HomePage> {
   }) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(
-        14,
-        13,
-        14,
-        14,
-      ),
+      padding: const EdgeInsets.fromLTRB(18, 17, 18, 18),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFDDE9E1),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFDDE9E1), width: 1),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x12000000),
-            blurRadius: 8,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Color(0x12000000), blurRadius: 8, offset: Offset(0, 3)),
         ],
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
               const Icon(
                 Icons.location_on_outlined,
-                size: 16,
+                size: 20,
                 color: Color(0xFF2E9E5B),
               ),
-
-              const SizedBox(width: 3),
-
+              const SizedBox(width: 4),
               Expanded(
                 child: Text(
                   displayLocation,
                   style: const TextStyle(
-                    fontSize: 11,
-                    fontWeight:
-                        FontWeight.w600,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: Color(0xFF2E9E5B),
                   ),
                 ),
@@ -636,92 +508,73 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          const SizedBox(height: 5),
+          const SizedBox(height: 8),
 
           Text(
             'Hello, $greetingName!',
             style: const TextStyle(
-              fontSize: 18,
+              fontSize: 24,
               fontWeight: FontWeight.w800,
               color: Color(0xFF172033),
             ),
           ),
 
-          const SizedBox(height: 3),
+          const SizedBox(height: 4),
 
           const Text(
             'Ready to get the best crop?',
-            style: TextStyle(
-              fontSize: 12,
-              color: Color(0xFF555D63),
-            ),
+            style: TextStyle(fontSize: 15, color: Color(0xFF555D63)),
           ),
 
-          const SizedBox(height: 12),
+          const SizedBox(height: 16),
 
           Container(
             width: double.infinity,
-            padding:
-                const EdgeInsets.all(11),
+            padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: const Color(0xFFF1FBF5),
-              borderRadius:
-                  BorderRadius.circular(11),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: Row(
               children: [
                 Container(
-                  width: 42,
-                  height: 42,
-                  decoration:
-                      const BoxDecoration(
+                  width: 52,
+                  height: 52,
+                  decoration: const BoxDecoration(
                     color: Color(0xFFDDF5E6),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.wb_sunny_outlined,
-                    size: 23,
+                    size: 28,
                     color: Color(0xFF2E9E5B),
                   ),
                 ),
-
-                const SizedBox(width: 10),
-
+                const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
                     "Today's Weather",
                     style: TextStyle(
-                      fontSize: 12,
-                      fontWeight:
-                          FontWeight.w800,
-                      color:
-                          Color(0xFF2E9E5B),
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF2E9E5B),
                     ),
                   ),
                 ),
-
                 Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       temperature,
                       style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight:
-                            FontWeight.w800,
-                        color:
-                            Color(0xFF172033),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: Color(0xFF172033),
                       ),
                     ),
-
                     Text(
                       weatherCondition,
-                      style: const TextStyle(
-                        fontSize: 9,
-                        color:
-                            Color(0xFF555D63),
-                      ),
+                      style: const TextStyle(fontSize: 12, color: Color(0xFF555D63)),
                     ),
                   ],
                 ),
@@ -740,26 +593,13 @@ class _HomePageState extends State<HomePage> {
   Widget _buildAskQuestion() {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.fromLTRB(
-        10,
-        10,
-        10,
-        11,
-      ),
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 15),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius:
-            BorderRadius.circular(12),
-        border: Border.all(
-          color: const Color(0xFFDCE5DF),
-          width: 1,
-        ),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: const Color(0xFFDCE5DF), width: 1),
         boxShadow: const [
-          BoxShadow(
-            color: Color(0x0A000000),
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Color(0x0A000000), blurRadius: 5, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -767,26 +607,23 @@ class _HomePageState extends State<HomePage> {
           Row(
             children: [
               Container(
-                height: 34,
-                width: 34,
-                decoration:
-                    const BoxDecoration(
+                height: 44,
+                width: 44,
+                decoration: const BoxDecoration(
                   color: Color(0xFFE0F7E9),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.chat_bubble_outline,
                   color: Color(0xFF2E9E5B),
-                  size: 19,
+                  size: 24,
                 ),
               ),
-
-              const SizedBox(width: 9),
-
+              const SizedBox(width: 12),
               const Text(
                 'Ask a Question',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 17,
                   fontWeight: FontWeight.w800,
                   color: Color(0xFF172033),
                 ),
@@ -794,77 +631,47 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
 
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           Container(
-            padding:
-                const EdgeInsets.fromLTRB(
-              8,
-              8,
-              8,
-              9,
-            ),
+            padding: const EdgeInsets.fromLTRB(11, 11, 11, 12),
             decoration: BoxDecoration(
               color: const Color(0xFFFFFBE8),
-              borderRadius:
-                  BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Padding(
-                  padding:
-                      EdgeInsets.only(left: 2),
+                  padding: EdgeInsets.only(left: 2),
                   child: Text(
                     'ASK EXPERTS',
                     style: TextStyle(
-                      fontSize: 11,
-                      fontWeight:
-                          FontWeight.w800,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w800,
                       color: Color(0xFF814B18),
                     ),
                   ),
                 ),
-
-                const SizedBox(height: 6),
-
+                const SizedBox(height: 8),
                 Container(
-                  height: 36,
+                  height: 46,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(9),
-                    border: Border.all(
-                      color:
-                          const Color(0xFFFFD940),
-                    ),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFFFD940)),
                   ),
                   child: const TextField(
-                    style: TextStyle(
-                      fontSize: 11,
-                    ),
-                    decoration:
-                        InputDecoration(
-                      hintText:
-                          'What you want to know...',
-                      hintStyle: TextStyle(
-                        fontSize: 11,
-                        color:
-                            Color(0xFF7C8187),
-                      ),
-                      border:
-                          InputBorder.none,
-                      contentPadding:
-                          EdgeInsets.symmetric(
-                        horizontal: 9,
-                        vertical: 8,
-                      ),
+                    style: TextStyle(fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'What you want to know...',
+                      hintStyle: TextStyle(fontSize: 14, color: Color(0xFF7C8187)),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                       suffixIcon: Icon(
                         Icons.mic_none,
-                        size: 21,
-                        color:
-                            Color(0xFF444A51),
+                        size: 24,
+                        color: Color(0xFF444A51),
                       ),
                     ),
                   ),
@@ -890,56 +697,36 @@ class _HomePageState extends State<HomePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: 82,
+        height: 96,
         width: double.infinity,
-        padding:
-            const EdgeInsets.symmetric(
-          horizontal: 10,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius:
-              BorderRadius.circular(12),
-          border: Border.all(
-            color: const Color(0xFFDCE5DF),
-            width: 1,
-          ),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: const Color(0xFFDCE5DF), width: 1),
           boxShadow: const [
-            BoxShadow(
-              color: Color(0x0A000000),
-              blurRadius: 5,
-              offset: Offset(0, 2),
-            ),
+            BoxShadow(color: Color(0x0A000000), blurRadius: 5, offset: Offset(0, 2)),
           ],
         ),
         child: Column(
-          mainAxisAlignment:
-              MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
-              height: 35,
-              width: 35,
+              height: 44,
+              width: 44,
               decoration: BoxDecoration(
                 color: iconBackground,
-                borderRadius:
-                    BorderRadius.circular(9),
+                borderRadius: BorderRadius.circular(11),
               ),
-              child: Icon(
-                icon,
-                size: 20,
-                color:
-                    const Color(0xFF2E9E5B),
-              ),
+              child: Icon(icon, size: 24, color: const Color(0xFF2E9E5B)),
             ),
-
-            const SizedBox(height: 6),
-
+            const SizedBox(height: 8),
             Text(
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 10,
-                height: 1.15,
+                fontSize: 13,
+                height: 1.2,
                 fontWeight: FontWeight.w800,
                 color: Color(0xFF172033),
               ),
@@ -957,249 +744,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBottomNavigation() {
     return KrishiBottomNav(
       selectedIndex: selectedBottomIndex,
-      onDestinationSelected:
-          onBottomNavigation,
-    );
-  }
-}
-
-// ==================================================================
-// ALL ALERTS PAGE
-// ==================================================================
-
-class AlertsPage extends StatelessWidget {
-  final List<Map<String, String>> pestAlerts;
-  final List<Map<String, String>> weatherAlerts;
-
-  const AlertsPage({
-    super.key,
-    required this.pestAlerts,
-    required this.weatherAlerts,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final List<Map<String, String>> allAlerts = [
-      ...pestAlerts.map(
-        (alert) => {
-          ...alert,
-          'type': 'Pest Alert',
-        },
-      ),
-      ...weatherAlerts.map(
-        (alert) => {
-          ...alert,
-          'type': 'Weather Alert',
-        },
-      ),
-    ];
-
-    return Scaffold(
-      backgroundColor:
-          const Color(0xFFF1FBF6),
-
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        centerTitle: true,
-
-        title: const Text(
-          "Today's Alerts",
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w800,
-            color: Color(0xFF172033),
-          ),
-        ),
-
-        iconTheme: const IconThemeData(
-          color: Color(0xFF172033),
-        ),
-      ),
-
-      body: allAlerts.isEmpty
-          ? const Center(
-              child: Text(
-                'No alerts available',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight:
-                      FontWeight.w600,
-                  color:
-                      Color(0xFF6C7471),
-                ),
-              ),
-            )
-          : ListView.builder(
-              padding:
-                  const EdgeInsets.all(12),
-              physics:
-                  const BouncingScrollPhysics(),
-              itemCount: allAlerts.length,
-              itemBuilder:
-                  (context, index) {
-                final alert =
-                    allAlerts[index];
-
-                final bool isPest =
-                    alert['type'] ==
-                        'Pest Alert';
-
-                return Container(
-                  margin:
-                      const EdgeInsets.only(
-                    bottom: 10,
-                  ),
-                  padding:
-                      const EdgeInsets.all(13),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(
-                      13,
-                    ),
-                    border: Border.all(
-                      color:
-                          const Color(0xFFDDE8E0),
-                    ),
-                    boxShadow: const [
-                      BoxShadow(
-                        color:
-                            Color(0x0A000000),
-                        blurRadius: 5,
-                        offset:
-                            Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration:
-                            BoxDecoration(
-                          color: isPest
-                              ? const Color(
-                                  0xFFFFF4D8,
-                                )
-                              : const Color(
-                                  0xFFEAF7FB,
-                                ),
-                          borderRadius:
-                              BorderRadius
-                                  .circular(
-                            10,
-                          ),
-                        ),
-                        child: Icon(
-                          isPest
-                              ? Icons
-                                  .bug_report_outlined
-                              : Icons
-                                  .cloud_outlined,
-                          color: isPest
-                              ? const Color(
-                                  0xFFE68A00,
-                                )
-                              : const Color(
-                                  0xFF2E7D9E,
-                                ),
-                          size: 22,
-                        ),
-                      ),
-
-                      const SizedBox(
-                        width: 11,
-                      ),
-
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment
-                                  .start,
-                          children: [
-                            Text(
-                              alert['type'] ??
-                                  'Alert',
-                              style:
-                                  TextStyle(
-                                fontSize: 9,
-                                fontWeight:
-                                    FontWeight
-                                        .w700,
-                                color: isPest
-                                    ? const Color(
-                                        0xFFE68A00,
-                                      )
-                                    : const Color(
-                                        0xFF2E7D9E,
-                                      ),
-                              ),
-                            ),
-
-                            const SizedBox(
-                              height: 3,
-                            ),
-
-                            Text(
-                              alert['title'] ??
-                                  'Alert',
-                              style:
-                                  const TextStyle(
-                                fontSize: 13,
-                                fontWeight:
-                                    FontWeight
-                                        .w800,
-                                color: Color(
-                                  0xFF172033,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(
-                              height: 4,
-                            ),
-
-                            Text(
-                              alert['message'] ??
-                                  '',
-                              style:
-                                  const TextStyle(
-                                fontSize: 10,
-                                color: Color(
-                                  0xFF60686D,
-                                ),
-                              ),
-                            ),
-
-                            if (alert['time'] !=
-                                null) ...[
-                              const SizedBox(
-                                height: 6,
-                              ),
-                              Text(
-                                alert['time']!,
-                                style:
-                                    const TextStyle(
-                                  fontSize: 8,
-                                  color: Color(
-                                    0xFF89908C,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
-            ),
+      onDestinationSelected: onBottomNavigation,
     );
   }
 }
