@@ -13,6 +13,8 @@ dependencies:
 
   image_picker: ^1.2.3
   file_picker: ^10.3.3
+  flutter_litert: ^3.1.2
+  image: ^4.1.7
 
   # Map
   flutter_map: ^8.2.1
@@ -39,5 +41,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
 
 flutter:
-
+  assets:
+    - assets/pest_model/pest_model_float32.tflite
+    - assets/pest_model/labels.txt
   uses-material-design: true

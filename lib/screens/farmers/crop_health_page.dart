@@ -4,6 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../services/disease_classifier_service.dart';
+import '../../widgets/detection_result_widgets.dart';
+
 class CropHealthPage extends StatefulWidget {
   const CropHealthPage({super.key});
 
@@ -13,37 +16,39 @@ class CropHealthPage extends StatefulWidget {
 
 class _CropHealthPageState extends State<CropHealthPage> {
   final ImagePicker picker = ImagePicker();
+  final DiseaseClassifierService classifier = DiseaseClassifierService();
 
   XFile? selectedImage;
-
-  // ============================================================
-  // DYNAMIC ML PREDICTION RESULTS
-  // ============================================================
-  //
-  // The ML model/backend will provide these values dynamically.
-  //
-  // Expected format:
-  //
-  // [
-  //   {
-  //     'diseaseName': 'Cotton Curl Virus',
-  //     'probability': '96.91%',
-  //     'description': 'Tap to see details',
-  //     'highRisk': true,
-  //   },
-  //   {
-  //     'diseaseName': 'Cotton Fusarium Wilt',
-  //     'probability': '0.53%',
-  //     'description': 'Tap to see details',
-  //     'highRisk': false,
-  //   },
-  // ]
-  //
-  // ============================================================
 
   List<Map<String, dynamic>> predictionResults = [];
 
   bool isPredicting = false;
+  bool isModelLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadModel();
+  }
+
+  Future<void> _loadModel() async {
+    try {
+      await classifier.loadModel();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Could not load disease detection model: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => isModelLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    classifier.dispose();
+    super.dispose();
+  }
 
   // ============================================================
   // PICK IMAGE
@@ -63,25 +68,7 @@ class _CropHealthPageState extends State<CropHealthPage> {
           isPredicting = true;
         });
 
-        // ========================================================
-        // SEND SELECTED IMAGE TO ML MODEL
-        // ========================================================
-        //
-        // Backend / ML developer will connect the model here.
-        //
-        // After the model returns its prediction:
-        //
-        // setState(() {
-        //   predictionResults = modelResults;
-        //   isPredicting = false;
-        // });
-        //
-        // The model can return any number of predictions.
-        // Nothing is hardcoded in the UI.
-        //
-        // ========================================================
-
-        // ML MODEL CONNECTION WILL BE ADDED HERE
+        await _runPrediction(image);
       }
     } catch (e) {
       if (!mounted) return;
@@ -93,7 +80,54 @@ class _CropHealthPageState extends State<CropHealthPage> {
           ),
         ),
       );
+      setState(() => isPredicting = false);
     }
+  }
+
+  Future<void> _runPrediction(XFile image) async {
+    if (kIsWeb) {
+      setState(() {
+        isPredicting = false;
+        predictionResults = [];
+      });
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('On-device detection is not available on web.')),
+      );
+      return;
+    }
+
+    try {
+      if (!classifier.isLoaded) {
+        await classifier.loadModel();
+      }
+
+      final predictions = await classifier.predict(File(image.path));
+      final top = predictions.take(2).toList();
+
+      setState(() {
+        predictionResults = top.map((p) {
+          final isHealthy = p.diseaseName.toLowerCase().contains('healthy');
+          return {
+            'diseaseName': _formatLabel(p.diseaseName),
+            'rawLabel': p.diseaseName,
+            'probability': '${(p.probability * 100).toStringAsFixed(2)}%',
+            'highRisk': !isHealthy && p.probability > 0.6,
+          };
+        }).toList();
+        isPredicting = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => isPredicting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Prediction failed: $e')),
+      );
+    }
+  }
+
+  String _formatLabel(String raw) {
+    return raw.replaceAll('___', ' ').replaceAll('__', ' ').replaceAll('_', ' ');
   }
 
   // ============================================================
@@ -101,58 +135,56 @@ class _CropHealthPageState extends State<CropHealthPage> {
   // ============================================================
 
   void showSymptomsDialog() {
-    final TextEditingController controller =
-        TextEditingController();
+    final TextEditingController controller = TextEditingController();
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
-            'Describe Symptoms',
-          ),
-
+          title: const Text('Describe Symptoms', style: TextStyle(fontSize: 18)),
           content: TextField(
             controller: controller,
             maxLines: 4,
+            style: const TextStyle(fontSize: 14),
             decoration: const InputDecoration(
-              hintText:
-                  'Example: Yellow spots on leaves...',
+              hintText: 'Example: Yellow spots on leaves...',
+              hintStyle: TextStyle(fontSize: 14),
               border: OutlineInputBorder(),
             ),
           ),
-
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
               },
-              child: const Text(
-                'Cancel',
-              ),
+              child: const Text('Cancel', style: TextStyle(fontSize: 14)),
             ),
-
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
 
                 if (controller.text.trim().isNotEmpty) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Symptoms submitted.',
-                      ),
-                    ),
+                    const SnackBar(content: Text('Symptoms submitted.')),
                   );
                 }
               },
-              child: const Text(
-                'Submit',
-              ),
+              child: const Text('Submit', style: TextStyle(fontSize: 14)),
             ),
           ],
         );
       },
+    );
+  }
+
+  // ============================================================
+  // ASK EXPERTS QUERY
+  // ============================================================
+
+  void _handleExpertQuery(String query) {
+    // TODO: send `query` to your backend / expert chat feature.
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Query submitted: "$query"')),
     );
   }
 
@@ -163,40 +195,38 @@ class _CropHealthPageState extends State<CropHealthPage> {
   Widget selectedImageWidget() {
     if (selectedImage == null) {
       return Container(
-        width: 70,
-        height: 70,
+        width: 120,
+        height: 120,
         decoration: BoxDecoration(
           color: const Color(0xFFE7F3E8),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(12),
         ),
         child: const Icon(
           Icons.image,
-          size: 30,
+          size: 48,
           color: Colors.grey,
         ),
       );
     }
 
-    // Web image preview
     if (kIsWeb) {
       return ClipRRect(
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(12),
         child: Image.network(
           selectedImage!.path,
-          width: 70,
-          height: 70,
+          width: 120,
+          height: 120,
           fit: BoxFit.cover,
         ),
       );
     }
 
-    // Android / iOS image preview
     return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+      borderRadius: BorderRadius.circular(12),
       child: Image.file(
         File(selectedImage!.path),
-        width: 70,
-        height: 70,
+        width: 120,
+        height: 120,
         fit: BoxFit.cover,
       ),
     );
@@ -211,39 +241,33 @@ class _CropHealthPageState extends State<CropHealthPage> {
     return Scaffold(
       backgroundColor: const Color(0xFFF3FBF7),
 
-      // ========================================================
-      // APP BAR
-      // ========================================================
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-
         title: const Text(
           'Leaf Disease Detection',
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 18,
             fontWeight: FontWeight.bold,
             color: Color(0xFF297A4A),
           ),
         ),
       ),
 
-      // ========================================================
-      // BODY
-      // ========================================================
-
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(
-            10,
-            12,
-            10,
-            20,
-          ),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
           child: Column(
             children: [
+              if (isModelLoading)
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 10),
+                  child: Text(
+                    'Loading detection model...',
+                    style: TextStyle(fontSize: 13, color: Colors.grey),
+                  ),
+                ),
 
               // ==================================================
               // UPLOAD CARD
@@ -251,35 +275,27 @@ class _CropHealthPageState extends State<CropHealthPage> {
 
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.04),
-                      blurRadius: 6,
+                      blurRadius: 8,
                     ),
                   ],
                 ),
-
                 child: Column(
                   children: [
-
-                    // ==========================================
-                    // IMAGE PREVIEW
-                    // ==========================================
-
                     Stack(
                       clipBehavior: Clip.none,
                       children: [
-
                         selectedImageWidget(),
-
                         if (selectedImage != null)
                           Positioned(
-                            right: -6,
-                            top: -6,
+                            right: -8,
+                            top: -8,
                             child: GestureDetector(
                               onTap: () {
                                 setState(() {
@@ -288,20 +304,17 @@ class _CropHealthPageState extends State<CropHealthPage> {
                                   isPredicting = false;
                                 });
                               },
-
                               child: Container(
-                                width: 18,
-                                height: 18,
-                                decoration:
-                                    const BoxDecoration(
+                                width: 26,
+                                height: 26,
+                                decoration: const BoxDecoration(
                                   color: Color(0xFFEF4444),
                                   shape: BoxShape.circle,
                                 ),
-
                                 child: const Icon(
                                   Icons.close,
                                   color: Colors.white,
-                                  size: 11,
+                                  size: 16,
                                 ),
                               ),
                             ),
@@ -309,158 +322,105 @@ class _CropHealthPageState extends State<CropHealthPage> {
                       ],
                     ),
 
-                    const SizedBox(height: 10),
-
-                    // ==========================================
-                    // TITLE
-                    // ==========================================
+                    const SizedBox(height: 16),
 
                     const Text(
                       'Upload Leaf Photo',
                       style: TextStyle(
-                        fontSize: 10,
+                        fontSize: 17,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
 
-                    const SizedBox(height: 3),
+                    const SizedBox(height: 6),
 
                     const Text(
                       'Select a photo from gallery or capture using camera',
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        fontSize: 7,
+                        fontSize: 13,
                         color: Colors.grey,
+                        height: 1.4,
+                      ),
+                    ),
+
+                    const SizedBox(height: 18),
+
+                    // GALLERY BUTTON
+                    SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: isModelLoading
+                            ? null
+                            : () {
+                          pickImage(ImageSource.gallery);
+                        },
+                        icon: const Icon(Icons.upload, size: 20),
+                        label: const Text(
+                          'Choose from Gallery',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF16A34A),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                       ),
                     ),
 
                     const SizedBox(height: 10),
 
-                    // ==========================================
-                    // GALLERY BUTTON
-                    // ==========================================
-
-                    SizedBox(
-                      width: double.infinity,
-                      height: 28,
-
-                      child: ElevatedButton.icon(
-                        onPressed: () {
-                          pickImage(
-                            ImageSource.gallery,
-                          );
-                        },
-
-                        icon: const Icon(
-                          Icons.upload,
-                          size: 13,
-                        ),
-
-                        label: const Text(
-                          'Choose from Gallery',
-                          style: TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFF16A34A),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(6),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 6),
-
-                    // ==========================================
                     // CAMERA BUTTON
-                    // ==========================================
-
                     SizedBox(
                       width: double.infinity,
-                      height: 28,
-
+                      height: 48,
                       child: ElevatedButton.icon(
-                        onPressed: () {
-                          pickImage(
-                            ImageSource.camera,
-                          );
+                        onPressed: isModelLoading
+                            ? null
+                            : () {
+                          pickImage(ImageSource.camera);
                         },
-
-                        icon: const Icon(
-                          Icons.camera_alt_outlined,
-                          size: 13,
-                        ),
-
+                        icon: const Icon(Icons.camera_alt_outlined, size: 20),
                         label: const Text(
                           'Capture with Camera',
-                          style: TextStyle(
-                            fontSize: 8,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                         ),
-
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFF2563EB),
+                          backgroundColor: const Color(0xFF2563EB),
                           foregroundColor: Colors.white,
                           elevation: 0,
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 10),
 
-                    // ==========================================
                     // VOICE SYMPTOMS BUTTON
-                    // ==========================================
-
                     SizedBox(
                       width: double.infinity,
-                      height: 28,
-
+                      height: 48,
                       child: OutlinedButton.icon(
                         onPressed: showSymptomsDialog,
-
                         icon: const Icon(
                           Icons.mic_none,
-                          size: 13,
+                          size: 20,
                           color: Colors.grey,
                         ),
-
                         label: const Text(
                           'Describe Symptoms (Voice)',
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: Color(0xFF555555),
-                          ),
+                          style: TextStyle(fontSize: 14, color: Color(0xFF555555)),
                         ),
-
-                        style:
-                            OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            color: Color(0xFFD9D9D9),
-                          ),
-
-                          shape:
-                              RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(6),
+                        style: OutlinedButton.styleFrom(
+                          side: const BorderSide(color: Color(0xFFD9D9D9)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         ),
                       ),
@@ -469,205 +429,43 @@ class _CropHealthPageState extends State<CropHealthPage> {
                 ),
               ),
 
-              const SizedBox(height: 7),
-
-              // ==================================================
-              // DYNAMIC ML PREDICTION RESULTS
-              // ==================================================
+              const SizedBox(height: 12),
 
               if (isPredicting)
                 const Padding(
-                  padding: EdgeInsets.symmetric(
-                    vertical: 15,
-                  ),
+                  padding: EdgeInsets.symmetric(vertical: 20),
                   child: CircularProgressIndicator(
                     color: Color(0xFF16A34A),
                   ),
                 ),
 
-              if (!isPredicting &&
-                  predictionResults.isNotEmpty)
+              // ==================================================
+              // DETECTION RESULTS + FAQ + ASK EXPERTS
+              // ==================================================
+
+              if (!isPredicting && predictionResults.isNotEmpty) ...[
+                DetectionResultsHeader(matchCount: predictionResults.length),
+                const SizedBox(height: 10),
                 ...predictionResults.map(
-                  (result) => Padding(
-                    padding: const EdgeInsets.only(
-                      bottom: 7,
-                    ),
+                      (result) => Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
                     child: DiseaseResultCard(
-                      diseaseName:
-                          result['diseaseName'] ??
-                              'Unknown Disease',
-
-                      probability:
-                          result['probability'] ??
-                              '--',
-
-                      description:
-                          result['description'] ??
-                              'Tap to see details',
-
-                      highRisk:
-                          result['highRisk'] ??
-                              false,
+                      diseaseName: result['diseaseName'] ?? 'Unknown Disease',
+                      rawLabel: result['rawLabel'] ?? '',
+                      probability: result['probability'] ?? '--',
+                      highRisk: result['highRisk'] ?? false,
                     ),
                   ),
                 ),
+                FaqButton(
+                  onTap: () {
+                    // TODO: navigate to your FAQ page/screen
+                  },
+                ),
+                AskExpertsSection(onSubmit: _handleExpertQuery),
+              ],
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-// ============================================================
-// DISEASE RESULT CARD
-// ============================================================
-
-class DiseaseResultCard extends StatelessWidget {
-  final String diseaseName;
-  final String probability;
-  final String description;
-  final bool highRisk;
-
-  const DiseaseResultCard({
-    super.key,
-    required this.diseaseName,
-    required this.probability,
-    required this.description,
-    required this.highRisk,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        showDialog(
-          context: context,
-
-          builder: (context) {
-            return AlertDialog(
-              title: Text(
-                diseaseName,
-              ),
-
-              content: Text(
-                'AI detection confidence: '
-                '$probability\n\n'
-                'More detailed information about '
-                'this disease will be displayed here later.',
-              ),
-
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-
-                  child: const Text(
-                    'Close',
-                  ),
-                ),
-              ],
-            );
-          },
-        );
-      },
-
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 10,
-        ),
-
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(10),
-
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 6,
-            ),
-          ],
-        ),
-
-        child: Row(
-          children: [
-
-            // ================================================
-            // LEAF ICON
-            // ================================================
-
-            const Icon(
-              Icons.eco_outlined,
-              size: 17,
-              color: Color(0xFF20A963),
-            ),
-
-            const SizedBox(width: 6),
-
-            // ================================================
-            // DISEASE INFORMATION
-            // ================================================
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-
-                children: [
-                  Text(
-                    diseaseName,
-                    style: const TextStyle(
-                      fontSize: 9,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 2),
-
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      fontSize: 7,
-                      color: Colors.grey,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ================================================
-            // PROBABILITY
-            // ================================================
-
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 7,
-                vertical: 4,
-              ),
-
-              decoration: BoxDecoration(
-                color: highRisk
-                    ? const Color(0xFFE8F8EF)
-                    : const Color(0xFFE8F8EF),
-
-                borderRadius:
-                    BorderRadius.circular(10),
-              ),
-
-              child: Text(
-                'Possibility: $probability',
-
-                style: const TextStyle(
-                  fontSize: 6.5,
-                  color: Color(0xFF18894F),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
         ),
       ),
     );

@@ -1,0 +1,17 @@
+Corn___Common_Rust
+Corn___Gray_Leaf_Spot
+Corn___Healthy
+Corn___Northern_Leaf_Blight
+Cotton__Bacterial_Blight
+Cotton__Curl_Virus
+Cotton__Fussarium_Wilt
+Cotton__Healthy
+Rice__Bacterial_Leaf_Blight
+Rice__Brown_Spot
+Rice__Healthy
+Rice__Leaf_Blast
+Rice__Leaf_Scald
+Rice__Sheath_Blight
+Wheat___Brown_Rust
+Wheat___Healthy
+Wheat___Yellow_Rust
